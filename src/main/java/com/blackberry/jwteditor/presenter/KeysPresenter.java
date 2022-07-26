@@ -52,13 +52,18 @@ public class KeysPresenter extends Presenter {
 
     /**
      * Create a new KeysPresenter
-     * @param view the KeysView to associate with the presenter
-     * @param presenters the shared list of all presenters
-     * @param callbacks Burp Suite callbacks (or null if standalone mode)
-     * @param keysModel KeysModel to use (or null to create a new one)
-     * @param rstaFactory Factory to create RSyntaxTextArea
+     *
+     * @param view                   the KeysView to associate with the presenter
+     * @param presenters             the shared list of all presenters
+     * @param callbacks              Burp Suite callbacks (or null if standalone mode)
+     * @param keysModel              KeysModel to use (or null to create a new one)
+     * @param rstaFactory            Factory to create RSyntaxTextArea
      */
-    public KeysPresenter(KeysView view, PresenterStore presenters, IBurpExtenderCallbacks callbacks, KeysModel keysModel, RstaFactory rstaFactory) {
+    public KeysPresenter(KeysView view,
+                         PresenterStore presenters,
+                         IBurpExtenderCallbacks callbacks,
+                         KeysModel keysModel,
+                         RstaFactory rstaFactory) {
         this.view = view;
         this.callbacks = callbacks;
         this.rstaFactory = rstaFactory;
@@ -108,7 +113,7 @@ public class KeysPresenter extends Presenter {
 
         // Show the dialog
         d.pack();
-        d.setLocationRelativeTo(SwingUtilities.getWindowAncestor(view.getUiComponent()));
+        d.setLocationRelativeTo(SwingUtilities.getWindowAncestor(view.getParent()));
         d.setVisible(true);
         // Block here until dialog completes
 
@@ -162,7 +167,7 @@ public class KeysPresenter extends Presenter {
     public void onButtonNewClicked(KeyDialog d) {
         // Display the dialog
         d.pack();
-        d.setLocationRelativeTo(SwingUtilities.getWindowAncestor(view.getUiComponent()));
+        d.setLocationRelativeTo(SwingUtilities.getWindowAncestor(view.getParent()));
         d.setVisible(true);
         // Block here until the dialog returns
 
