@@ -18,14 +18,13 @@ limitations under the License.
 
 package com.blackberry.jwteditor.presenter;
 
-import com.blackberry.jwteditor.operations.Attacks;
-import com.blackberry.jwteditor.operations.Operations;
-import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.model.jose.JOSEObject;
 import com.blackberry.jwteditor.model.jose.JOSEObjectPair;
 import com.blackberry.jwteditor.model.jose.JWE;
 import com.blackberry.jwteditor.model.jose.JWS;
 import com.blackberry.jwteditor.model.keys.Key;
+import com.blackberry.jwteditor.operations.Operations;
+import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.view.EditorView;
 import com.blackberry.jwteditor.view.dialog.operations.EncryptDialog;
 import com.blackberry.jwteditor.view.dialog.operations.KeyConfusionAttackDialog;

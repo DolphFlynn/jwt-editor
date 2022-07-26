@@ -11,8 +11,8 @@ import com.blackberry.jwteditor.view.BurpView;
 import com.blackberry.jwteditor.view.EditorView;
 import com.blackberry.jwteditor.view.RstaFactory;
 import com.blackberry.jwteditor.view.RstaFactory.BurpThemeAwareRstaFactory;
+import com.blackberry.jwteditor.view.utils.WindowUtils;
 
-import javax.swing.*;
 import java.awt.*;
 import java.text.ParseException;
 
@@ -21,10 +21,11 @@ import java.text.ParseException;
  */
 @SuppressWarnings("unused")
 public class BurpExtender implements IBurpExtender, IMessageEditorTabFactory, IProxyListener {
+    private static final String BURP_SUITE_FRAME_NAME = "suiteFrame";
 
     private IExtensionHelpers extensionHelpers;
     private PresenterStore presenters;
-    private JFrame burp_frame;
+    private Window suiteWindow;
     private RstaFactory rstaFactory;
     private ProxyConfig proxyConfig;
 
@@ -47,11 +48,7 @@ public class BurpExtender implements IBurpExtender, IMessageEditorTabFactory, IP
             keysModel = new KeysModel();
         }
 
-        for (Frame frame : Frame.getFrames()){
-            if (frame.getName().equals("suiteFrame")) {
-                burp_frame = (JFrame) frame;
-            }
-        }
+        suiteWindow = WindowUtils.findWindowWithName(BURP_SUITE_FRAME_NAME);
 
         ProxyConfigPersistence proxyConfigPersistence = new ProxyConfigPersistence(callbacks);
         proxyConfig = proxyConfigPersistence.loadOrCreateNew();
@@ -60,7 +57,7 @@ public class BurpExtender implements IBurpExtender, IMessageEditorTabFactory, IP
 
         // Create the tab
         BurpView burpView = new BurpView(
-                burp_frame,
+                suiteWindow,
                 presenters,
                 callbacks,
                 keysModel,
@@ -108,6 +105,6 @@ public class BurpExtender implements IBurpExtender, IMessageEditorTabFactory, IP
 
     public IMessageEditorTab createNewInstance(IMessageEditorController controller, boolean editable) {
         // Create a new editor view when a HTTP message in Intercept/Repeater etc contains a JWE/JWS
-        return new EditorView(burp_frame, presenters, extensionHelpers, rstaFactory, editable);
+        return new EditorView(suiteWindow, presenters, extensionHelpers, rstaFactory, editable);
     }
 }

@@ -30,7 +30,10 @@ import com.blackberry.jwteditor.view.utils.ThemeDetector;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.HierarchyEvent;
+import java.awt.event.HierarchyListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.net.URL;
 
 import static java.awt.Image.SCALE_SMOOTH;
@@ -40,7 +43,7 @@ import static java.awt.Image.SCALE_SMOOTH;
  */
 public class BurpView implements ITab {
     private final BurpPresenter presenter;
-    private final JFrame parent;
+    private final Window parent;
     private final PresenterStore presenters;
     private final IBurpExtenderCallbacks callbacks;
     private final KeysModel keysModel;
@@ -52,7 +55,7 @@ public class BurpView implements ITab {
     private KeysView keysView;
 
     public BurpView(
-            JFrame parent,
+            Window parent,
             PresenterStore presenters,
             IBurpExtenderCallbacks callbacks,
             KeysModel keysModel,

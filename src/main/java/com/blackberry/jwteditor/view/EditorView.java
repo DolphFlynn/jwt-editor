@@ -20,9 +20,9 @@ package com.blackberry.jwteditor.view;
 
 import burp.IExtensionHelpers;
 import burp.IMessageEditorTab;
-import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.presenter.EditorPresenter;
 import com.blackberry.jwteditor.presenter.PresenterStore;
+import com.blackberry.jwteditor.utils.Utils;
 import org.exbin.deltahex.EditationAllowed;
 import org.exbin.deltahex.ViewMode;
 import org.exbin.deltahex.swing.CodeArea;
@@ -51,7 +51,7 @@ public class EditorView implements IMessageEditorTab {
     private boolean editable;
     private int mode;
 
-    private JFrame parent;
+    private Window parent;
     private JTabbedPane tabbedPane;
     private JComboBox<String> comboBoxJOSEObject;
     private JButton buttonSign;
@@ -88,11 +88,11 @@ public class EditorView implements IMessageEditorTab {
 
     }
 
-    public EditorView(JFrame parent, PresenterStore presenters, RstaFactory rstaFactory) {
+    public EditorView(Window parent, PresenterStore presenters, RstaFactory rstaFactory) {
         this(parent, presenters, null, rstaFactory, true);
     }
 
-    public EditorView(JFrame parent, PresenterStore presenters, IExtensionHelpers helpers, RstaFactory rstaFactory, boolean editable) {
+    public EditorView(Window parent, PresenterStore presenters, IExtensionHelpers helpers, RstaFactory rstaFactory, boolean editable) {
         this.parent = parent;
         this.rstaFactory = rstaFactory;
 
@@ -524,10 +524,10 @@ public class EditorView implements IMessageEditorTab {
     }
 
     /**
-     * Get the view's parent JFrame
-     * @return parent JFrame
+     * Get the view's parent Window
+     * @return parent Window
      */
-    public JFrame getParent() {
+    public Window getParent() {
         return parent;
     }
 

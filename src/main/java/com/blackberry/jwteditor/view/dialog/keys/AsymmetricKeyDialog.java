@@ -19,11 +19,11 @@ limitations under the License.
 package com.blackberry.jwteditor.view.dialog.keys;
 
 import com.blackberry.jwteditor.cryptography.okp.OKPGenerator;
-import com.blackberry.jwteditor.presenter.PresenterStore;
-import com.blackberry.jwteditor.utils.Utils;
-import com.blackberry.jwteditor.utils.PEMUtils;
 import com.blackberry.jwteditor.model.keys.JWKKey;
 import com.blackberry.jwteditor.model.keys.Key;
+import com.blackberry.jwteditor.presenter.PresenterStore;
+import com.blackberry.jwteditor.utils.PEMUtils;
+import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.view.RstaFactory;
 import com.nimbusds.jose.jwk.*;
 import com.nimbusds.jose.jwk.gen.ECKeyGenerator;
@@ -35,7 +35,9 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.security.KeyStore;
 import java.security.Provider;
 import java.security.Security;
@@ -77,23 +79,23 @@ public class AsymmetricKeyDialog extends KeyDialog {
     private final RstaFactory rstaFactory;
     private JWK jwk;
 
-    public AsymmetricKeyDialog(JFrame parent, PresenterStore presenters, RstaFactory rstaFactory, RSAKey rsaKey){
+    public AsymmetricKeyDialog(Window parent, PresenterStore presenters, RstaFactory rstaFactory, RSAKey rsaKey){
         this(parent, presenters, Mode.RSA, rstaFactory, rsaKey);
     }
 
-    public AsymmetricKeyDialog(JFrame parent, PresenterStore presenters, RstaFactory rstaFactory, ECKey ecKey){
+    public AsymmetricKeyDialog(Window parent, PresenterStore presenters, RstaFactory rstaFactory, ECKey ecKey){
         this(parent, presenters, Mode.EC, rstaFactory, ecKey);
     }
 
-    public AsymmetricKeyDialog(JFrame parent, PresenterStore presenters, RstaFactory rstaFactory, OctetKeyPair octetKeyPair){
+    public AsymmetricKeyDialog(Window parent, PresenterStore presenters, RstaFactory rstaFactory, OctetKeyPair octetKeyPair){
         this(parent, presenters, Mode.OKP, rstaFactory, octetKeyPair);
     }
 
-    public AsymmetricKeyDialog(JFrame parent, PresenterStore presenters, RstaFactory rstaFactory, Mode mode){
+    public AsymmetricKeyDialog(Window parent, PresenterStore presenters, RstaFactory rstaFactory, Mode mode){
         this(parent, presenters, mode, rstaFactory, null);
     }
 
-    private AsymmetricKeyDialog(JFrame parent, PresenterStore presenters, Mode mode, RstaFactory rstaFactory, JWK jwk) {
+    private AsymmetricKeyDialog(Window parent, PresenterStore presenters, Mode mode, RstaFactory rstaFactory, JWK jwk) {
         super(parent);
         this.mode = mode;
         this.rstaFactory = rstaFactory;

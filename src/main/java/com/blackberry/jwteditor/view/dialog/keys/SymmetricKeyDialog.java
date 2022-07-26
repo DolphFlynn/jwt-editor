@@ -18,10 +18,10 @@ limitations under the License.
 
 package com.blackberry.jwteditor.view.dialog.keys;
 
-import com.blackberry.jwteditor.presenter.PresenterStore;
-import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.model.keys.JWKKey;
 import com.blackberry.jwteditor.model.keys.Key;
+import com.blackberry.jwteditor.presenter.PresenterStore;
+import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.view.RstaFactory;
 import com.nimbusds.jose.jwk.OctetSequenceKey;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
@@ -30,7 +30,9 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.security.SecureRandom;
 import java.text.ParseException;
 import java.util.UUID;
@@ -52,7 +54,7 @@ public class SymmetricKeyDialog extends KeyDialog {
 
     private OctetSequenceKey jwk;
 
-    public SymmetricKeyDialog(JFrame parent, PresenterStore presenters, RstaFactory rstaFactory, OctetSequenceKey jwk) {
+    public SymmetricKeyDialog(Window parent, PresenterStore presenters, RstaFactory rstaFactory, OctetSequenceKey jwk) {
         super(parent);
         this.rstaFactory = rstaFactory;
         this.presenters = presenters;

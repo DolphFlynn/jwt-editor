@@ -18,14 +18,15 @@ limitations under the License.
 
 package com.blackberry.jwteditor.view.dialog.keys;
 
-import com.blackberry.jwteditor.presenter.PresenterStore;
-import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.model.keys.PasswordKey;
+import com.blackberry.jwteditor.presenter.PresenterStore;
+import com.blackberry.jwteditor.utils.Utils;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -45,16 +46,16 @@ public class PasswordDialog extends KeyDialog {
 
     PasswordKey key = null;
 
-    public PasswordDialog(JFrame parent, PresenterStore presenters){
+    public PasswordDialog(Window parent, PresenterStore presenters){
         this(parent, presenters, UUID.randomUUID().toString(), "", 8, 1000);
         originalId = null;
     }
 
-    public PasswordDialog(JFrame parent, PresenterStore presenters, PasswordKey key){
+    public PasswordDialog(Window parent, PresenterStore presenters, PasswordKey key){
         this(parent, presenters, key.getID(), key.getPassword(), key.getSaltLength(), key.getIterations());
     }
 
-    private PasswordDialog(JFrame parent, PresenterStore presenters, String keyId, String password, int saltLength, int iterations) {
+    private PasswordDialog(Window parent, PresenterStore presenters, String keyId, String password, int saltLength, int iterations) {
         super(parent);
         this.presenters = presenters;
         originalId = keyId;

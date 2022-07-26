@@ -18,17 +18,20 @@ limitations under the License.
 
 package com.blackberry.jwteditor.view.dialog.operations;
 
-import com.blackberry.jwteditor.operations.Attacks;
-import com.blackberry.jwteditor.utils.Utils;
-import com.blackberry.jwteditor.utils.CryptoUtils;
-import com.blackberry.jwteditor.utils.PEMUtils;
 import com.blackberry.jwteditor.model.jose.JWS;
 import com.blackberry.jwteditor.model.keys.JWKKey;
 import com.blackberry.jwteditor.model.keys.Key;
+import com.blackberry.jwteditor.operations.Attacks;
+import com.blackberry.jwteditor.utils.CryptoUtils;
+import com.blackberry.jwteditor.utils.PEMUtils;
+import com.blackberry.jwteditor.utils.Utils;
 import com.nimbusds.jose.JWSAlgorithm;
 
 import javax.swing.*;
-import java.awt.event.*;
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.List;
 
 /**
@@ -49,7 +52,7 @@ public class KeyConfusionAttackDialog extends JDialog {
      * @param signingKeys the signing keys available
      * @param jws the content to sign
      */
-    public KeyConfusionAttackDialog(JFrame parent, List<Key> signingKeys, JWS jws) {
+    public KeyConfusionAttackDialog(Window parent, List<Key> signingKeys, JWS jws) {
         super(parent);
         this.jws = jws;
 

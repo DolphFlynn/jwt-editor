@@ -19,10 +19,10 @@ limitations under the License.
 package com.blackberry.jwteditor.view;
 
 import burp.IBurpExtenderCallbacks;
-import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.model.KeysModel;
 import com.blackberry.jwteditor.presenter.KeysPresenter;
 import com.blackberry.jwteditor.presenter.PresenterStore;
+import com.blackberry.jwteditor.utils.Utils;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
@@ -31,15 +31,15 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * View class for the Keys tab
  */
 public class KeysView {
     private final KeysPresenter presenter;
-    private final JFrame parent;
+    private final Window parent;
 
     private JButton buttonNewSymmetric;
     private JButton buttonNewRSA;
@@ -57,7 +57,7 @@ public class KeysView {
     JMenuItem menuItemCopyPassword;
 
     public KeysView(
-            JFrame parent,
+            Window parent,
             PresenterStore presenters,
             IBurpExtenderCallbacks callbacks,
             KeysModel keysModel,
@@ -291,10 +291,10 @@ public class KeysView {
     }
 
     /**
-     * Get the view's parent JFrame
-     * @return parent JFrame
+     * Get the view's parent Window
+     * @return parent Window
      */
-    public JFrame getParent() {
+    public Window getParent() {
         return parent;
     }
 

@@ -18,17 +18,20 @@ limitations under the License.
 
 package com.blackberry.jwteditor.view.dialog.operations;
 
-import com.blackberry.jwteditor.operations.Operations;
-import com.blackberry.jwteditor.utils.Utils;
-import com.blackberry.jwteditor.utils.CryptoUtils;
 import com.blackberry.jwteditor.model.jose.JWE;
 import com.blackberry.jwteditor.model.jose.JWS;
 import com.blackberry.jwteditor.model.keys.Key;
+import com.blackberry.jwteditor.operations.Operations;
+import com.blackberry.jwteditor.utils.CryptoUtils;
+import com.blackberry.jwteditor.utils.Utils;
 import com.nimbusds.jose.EncryptionMethod;
 import com.nimbusds.jose.JWEAlgorithm;
 
 import javax.swing.*;
-import java.awt.event.*;
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.List;
 
 /**
@@ -50,7 +53,7 @@ public class EncryptDialog extends JDialog {
      * @param jws the JWS to sign
      * @param encryptionKeys the available encryption keys
      */
-    public EncryptDialog(JFrame parent, JWS jws, List<Key> encryptionKeys) {
+    public EncryptDialog(Window parent, JWS jws, List<Key> encryptionKeys) {
         super(parent);
         this.jws = jws;
 

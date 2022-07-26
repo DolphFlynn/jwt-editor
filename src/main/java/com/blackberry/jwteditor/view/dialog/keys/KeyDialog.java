@@ -24,6 +24,7 @@ import com.blackberry.jwteditor.presenter.PresenterStore;
 import com.blackberry.jwteditor.utils.Utils;
 
 import javax.swing.*;
+import java.awt.*;
 
 /**
  * Abstract class to be extended by dialogs for key editing/generation on the Keys tab
@@ -33,7 +34,7 @@ public abstract class KeyDialog extends JDialog {
     protected PresenterStore presenters;
     protected String originalId;
 
-    public KeyDialog(JFrame parent){
+    public KeyDialog(Window parent){
         super(parent);
     }
 

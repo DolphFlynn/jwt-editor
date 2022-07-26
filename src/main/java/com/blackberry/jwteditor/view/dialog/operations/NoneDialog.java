@@ -22,6 +22,7 @@ import com.blackberry.jwteditor.operations.Attacks;
 import com.blackberry.jwteditor.utils.Utils;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -40,7 +41,7 @@ public class NoneDialog extends JDialog {
      * @param parent the parent for the dialog
      * @param jws the content to remove signature from
      */
-    public NoneDialog(JFrame parent, JWS jws) {
+    public NoneDialog(Window parent, JWS jws) {
         super(parent);
         this.jws = jws;
 
