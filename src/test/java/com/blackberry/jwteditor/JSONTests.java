@@ -21,11 +21,10 @@ package com.blackberry.jwteditor;
 import com.blackberry.jwteditor.utils.Utils;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
-public class JSONTests {
-
-    private static String PRETTY_PRINTED_JSON = "{\n" +
+class JSONTests {
+    private static final String PRETTY_PRINTED_JSON = "{\n" +
             "    \"kid\": \"dfc6a9df-916c-406d-84de-ce5b49d50ad0\",\n" +
             "    \"typ\": \"JWT\",\n" +
             "    \"alg\": \"RS256\",\n" +
@@ -37,18 +36,17 @@ public class JSONTests {
             "    }\n" +
             "}";
 
-    private static String COMPACTED_JSON = "{\"kid\":\"dfc6a9df-916c-406d-84de-ce5b49d50ad0\",\"typ\":\"JWT\",\"alg\":\"RS256\",\"jwk\":{\"kty\":\"RSA\",\"e\":\"AQAB\",\"kid\":\"dfc6a9df-916c-406d-84de-ce5b49d50ad0\",\"n\":\"p0U0MdHFLPovX5j91oH-dc54oeJDIDapuPDM9gYHjhX2Bwj4fFhqvaAfIhn-w7zm-6HZsH-VxPCngl7GkWxx1F7Cobkg8TOD4UusFFo8srSFDExWCQ4MRFDRcLN9bmfXeiR-MvGE1tHZNJCOnxsx32-ueF0T2xo880-073skum8sS9vi7RuNhaCY_liJNkrznqQCEbNLR_-V_-IQaFG_obDNqEHroKC3lxz34s4CPpUwen8IFJm8_vbcFiI_jZrw_VTwJM4Il5Hr2uJLv_ahsZTLomumJmabvXulgQFBK4hEd-FH4c72glbFfFLEkzRQz-ozCzySudbRG9UvhubPyQ\"}}";
+    private static final String COMPACTED_JSON = "{\"kid\":\"dfc6a9df-916c-406d-84de-ce5b49d50ad0\",\"typ\":\"JWT\",\"alg\":\"RS256\",\"jwk\":{\"kty\":\"RSA\",\"e\":\"AQAB\",\"kid\":\"dfc6a9df-916c-406d-84de-ce5b49d50ad0\",\"n\":\"p0U0MdHFLPovX5j91oH-dc54oeJDIDapuPDM9gYHjhX2Bwj4fFhqvaAfIhn-w7zm-6HZsH-VxPCngl7GkWxx1F7Cobkg8TOD4UusFFo8srSFDExWCQ4MRFDRcLN9bmfXeiR-MvGE1tHZNJCOnxsx32-ueF0T2xo880-073skum8sS9vi7RuNhaCY_liJNkrznqQCEbNLR_-V_-IQaFG_obDNqEHroKC3lxz34s4CPpUwen8IFJm8_vbcFiI_jZrw_VTwJM4Il5Hr2uJLv_ahsZTLomumJmabvXulgQFBK4hEd-FH4c72glbFfFLEkzRQz-ozCzySudbRG9UvhubPyQ\"}}";
 
     @Test
     void compactJSONTest(){
         String compactedJSON = Utils.compactJSON(PRETTY_PRINTED_JSON);
-        assertEquals(compactedJSON, COMPACTED_JSON);
+        assertThat(compactedJSON).isEqualTo(COMPACTED_JSON);
     }
 
     @Test
     void prettyPrintJSON(){
         String prettyPrintedJSON = Utils.prettyPrintJSON(PRETTY_PRINTED_JSON);
-        assertEquals(prettyPrintedJSON, PRETTY_PRINTED_JSON);
+        assertThat(prettyPrintedJSON).isEqualTo(PRETTY_PRINTED_JSON);
     }
-
 }

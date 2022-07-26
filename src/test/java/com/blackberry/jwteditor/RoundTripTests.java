@@ -29,10 +29,9 @@ import org.junit.jupiter.api.Test;
 import java.security.Security;
 import java.text.ParseException;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class RoundTripTests {
-
     @BeforeAll
     static void addBouncyCastle() {
         Security.addProvider(new BouncyCastleProvider());
@@ -43,13 +42,13 @@ class RoundTripTests {
         for(String pem: PEMToJWKTests.RSAPrivate) {
             RSAKey rsaKey = PEMUtils.pemToRSAKey(pem);
             String newPem = PEMUtils.jwkToPem(rsaKey);
-            assertEquals(pem, newPem);
+            assertThat(pem).isEqualTo(newPem);
         }
 
         for(String pem: PEMToJWKTests.RSAPublic) {
             RSAKey rsaKey = PEMUtils.pemToRSAKey(pem);
             String newPem = PEMUtils.jwkToPem(rsaKey);
-            assertEquals(pem, newPem);
+            assertThat(pem).isEqualTo(newPem);
         }
     }
 
@@ -79,7 +78,7 @@ class RoundTripTests {
         for(String pem: PEMToJWKTests.ECPublic) {
             ECKey ecKey = PEMUtils.pemToECKey(pem);
             String newPem = PEMUtils.jwkToPem(ecKey);
-            assertEquals(pem, newPem);
+            assertThat(pem).isEqualTo(newPem);
         }
     }
 

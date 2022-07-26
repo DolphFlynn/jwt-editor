@@ -37,11 +37,9 @@ import org.junit.jupiter.params.provider.ValueSource;
 import java.security.Security;
 import java.text.ParseException;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class AttackTests {
-
     // Using values from https://www.nccgroup.com/ae/about-us/newsroom-and-events/blogs/2019/january/jwt-attack-walk-through/ to verify
     private static final String HMAC_KEY_CONFUSION_JWS = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC9kZW1vLnNqb2VyZGxhbmdrZW1wZXIubmxcLyIsImlhdCI6MTU0NzcyOTY2MiwiZXhwIjoxNTQ3Nzk5OTk5LCJkYXRhIjp7Ik5DQyI6InRlc3QifX0.";
     private static final String HMAC_KEY_CONFUSION_EXPECTED_JWS = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC9kZW1vLnNqb2VyZGxhbmdrZW1wZXIubmxcLyIsImlhdCI6MTU0NzcyOTY2MiwiZXhwIjoxNTQ3Nzk5OTk5LCJkYXRhIjp7Ik5DQyI6InRlc3QifX0.2zobdg7sgeApcEaR9ngMTRZT1dkWiMJOWYkelzQu5Z8";
@@ -69,9 +67,9 @@ class AttackTests {
         JWS jws = JWS.parse(HMAC_KEY_CONFUSION_JWS);
         JWS modifiedJWS = Attacks.noneSigning(jws, algorithm);
 
-        assertEquals(modifiedJWS.getHeader(), String.format("{\"typ\":\"JWT\",\"alg\":\"%s\"}", algorithm));
-        assertEquals(modifiedJWS.getEncodedPayload().toString(), HMAC_KEY_CONFUSION_JWS.split("\\.")[1]);
-        assertEquals(modifiedJWS.getSignature().length, 0);
+        assertThat(modifiedJWS.getHeader()).isEqualTo(String.format("{\"typ\":\"JWT\",\"alg\":\"%s\"}", algorithm));
+        assertThat(modifiedJWS.getEncodedPayload().toString()).isEqualTo(HMAC_KEY_CONFUSION_JWS.split("\\.")[1]);
+        assertThat(modifiedJWS.getSignature()).isEmpty();
     }
 
     @Test
@@ -82,7 +80,7 @@ class AttackTests {
 
         JWS modifiedJWS  = Attacks.hmacKeyConfusion(jws, key, JWSAlgorithm.HS256, false);
 
-        assertArrayEquals(modifiedJWS.getSignature(), expectedJWS.getSignature());
+        assertThat(modifiedJWS.getSignature()).isEqualTo(expectedJWS.getSignature());
     }
 
     @Test
@@ -93,9 +91,8 @@ class AttackTests {
 
         JWS modifiedJWS = Attacks.embeddedJWK(jws, jwk, JWSAlgorithm.RS256);
 
-        assertEquals(modifiedJWS.serialize(), EMBEDDED_JWK_EXPECTED_JWS);
+        assertThat(modifiedJWS.serialize()).isEqualTo(EMBEDDED_JWK_EXPECTED_JWS);
     }
-
 
     @Test
     // Test the Embedded JWK attack with all signing key types

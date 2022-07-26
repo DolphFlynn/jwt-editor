@@ -39,8 +39,8 @@ import org.junit.jupiter.api.Test;
 
 import java.security.Security;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 class SigningTests {
@@ -66,12 +66,12 @@ class SigningTests {
                 for (JWSAlgorithm algorithm : key.getSigningAlgorithms()) {
                     JWSHeader signingInfo = new JWSHeader.Builder(algorithm).build();
                     JWS jws = CryptoUtils.sign(signingInfo.toBase64URL(), TEST_JWS.getEncodedPayload(), key, signingInfo);
-                    assertTrue(CryptoUtils.verify(jws, key, signingInfo));
+                    assertThat(CryptoUtils.verify(jws, key, signingInfo)).isTrue();
                     atLeastOne = true;
                 }
             }
         }
-        assertTrue(atLeastOne);
+        assertThat(atLeastOne).isTrue();
     }
 
     @Test
@@ -85,12 +85,12 @@ class SigningTests {
                 for (JWSAlgorithm algorithm : key.getSigningAlgorithms()) {
                     JWSHeader signingInfo = new JWSHeader.Builder(algorithm).build();
                     JWS jws = CryptoUtils.sign(signingInfo.toBase64URL(), TEST_JWS.getEncodedPayload(), key, signingInfo);
-                    assertTrue(CryptoUtils.verify(jws, key, signingInfo));
+                    assertThat(CryptoUtils.verify(jws, key, signingInfo)).isTrue();
                     atLeastOne = true;
                 }
             }
         }
-        assertTrue(atLeastOne);
+        assertThat(atLeastOne).isTrue();
     }
 
     @Test
@@ -105,12 +105,12 @@ class SigningTests {
                 for (JWSAlgorithm algorithm : privateKey.getSigningAlgorithms()) {
                     JWSHeader signingInfo = new JWSHeader.Builder(algorithm).build();
                     JWS jws = CryptoUtils.sign(signingInfo.toBase64URL(), TEST_JWS.getEncodedPayload(), privateKey, signingInfo);
-                    assertTrue(CryptoUtils.verify(jws, publicKey, signingInfo));
+                    assertThat(CryptoUtils.verify(jws, publicKey, signingInfo)).isTrue();
                     atLeastOne = true;
                 }
             }
         }
-        assertTrue(atLeastOne);
+        assertThat(atLeastOne).isTrue();
     }
 
     @Test
@@ -128,17 +128,17 @@ class SigningTests {
 
         for(OctetSequenceKey octetSequenceKey: octetSequenceKeys){
             JWKKey key = new JWKKey(octetSequenceKey);
-            assertTrue(key.canSign()); //any key should be able to sign
+            assertThat(key.canSign()).isTrue(); //any key should be able to sign
 
             for (JWSAlgorithm algorithm : key.getSigningAlgorithms()) {
                 JWSHeader signingInfo = new JWSHeader.Builder(algorithm).build();
                 JWS jws = CryptoUtils.sign(signingInfo.toBase64URL(), TEST_JWS.getEncodedPayload(), key, signingInfo);
                 //we should be able to sign and verify with any supported algorithm
-                assertTrue(CryptoUtils.verify(jws, key, signingInfo));
+                assertThat(CryptoUtils.verify(jws, key, signingInfo)).isTrue();
                 atLeastOne = true;
             }
         }
-        assertTrue(atLeastOne);
+        assertThat(atLeastOne).isTrue();
     }
 
     @Test

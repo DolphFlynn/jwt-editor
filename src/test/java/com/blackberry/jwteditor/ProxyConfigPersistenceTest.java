@@ -13,7 +13,7 @@ import java.util.stream.Stream;
 
 import static com.blackberry.jwteditor.model.config.ProxyConfig.DEFAULT_HIGHLIGHT_COLOR;
 import static com.blackberry.jwteditor.model.persistence.ProxyConfigPersistence.PROXY_LISTENER_SETTINGS_NAME;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -27,9 +27,9 @@ class ProxyConfigPersistenceTest {
 
         ProxyConfig proxyConfig = configPersistence.loadOrCreateNew();
 
-        assertNotNull(proxyConfig);
-        assertTrue(proxyConfig.highlightJWT());
-        assertEquals(proxyConfig.highlightColor(), DEFAULT_HIGHLIGHT_COLOR);
+        assertThat(proxyConfig).isNotNull();
+        assertThat(proxyConfig.highlightJWT()).isTrue();
+        assertThat(proxyConfig.highlightColor()).isEqualTo(DEFAULT_HIGHLIGHT_COLOR);
         configPersistence.save(proxyConfig);
     }
 
@@ -57,9 +57,9 @@ class ProxyConfigPersistenceTest {
 
         ProxyConfig proxyConfig = configPersistence.loadOrCreateNew();
 
-        assertNotNull(proxyConfig);
-        assertTrue(proxyConfig.highlightJWT());
-        assertEquals(proxyConfig.highlightColor(), DEFAULT_HIGHLIGHT_COLOR);
+        assertThat(proxyConfig).isNotNull();
+        assertThat(proxyConfig.highlightJWT()).isTrue();
+        assertThat(proxyConfig.highlightColor()).isEqualTo(DEFAULT_HIGHLIGHT_COLOR);
     }
 
     private static Stream<Arguments> validProxyConfigJson() {
@@ -85,8 +85,8 @@ class ProxyConfigPersistenceTest {
 
         ProxyConfig proxyConfig = configPersistence.loadOrCreateNew();
 
-        assertNotNull(proxyConfig);
-        assertEquals(proxyConfig.highlightJWT(), listenerEnabled);
-        assertEquals(proxyConfig.highlightColor(), highlightColor);
+        assertThat(proxyConfig).isNotNull();
+        assertThat(proxyConfig.highlightJWT()).isEqualTo(listenerEnabled);
+        assertThat(proxyConfig.highlightColor()).isEqualTo(highlightColor);
     }
 }

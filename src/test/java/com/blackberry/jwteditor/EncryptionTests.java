@@ -40,9 +40,9 @@ import org.junit.jupiter.api.Test;
 import java.security.Security;
 import java.text.ParseException;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
-public class EncryptionTests {
+class EncryptionTests {
     private static final String TEST_JWS = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJUZXN0In0.WVLalefVZ5Rj991Cjgh0qBjKSIQaqC_CgN3b-30GKpQ";
 
     @BeforeAll
@@ -75,7 +75,7 @@ public class EncryptionTests {
                 }
             }
         }
-        assertTrue(atLeastOne);
+        assertThat(atLeastOne).isTrue();
     }
 
     @Test
@@ -102,7 +102,7 @@ public class EncryptionTests {
                 }
             }
         }
-        assertTrue(atLeastOne);
+        assertThat(atLeastOne).isTrue();
     }
 
     @Test
@@ -129,7 +129,7 @@ public class EncryptionTests {
                 }
             }
         }
-        assertTrue(atLeastOne);
+        assertThat(atLeastOne).isTrue();
     }
 
     @Test
@@ -158,7 +158,7 @@ public class EncryptionTests {
                 }
             }
         }
-        assertTrue(atLeastOne);
+        assertThat(atLeastOne).isTrue();
     }
 
     @Test
@@ -176,7 +176,6 @@ public class EncryptionTests {
                 }
             }
         }
-        assertTrue(atLeastOne);
+        assertThat(atLeastOne).isTrue();
     }
-
 }

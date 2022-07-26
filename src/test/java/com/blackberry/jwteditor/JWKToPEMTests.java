@@ -23,7 +23,10 @@ import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.model.keys.PasswordKey;
 import com.blackberry.jwteditor.utils.PEMUtils;
 import com.blackberry.jwteditor.utils.PEMUtils.PemException;
-import com.nimbusds.jose.jwk.*;
+import com.nimbusds.jose.jwk.ECKey;
+import com.nimbusds.jose.jwk.OctetKeyPair;
+import com.nimbusds.jose.jwk.OctetSequenceKey;
+import com.nimbusds.jose.jwk.RSAKey;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -32,11 +35,11 @@ import java.text.ParseException;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 class JWKToPEMTests {
-
     static final String RSA2048PrivateDEN = "{\"kty\": \"RSA\", \"d\": \"NWk0zSEQGWDeAuuVa_5N_oNr5K2whMhvbCPFHjUPFpfcA3FMAPMHT17u9GMBlum2pgYrvRHsibfn0i5pRxpFnSEvqnzYubWlaVSiRL1xTLjn6UixpxwfJkPY8C1dBa9aPZvSO_R-MfHoDudVecckMrWWdScw_9nir_Fc2l8QCp4R_OYGu6Uj58YDYCrToJ817utPltDRaTBg_7FD-ppX9-qdoBB1RW5kzJqGksBt4gk6zBeagvryvCfxVtrkYVv4cVJ8K1i2waMXRtAl-cyNTJh4M6zcsBM8pO6DirxBQdmzYsz_20w3vPdPs3yH53XxbAMXTEwlZz3lrJaoFAi6eQ\", \"e\": \"AQAB\", \"kid\": \"4c756ccb-0080-42d3-bc58-7692fd2ab3c5\", \"n\": \"mt04cN9oFDdmSDWkuxnsxyA6FJvEi1Ha1bYOUNLnS1Ecoqe7ErvDoycctBrAZ2ul408zFSoSRqf7IX5P3W2b8KDh7QvToZ0o9E0DBFWlqo88Iariif4ZpXL7r2Kse67zZ7ZVmU4A3aB_8mbpZQutQEWwuhTANnzc94pDv6ryaqcAc4rPgsnE1IY2gqznWBL2ZGa2iCzphTeB4yxSr3AfLY8HOUSku4Vvr6l20t-_ZbaSJFDqvjo699w9LkqzzxNTtdOmenxRc8eEKg6_Cw_Do_Q-SgblDXMWI057u-pSXbYjbknk20HczULLxgS7nUQJhs8uN8tX-xcQuoZexU0sGw\"}";
     static final String RSA2048PrivateAll = "{\"p\": \"4lzEStkwPU75h1uGr8Tn2hYAouFLhR8nnN7XV66UM6wQkJwA6pBE1FDb-xRvmZyrz9oGeryYrs6cE34tfYVkZYjyO95sE4ABi44986RmioHMg1-P5Ip8iq7_CMagq1WGgyi5Bx-hRtOxhnGZT3W2Juz34VWelDRsRNnbV0-ZV5c\", \"kty\": \"RSA\", \"q\": \"ryP4Uo9wMeA_nvGHsLwOjTaFWm0aLYZDm06U7i8Tl3y1NO1zgez2qyuGyPA0RYPrKVdYU9275RRv7hT1I2SxEr5RT6IXFOoXZOtrtocmLll2W2cVVZqfsHoVtD_TcZ4haMqp8hUOVW0i_nc4uSMPQFLSVgfLaRLXi80jcFpLwB0\", \"d\": \"NWk0zSEQGWDeAuuVa_5N_oNr5K2whMhvbCPFHjUPFpfcA3FMAPMHT17u9GMBlum2pgYrvRHsibfn0i5pRxpFnSEvqnzYubWlaVSiRL1xTLjn6UixpxwfJkPY8C1dBa9aPZvSO_R-MfHoDudVecckMrWWdScw_9nir_Fc2l8QCp4R_OYGu6Uj58YDYCrToJ817utPltDRaTBg_7FD-ppX9-qdoBB1RW5kzJqGksBt4gk6zBeagvryvCfxVtrkYVv4cVJ8K1i2waMXRtAl-cyNTJh4M6zcsBM8pO6DirxBQdmzYsz_20w3vPdPs3yH53XxbAMXTEwlZz3lrJaoFAi6eQ\", \"e\": \"AQAB\", \"kid\": \"4c756ccb-0080-42d3-bc58-7692fd2ab3c5\", \"qi\": \"hWYpdilJqiGG7lMEdEPEjPuwycq21YXexob2WTbCxJcF3Yy0vC_zSzxPB1qExA18-Zz9lUwnI9F21gBxvCactWZJ9tvwwawfTbX_9OqOl_ebORFvWKEsoFfpVCQXhwHCTB-kf9ShmDzxBnEuTcok5EXZi6xrofM3Y0PZotSgSoo\",\"dp\": \"h4Xsy7cup3YR9RU6FR_5g9tqdBoYwdG-QLA2EzvlZO5eWIXeEpFfdBIZMkCw9DIVt3KcMH2bmAUA8ra3e5ASZKvSA0AOSrp3slruAmHqNoCxtfHPz4-OMuXEsTdiWFHzH7GQ3Y_1WddCUPDQTf92l-WGHvXI5IhiTfJ03Ng-QW8\", \"dq\": \"m7RG2F9dR3ouFYh1MdJ-vVxzQektFLwA7tn13atMp6jfEKbpweCBi7uuoIWscwDM2Hwmsqi2mvqIaAmJxmWGZzt73mgkTRuwoLALmsKcVyiB6NDETs6gmaxwD0ePG7uRyDAk1muRyrC0I7aqXy2kKXN4O7PCSy_NISTHFOOx5KE\", \"n\": \"mt04cN9oFDdmSDWkuxnsxyA6FJvEi1Ha1bYOUNLnS1Ecoqe7ErvDoycctBrAZ2ul408zFSoSRqf7IX5P3W2b8KDh7QvToZ0o9E0DBFWlqo88Iariif4ZpXL7r2Kse67zZ7ZVmU4A3aB_8mbpZQutQEWwuhTANnzc94pDv6ryaqcAc4rPgsnE1IY2gqznWBL2ZGa2iCzphTeB4yxSr3AfLY8HOUSku4Vvr6l20t-_ZbaSJFDqvjo699w9LkqzzxNTtdOmenxRc8eEKg6_Cw_Do_Q-SgblDXMWI057u-pSXbYjbknk20HczULLxgS7nUQJhs8uN8tX-xcQuoZexU0sGw\"}";
     static final String RSA2048Public = "{\"kty\": \"RSA\", \"e\": \"AQAB\", \"kid\": \"4c756ccb-0080-42d3-bc58-7692fd2ab3c5\", \"n\": \"mt04cN9oFDdmSDWkuxnsxyA6FJvEi1Ha1bYOUNLnS1Ecoqe7ErvDoycctBrAZ2ul408zFSoSRqf7IX5P3W2b8KDh7QvToZ0o9E0DBFWlqo88Iariif4ZpXL7r2Kse67zZ7ZVmU4A3aB_8mbpZQutQEWwuhTANnzc94pDv6ryaqcAc4rPgsnE1IY2gqznWBL2ZGa2iCzphTeB4yxSr3AfLY8HOUSku4Vvr6l20t-_ZbaSJFDqvjo699w9LkqzzxNTtdOmenxRc8eEKg6_Cw_Do_Q-SgblDXMWI057u-pSXbYjbknk20HczULLxgS7nUQJhs8uN8tX-xcQuoZexU0sGw\"}";
@@ -100,10 +103,10 @@ class JWKToPEMTests {
     @MethodSource("ecPrivateValidJWKs")
     void ecPrivateKeyToPemValid(String jwkString) throws PemException, ParseException {
         ECKey ecKey = ECKey.parse(jwkString);
-        assertTrue(ecKey.isPrivate());
+        assertThat(ecKey.isPrivate()).isTrue();
 
         String pem = PEMUtils.jwkToPem(ecKey);
-        assertFalse(pem.isEmpty());
+        assertThat(pem).isNotEmpty();
     }
 
     private static Stream<String> ecPublicValidJWKs() {
@@ -114,10 +117,10 @@ class JWKToPEMTests {
     @MethodSource("ecPublicValidJWKs")
     void ecPublicKeyToPemValid(String jwkString) throws PemException, ParseException {
         ECKey ecKey = ECKey.parse(jwkString);
-        assertFalse(ecKey.isPrivate());
+        assertThat(ecKey.isPrivate()).isFalse();
 
         String pem = PEMUtils.jwkToPem(ecKey);
-        assertFalse(pem.isEmpty());
+         assertThat(pem).isNotEmpty();
     }
 
     private static Stream<String> ecInvalidJWKs() {
@@ -138,10 +141,10 @@ class JWKToPEMTests {
     @MethodSource("rsaPrivateValidJWKs")
     void rsaPrivateKeyToPemValid(String jwkString) throws PemException, ParseException {
         RSAKey rsaKey = RSAKey.parse(jwkString);
-        assertTrue(rsaKey.isPrivate());
+        assertThat(rsaKey.isPrivate()).isTrue();
 
         String pem = PEMUtils.jwkToPem(rsaKey);
-        assertFalse(pem.isEmpty());
+         assertThat(pem).isNotEmpty();
     }
 
     private static Stream<String> rsaPublicValidJWKs() {
@@ -152,10 +155,10 @@ class JWKToPEMTests {
     @MethodSource("rsaPublicValidJWKs")
     void rsaPublicKeyToPemValid(String jwkString) throws PemException, ParseException {
         RSAKey rsaKey = RSAKey.parse(jwkString);
-        assertFalse(rsaKey.isPrivate());
+        assertThat(rsaKey.isPrivate()).isFalse();
 
         String pem = PEMUtils.jwkToPem(rsaKey);
-        assertFalse(pem.isEmpty());
+         assertThat(pem).isNotEmpty();
     }
 
     private static Stream<String> rsaInvalidJWKs() {
@@ -176,10 +179,10 @@ class JWKToPEMTests {
     @MethodSource("ocpPrivateValidJWKs")
     void octetKeyPairPrivateToPemValid(String jwkString) throws PemException, ParseException {
         OctetKeyPair octetKeyPair = OctetKeyPair.parse(jwkString);
-        assertTrue(octetKeyPair.isPrivate());
+        assertThat(octetKeyPair.isPrivate()).isTrue();
 
         String pem = PEMUtils.jwkToPem(octetKeyPair);
-        assertFalse(pem.isEmpty());
+         assertThat(pem).isNotEmpty();
     }
 
     private static Stream<String> ocpPublicValidJWKs() {
@@ -190,10 +193,10 @@ class JWKToPEMTests {
     @MethodSource("ocpPublicValidJWKs")
     void octetKeyPairPublicToPemValid(String jwkString) throws PemException, ParseException {
         OctetKeyPair octetKeyPair = OctetKeyPair.parse(jwkString);
-        assertFalse(octetKeyPair.isPrivate());
+        assertThat(octetKeyPair.isPrivate()).isFalse();
 
         String pem = PEMUtils.jwkToPem(octetKeyPair);
-        assertFalse(pem.isEmpty());
+         assertThat(pem).isNotEmpty();
     }
 
     private static Stream<String> ocpInvalidJWKs() {
@@ -219,6 +222,6 @@ class JWKToPEMTests {
     @ParameterizedTest
     @MethodSource("keyToPemData")
     void testCanConvertToPemForJWKs(Key key, boolean canConvert) {
-        assertEquals(key.canConvertToPem(), canConvert);
+        assertThat(key.canConvertToPem()).isEqualTo(canConvert);
     }
 }

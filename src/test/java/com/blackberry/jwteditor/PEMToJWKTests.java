@@ -32,10 +32,10 @@ import java.security.Security;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class PEMToJWKTests {
-
     private static final String PRIME256v1PrivatePKCS8 = "-----BEGIN PRIVATE KEY-----\n" +
             "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgR7xUBrtHikGBXsJk\n" +
             "DekdUxWWC2YhYMKTDXILREc4/7uhRANCAAQrHJ52L8MTrBl0LWyEx5hXH0i9JeXX\n" +
@@ -409,7 +409,7 @@ class PEMToJWKTests {
     @MethodSource("ecPrivateValidPEMs")
     void pemToECKeyPrivateValid(String pem) throws PemException {
         ECKey ecKey = PEMUtils.pemToECKey(pem);
-        assertTrue(ecKey.isPrivate());
+        assertThat(ecKey.isPrivate()).isTrue();
     }
 
     private static Stream<String> ecPublicValidPEMs() {
@@ -420,7 +420,7 @@ class PEMToJWKTests {
     @MethodSource("ecPublicValidPEMs")
     void pemToECKeyPublicValid(String pem) throws PemException {
         ECKey ecKey = PEMUtils.pemToECKey(pem);
-        assertFalse(ecKey.isPrivate());
+        assertThat(ecKey.isPrivate()).isFalse();
     }
 
     private static Stream<String> ecInvalidPEMs() {
@@ -441,7 +441,7 @@ class PEMToJWKTests {
     @MethodSource("rsaPrivateValidPEMs")
     void pemToRSAKeyPrivateValid(String pem) throws PemException {
         RSAKey rsaKey = PEMUtils.pemToRSAKey(pem);
-        assertTrue(rsaKey.isPrivate());
+        assertThat(rsaKey.isPrivate()).isTrue();
     }
 
     private static Stream<String> rsaPublicValidPEMs() {
@@ -452,7 +452,7 @@ class PEMToJWKTests {
     @MethodSource("rsaPublicValidPEMs")
     void pemToRSAKeyPairPublicValid(String pem) throws PemException {
         RSAKey rsaKey = PEMUtils.pemToRSAKey(pem);
-        assertFalse(rsaKey.isPrivate());
+        assertThat(rsaKey.isPrivate()).isFalse();
     }
 
     private static Stream<String> rsaInvalidPEMs() {
@@ -474,9 +474,9 @@ class PEMToJWKTests {
     void pemToOctetKeyPairPrivateValid(String pem) throws PemException {
         OctetKeyPair octetKeyPair = PEMUtils.pemToOctetKeyPair(pem);
 
-        assertNotNull(octetKeyPair.getX());
-        assertTrue(octetKeyPair.isPrivate());
-        assertNotNull(octetKeyPair.getD());
+        assertThat(octetKeyPair.getX()).isNotNull();
+        assertThat(octetKeyPair.isPrivate()).isTrue();
+        assertThat(octetKeyPair.getD()).isNotNull();
     }
 
     private static Stream<String> ocpPublicValidPEMs() {
@@ -487,9 +487,9 @@ class PEMToJWKTests {
     @MethodSource("ocpPublicValidPEMs")
     void pemToOctetKeyPairPublicValid(String pem) throws PemException {
         OctetKeyPair octetKeyPair = PEMUtils.pemToOctetKeyPair(pem);
-        assertNotNull(octetKeyPair.getX());
-        assertFalse(octetKeyPair.isPrivate());
-        assertNull(octetKeyPair.getD());
+        assertThat(octetKeyPair.getX()).isNotNull();
+        assertThat(octetKeyPair.isPrivate()).isFalse();
+        assertThat(octetKeyPair.getD()).isNull();
     }
 
     private static Stream<String> ocpInvalidPEMs() {
@@ -511,6 +511,6 @@ class PEMToJWKTests {
     void octetKeyPairPemRoundTrip(String pem) throws PemException {
         OctetKeyPair octetKeyPair = PEMUtils.pemToOctetKeyPair(pem);
         String newPem = PEMUtils.octetKeyPairToPem(octetKeyPair);
-        assertEquals(pem, newPem);
+        assertThat(pem).isEqualTo(newPem);
     }
 }

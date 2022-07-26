@@ -24,13 +24,11 @@ import com.blackberry.jwteditor.model.jose.JWS;
 import com.blackberry.jwteditor.utils.Utils;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
+import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
-public class JOSEParserTests {
-
+class JOSEParserTests {
     private static final String[] VALID_JWS = new String[]{
             // JWS
             "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJUZXN0In0.Nabf3xakZubPnCzHT-fx0vG1iuNPeJKuSzHxUiQKf-8",
@@ -76,39 +74,38 @@ public class JOSEParserTests {
             "1.2.www.blackberry.com",
     };
 
-
     @Test
     void testValidJWS(){
         for(String joseObjectString: VALID_JWS){
-            ArrayList<JOSEObjectPair> joseObjects = Utils.extractJOSEObjects(joseObjectString);
-            assertEquals(1, joseObjects.size());
-            assertTrue(joseObjects.get(0).getModified() instanceof JWS);
+            List<JOSEObjectPair> joseObjects = Utils.extractJOSEObjects(joseObjectString);
+            assertThat(joseObjects).hasSize(1);
+            assertThat(joseObjects.get(0).getModified()).isInstanceOf(JWS.class);
         }
     }
 
     @Test
     void testInvalidJWS(){
         for(String joseObjectString: INVALID_JWS){
-            ArrayList<JOSEObjectPair> joseObjects = Utils.extractJOSEObjects(joseObjectString);
-            assertEquals(0, joseObjects.size());
+            List<JOSEObjectPair> joseObjects = Utils.extractJOSEObjects(joseObjectString);
+            assertThat(joseObjects).isEmpty();
         }
     }
 
     @Test
     void testValidJWE(){
         for(String joseObjectString: VALID_JWE){
-            ArrayList<JOSEObjectPair> joseObjects = Utils.extractJOSEObjects(joseObjectString);
-            assertEquals(1, joseObjects.size());
-            assertTrue(joseObjects.get(0).getModified() instanceof JWE);
+            List<JOSEObjectPair> joseObjects = Utils.extractJOSEObjects(joseObjectString);
+
+            assertThat(joseObjects).hasSize(1);
+            assertThat(joseObjects.get(0).getModified()).isInstanceOf(JWE.class);
         }
     }
 
     @Test
     void testInvalidJWE(){
         for(String joseObjectString: INVALID_JWE){
-            ArrayList<JOSEObjectPair> joseObjects = Utils.extractJOSEObjects(joseObjectString);
-            assertEquals(0, joseObjects.size());
+            List<JOSEObjectPair> joseObjects = Utils.extractJOSEObjects(joseObjectString);
+            assertThat(joseObjects).isEmpty();
         }
     }
-
 }
