@@ -5,8 +5,10 @@ import com.blackberry.jwteditor.model.config.ProxyConfig;
 import com.blackberry.jwteditor.model.jose.JOSEObjectPair;
 import com.blackberry.jwteditor.model.jose.JWS;
 import com.blackberry.jwteditor.model.persistence.ProxyConfigPersistence;
-import com.blackberry.jwteditor.presenter.PresenterStore;
+import com.blackberry.jwteditor.model.persistence.BurpKeysModelPersistence;
+import com.blackberry.jwteditor.model.persistence.KeysModelPersistence;
 import com.blackberry.jwteditor.utils.Utils;
+import com.blackberry.jwteditor.presenter.PresenterStore;
 import com.blackberry.jwteditor.view.BurpView;
 import com.blackberry.jwteditor.view.EditorView;
 import com.blackberry.jwteditor.view.RstaFactory;
@@ -14,7 +16,6 @@ import com.blackberry.jwteditor.view.RstaFactory.BurpThemeAwareRstaFactory;
 
 import javax.swing.*;
 import java.awt.*;
-import java.text.ParseException;
 
 /**
  * Burp extension main class
@@ -31,21 +32,9 @@ public class BurpExtender implements IBurpExtender, IMessageEditorTabFactory, IH
     public void registerExtenderCallbacks(IBurpExtenderCallbacks callbacks) {
         presenters = new PresenterStore();
 
-        // Try to load the keystore from the Burp project
-        String json = callbacks.loadExtensionSetting("com.blackberry.jwteditor.keystore");
+        KeysModelPersistence keysModelPersistence = new BurpKeysModelPersistence(callbacks);
 
-        // If this fails (empty), create a new keystore
-        KeysModel keysModel;
-        if(json != null) {
-            try {
-                keysModel = KeysModel.parse(json);
-            } catch (ParseException e) {
-                keysModel = new KeysModel();
-            }
-        }
-        else {
-            keysModel = new KeysModel();
-        }
+        KeysModel keysModel = keysModelPersistence.loadOrCreateNew();
 
         for (Frame frame : Frame.getFrames()){
             if (frame.getName().equals("suiteFrame")) {
@@ -62,7 +51,7 @@ public class BurpExtender implements IBurpExtender, IMessageEditorTabFactory, IH
         BurpView burpView = new BurpView(
                 burp_frame,
                 presenters,
-                callbacks,
+                keysModelPersistence,
                 keysModel,
                 rstaFactory,
                 proxyConfigPersistence,

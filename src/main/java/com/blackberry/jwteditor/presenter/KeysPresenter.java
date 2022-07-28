@@ -18,11 +18,11 @@ limitations under the License.
 
 package com.blackberry.jwteditor.presenter;
 
-import burp.IBurpExtenderCallbacks;
 import com.blackberry.jwteditor.model.KeysModel;
 import com.blackberry.jwteditor.model.keys.JWKKey;
 import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.model.keys.PasswordKey;
+import com.blackberry.jwteditor.model.persistence.KeysModelPersistence;
 import com.blackberry.jwteditor.utils.PEMUtils;
 import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.view.KeysView;
@@ -34,9 +34,6 @@ import com.blackberry.jwteditor.view.dialog.keys.SymmetricKeyDialog;
 import com.nimbusds.jose.jwk.*;
 
 import javax.swing.*;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.util.List;
 
 /**
@@ -46,36 +43,30 @@ public class KeysPresenter extends Presenter {
 
     private final KeysModel model;
     private final KeysView view;
-    private final IBurpExtenderCallbacks callbacks;
     private final RstaFactory rstaFactory;
     private final PresenterStore presenters;
+    private final KeysModelPersistence keysModelPersistence;
 
     /**
      * Create a new KeysPresenter
      *
-     * @param view                   the KeysView to associate with the presenter
-     * @param presenters             the shared list of all presenters
-     * @param callbacks              Burp Suite callbacks (or null if standalone mode)
-     * @param keysModel              KeysModel to use (or null to create a new one)
-     * @param rstaFactory            Factory to create RSyntaxTextArea
+     * @param view                 the KeysView to associate with the presenter
+     * @param presenters           the shared list of all presenters
+     * @param keysModelPersistence class used to persist keys model
+     * @param keysModel            KeysModel to use (or null to create a new one)
+     * @param rstaFactory          Factory to create RSyntaxTextArea
      */
     public KeysPresenter(KeysView view,
                          PresenterStore presenters,
-                         IBurpExtenderCallbacks callbacks,
+                         KeysModelPersistence keysModelPersistence,
                          KeysModel keysModel,
                          RstaFactory rstaFactory) {
         this.view = view;
-        this.callbacks = callbacks;
         this.rstaFactory = rstaFactory;
-
-        if(keysModel == null){
-            model = new KeysModel();
-        }
-        else{
-            model = keysModel;
-        }
-
         this.presenters = presenters;
+        this.keysModelPersistence = keysModelPersistence;
+        this.model = keysModel == null ? new KeysModel() : keysModel;
+
         model.setPresenter(this);
         presenters.register(this);
         updateView();
@@ -216,21 +207,7 @@ public class KeysPresenter extends Presenter {
      * Callback called by the model when the model changes
      */
     public void onModelUpdated() {
-        // Callbacks being set indicates running as a Burp Extension
-        if(callbacks == null){
-            // Serialise the keystore and save to disk
-            try {
-                String json = Utils.prettyPrintJSON(model.serialize());
-                Files.write(Utils.getKeysFile(), json.getBytes(StandardCharsets.UTF_8));
-            }
-            catch (IOException e) {
-                System.out.println(Utils.getResourceString("error_save")); //NON-NLS
-            }
-        }
-        else {
-            // Serialise the keystore and save inside the active Burp session
-            callbacks.saveExtensionSetting("com.blackberry.jwteditor.keystore", model.serialize()); //NON-NLS
-        }
+        keysModelPersistence.save(model);
 
         // Refresh the view
         updateView();
