@@ -18,19 +18,23 @@ limitations under the License.
 
 package com.blackberry.jwteditor;
 
+import com.blackberry.jwteditor.model.keys.JWKKey;
+import com.blackberry.jwteditor.model.keys.Key;
+import com.blackberry.jwteditor.model.keys.PasswordKey;
 import com.blackberry.jwteditor.utils.PEMUtils;
 import com.blackberry.jwteditor.utils.PEMUtils.PemException;
-import com.nimbusds.jose.jwk.ECKey;
-import com.nimbusds.jose.jwk.OctetKeyPair;
-import com.nimbusds.jose.jwk.RSAKey;
+import com.nimbusds.jose.jwk.*;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
+import static com.blackberry.jwteditor.utils.PEMUtils.canConvertToPem;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 class JWKToPEMTests {
 
@@ -201,5 +205,21 @@ class JWKToPEMTests {
     @MethodSource("ocpInvalidJWKs")
     void octetKeyPairToPemInvalid(String jwkString) {
         assertThrows(Exception.class, () -> OctetKeyPair.parse(jwkString));
+    }
+
+    private static Stream<Arguments> keyToPemData() throws ParseException, Key.UnsupportedKeyException {
+        return Stream.of(
+                arguments(new JWKKey(RSAKey.parse(RSA2048PrivateDEN)), true),
+                arguments(new JWKKey(ECKey.parse(P256Private)), true),
+                arguments(new JWKKey(OctetKeyPair.parse(Ed25519Private)), true),
+                arguments(new JWKKey(new OctetSequenceKey.Builder("secret123".getBytes()).build()), false),
+                arguments(new PasswordKey("keyId", "secret123", 17, 29), false)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("keyToPemData")
+    void testCanConvertToPemForJWKs(Key key, boolean canConvert) {
+        assertEquals(canConvertToPem(key), canConvert);
     }
 }
