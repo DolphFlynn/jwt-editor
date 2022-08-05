@@ -33,7 +33,7 @@ import java.util.Map;
 /**
  * Class for secrets that can be represented as a JWK
  */
-public class JWKKey extends Key {
+public class JWKKey implements Key {
 
     private final JWK jwk;
     private final KeyType keyType;
@@ -255,6 +255,21 @@ public class JWKKey extends Key {
         return false;
     }
 
+    @Override
+    public boolean canConvertToPem() {
+        switch (getKeyType()) {
+            case RSA:
+            case EC:
+            case OKP:
+                return true;
+
+            case OCT:
+            case PASSWORD:
+            default:
+                return false;
+        }
+    }
+
     /**
      * Get the signing algorithms that can be used with this key
      *
@@ -447,12 +462,8 @@ public class JWKKey extends Key {
         }
     }
 
-    private byte[] padZeroes(byte[] key, int length) {
-        if(key.length >= length) {
-            return key;
-        }
-
-        return Arrays.copyOf(key, length);
+    private static byte[] padZeroes(byte[] key, int length) {
+        return key.length >= length ? key : Arrays.copyOf(key, length);
     }
 
     /**

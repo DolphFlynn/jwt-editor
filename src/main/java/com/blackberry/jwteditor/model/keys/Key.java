@@ -26,35 +26,37 @@ import org.json.JSONObject;
 import java.text.ParseException;
 
 /**
- * Abstract class containing common elements for all keys
+ * Interface containing common elements for all keys
  */
-public abstract class Key {
+public interface Key {
 
-    public abstract String getID();
-    public abstract String getDescription();
-    public abstract String toString();
+    String getID();
+    String getDescription();
+    String toString();
 
-    public abstract boolean isPublic();
-    public abstract boolean isPrivate();
-    public abstract boolean canSign();
-    public abstract boolean canVerify();
-    public abstract boolean canEncrypt();
-    public abstract boolean canDecrypt();
+    boolean isPublic();
+    boolean isPrivate();
+    boolean canSign();
+    boolean canVerify();
+    boolean canEncrypt();
+    boolean canDecrypt();
 
-    public abstract boolean hasJWK();
-    public abstract boolean hasPEM();
+    boolean hasJWK();
+    boolean hasPEM();
 
+    boolean canConvertToPem();
 
-    public abstract JWSAlgorithm[] getSigningAlgorithms();
-    public abstract JWEAlgorithm[] getKeyEncryptionKeyAlgorithms();
-    public abstract EncryptionMethod[] getContentEncryptionKeyAlgorithms(JWEAlgorithm keyEncryptionKeyAlgorithm);
+    JWSAlgorithm[] getSigningAlgorithms();
+    JWEAlgorithm[] getKeyEncryptionKeyAlgorithms();
 
-    public abstract JWSSigner getSigner() throws JOSEException;
-    public abstract JWSVerifier getVerifier() throws JOSEException;
-    public abstract JWEEncrypter getEncrypter(JWEAlgorithm kekAlgorithm) throws JOSEException;
-    public abstract JWEDecrypter getDecrypter(JWEAlgorithm kekAlgorithm) throws JOSEException;
+    EncryptionMethod[] getContentEncryptionKeyAlgorithms(JWEAlgorithm keyEncryptionKeyAlgorithm);
+    JWSSigner getSigner() throws JOSEException;
+    JWSVerifier getVerifier() throws JOSEException;
+    JWEEncrypter getEncrypter(JWEAlgorithm kekAlgorithm) throws JOSEException;
 
-    public abstract JSONObject toJSONObject();
+    JWEDecrypter getDecrypter(JWEAlgorithm kekAlgorithm) throws JOSEException;
+
+    JSONObject toJSONObject();
 
     /**
      * Parse a password or JWK from a JSON object
@@ -63,7 +65,7 @@ public abstract class Key {
      * @throws ParseException if parsing fails
      * @throws UnsupportedKeyException if the key construction fails
      */
-    public static Key fromJSONObject(JSONObject jsonObject) throws ParseException, UnsupportedKeyException {
+    static Key fromJSONObject(JSONObject jsonObject) throws ParseException, UnsupportedKeyException {
 
         if( jsonObject.has("key_id") &&  //NON-NLS
             jsonObject.has("password") && //NON-NLS
@@ -82,7 +84,6 @@ public abstract class Key {
     }
 
 
-    public static class UnsupportedKeyException extends Exception{
-
+    class UnsupportedKeyException extends Exception {
     }
 }
