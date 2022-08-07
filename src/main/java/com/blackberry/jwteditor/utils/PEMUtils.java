@@ -18,6 +18,7 @@ limitations under the License.
 
 package com.blackberry.jwteditor.utils;
 
+import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.model.keys.JWKKey;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.*;
@@ -124,6 +125,32 @@ public class PEMUtils {
             }
         } catch (com.blackberry.jwteditor.model.keys.Key.UnsupportedKeyException e) {
             throw new PemException("Invalid JWK type for PEM conversions");
+        }
+    }
+
+    /**
+     * Tests whether specified key can be converted to PEM format
+     *
+     * @param key the key to test
+     * @return true if key can be converted to PEM format
+     */
+    public static boolean canConvertToPem(Key key) {
+        if (!(key instanceof JWKKey)) {
+            return false;
+        }
+
+        JWKKey jwkKey = (JWKKey) key;
+
+        switch (jwkKey.getKeyType()) {
+            case RSA:
+            case EC:
+            case OKP:
+                return true;
+
+            case OCT:
+            case PASSWORD:
+            default:
+                return false;
         }
     }
 
