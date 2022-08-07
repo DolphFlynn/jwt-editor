@@ -32,15 +32,14 @@ public class BurpExtender implements IBurpExtender, IMessageEditorTabFactory, IH
     public void registerExtenderCallbacks(IBurpExtenderCallbacks callbacks) {
         presenters = new PresenterStore();
 
-        KeysModelPersistence keysModelPersistence = new BurpKeysModelPersistence(callbacks);
-
-        KeysModel keysModel = keysModelPersistence.loadOrCreateNew();
-
         for (Frame frame : Frame.getFrames()){
             if (frame.getName().equals("suiteFrame")) {
                 burp_frame = (JFrame) frame;
             }
         }
+
+        KeysModelPersistence keysModelPersistence = new BurpKeysModelPersistence(callbacks);
+        KeysModel keysModel = keysModelPersistence.loadOrCreateNew();
 
         ProxyConfigPersistence proxyConfigPersistence = new ProxyConfigPersistence(callbacks);
         proxyConfig = proxyConfigPersistence.loadOrCreateNew();

@@ -18,10 +18,10 @@ limitations under the License.
 
 package com.blackberry.jwteditor.view;
 
-import burp.IBurpExtenderCallbacks;
 import burp.ITab;
 import com.blackberry.jwteditor.model.KeysModel;
 import com.blackberry.jwteditor.model.config.ProxyConfig;
+import com.blackberry.jwteditor.model.persistence.KeysModelPersistence;
 import com.blackberry.jwteditor.model.persistence.ProxyConfigPersistence;
 import com.blackberry.jwteditor.presenter.BurpPresenter;
 import com.blackberry.jwteditor.presenter.PresenterStore;
@@ -42,7 +42,7 @@ public class BurpView implements ITab {
     private final BurpPresenter presenter;
     private final JFrame parent;
     private final PresenterStore presenters;
-    private final IBurpExtenderCallbacks callbacks;
+    private final KeysModelPersistence keysModelPersistence;
     private final KeysModel keysModel;
     private final RstaFactory rstaFactory;
 
@@ -54,14 +54,14 @@ public class BurpView implements ITab {
     public BurpView(
             JFrame parent,
             PresenterStore presenters,
-            IBurpExtenderCallbacks callbacks,
+            KeysModelPersistence keysModelPersistence,
             KeysModel keysModel,
             RstaFactory rstaFactory,
             ProxyConfigPersistence proxyConfigPersistence,
             ProxyConfig proxyConfig) {
         this.parent = parent;
         this.presenters = presenters;
-        this.callbacks = callbacks;
+        this.keysModelPersistence = keysModelPersistence;
         this.keysModel = keysModel;
         this.rstaFactory = rstaFactory;
 
@@ -106,7 +106,7 @@ public class BurpView implements ITab {
         keysView = new KeysView(
                 parent,
                 presenters,
-                callbacks,
+                keysModelPersistence,
                 keysModel,
                 rstaFactory
         );
