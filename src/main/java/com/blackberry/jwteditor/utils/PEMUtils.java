@@ -18,15 +18,11 @@ limitations under the License.
 
 package com.blackberry.jwteditor.utils;
 
+import com.blackberry.jwteditor.pem.JWKToPemConverterFactory;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.*;
-import com.nimbusds.jose.util.Base64URL;
 import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
-import org.bouncycastle.crypto.params.Ed25519PrivateKeyParameters;
-import org.bouncycastle.crypto.params.Ed448PrivateKeyParameters;
-import org.bouncycastle.crypto.params.X25519PrivateKeyParameters;
-import org.bouncycastle.crypto.params.X448PrivateKeyParameters;
 import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPrivateKey;
 import org.bouncycastle.jce.spec.ECParameterSpec;
 import org.bouncycastle.jce.spec.ECPublicKeySpec;
@@ -49,9 +45,6 @@ import java.security.spec.InvalidKeySpecException;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Map;
-
-import static com.blackberry.jwteditor.utils.ByteArrayUtils.trimByteArray;
-import static java.util.Arrays.stream;
 
 /**
  * Class containing utilities to convert between PEM and nimbus-jose JWK formats
@@ -269,80 +262,6 @@ public class PEMUtils {
             throw new PemException("Invalid number of ASN1 objects");
         } catch (ClassCastException e){
             throw new PemException("Invalid ASN1");
-        }
-    }
-
-    enum OKPCurve {
-        X25519(Curve.X25519, 32, "1.3.101.110"),
-        X448(Curve.X448, 56, "1.3.101.111"),
-        ED25519(Curve.Ed25519, 32, "1.3.101.112"),
-        ED448(Curve.Ed448, 57, "1.3.101.113");
-
-        private final Curve curve;
-        private final int keyLength;
-        private final ASN1ObjectIdentifier oid;
-
-        OKPCurve(Curve curve, int keyLength, String oid) {
-            this.curve = curve;
-            this.keyLength = keyLength;
-            this.oid = new ASN1ObjectIdentifier(oid);
-        }
-
-        OctetKeyPair buildPrivateKeyFrom(byte[] octets) throws PemException {
-            if (octets.length != keyLength) {
-                throw new PemException("Invalid key length");
-            }
-
-            Base64URL x = Base64URL.encode(extractPublicKeyFromPrivateKey(octets));
-            Base64URL d = Base64URL.encode(octets);
-
-            return new OctetKeyPair.Builder(curve, x).d(d).build();
-        }
-
-        OctetKeyPair buildPublicKeyFrom(byte[] octets) {
-            Base64URL x = Base64URL.encode(trimByteArray(octets, keyLength));
-            return new OctetKeyPair.Builder(curve, x).build();
-        }
-
-        ASN1Encodable objectIdentifier() {
-            return oid;
-        }
-
-        int keyLength() {
-            return keyLength;
-        }
-
-        private byte[] extractPublicKeyFromPrivateKey(byte[] octets) throws PemException {
-            switch (this) {
-                case X25519:
-                    return new X25519PrivateKeyParameters(octets).generatePublicKey().getEncoded();
-
-                case X448:
-                    return new X448PrivateKeyParameters(octets).generatePublicKey().getEncoded();
-
-                case ED25519:
-                    return new Ed25519PrivateKeyParameters(octets).generatePublicKey().getEncoded();
-
-                case ED448:
-                    return new Ed448PrivateKeyParameters(octets).generatePublicKey().getEncoded();
-
-                default:
-                    throw new PemException("Unsupported curve " + this);
-            }
-        }
-
-        static OKPCurve fromStandardName(String name) throws PemException {
-            return stream(values())
-                    .filter(curve -> curve.curve.getStdName().equals(name))
-                    .findFirst()
-                    .orElseThrow(() -> new PemException("Invalid curve with name: " + name));
-        }
-
-        static OKPCurve fromAlgorithmId(String oid) throws PemException {
-            return stream(values())
-                    .filter(curve -> curve.oid.getId().equals(oid))
-                    .findFirst()
-                    .orElseThrow(() -> new PemException("Invalid curve with OID: " + oid));
         }
     }
 }

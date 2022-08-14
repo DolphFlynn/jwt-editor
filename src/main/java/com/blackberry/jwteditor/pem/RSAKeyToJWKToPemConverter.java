@@ -1,4 +1,4 @@
-package com.blackberry.jwteditor.utils;
+package com.blackberry.jwteditor.pem;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.RSAKey;

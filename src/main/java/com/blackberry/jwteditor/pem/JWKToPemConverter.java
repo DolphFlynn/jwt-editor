@@ -1,4 +1,4 @@
-package com.blackberry.jwteditor.utils;
+package com.blackberry.jwteditor.pem;
 
 import com.blackberry.jwteditor.utils.PEMUtils.PemException;
 import com.nimbusds.jose.JOSEException;
