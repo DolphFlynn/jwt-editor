@@ -19,75 +19,79 @@ limitations under the License.
 package com.blackberry.jwteditor;
 
 import com.blackberry.jwteditor.utils.PEMUtils;
+import com.blackberry.jwteditor.utils.PEMUtils.PemException;
 import com.nimbusds.jose.jwk.ECKey;
 import com.nimbusds.jose.jwk.OctetKeyPair;
 import com.nimbusds.jose.jwk.RSAKey;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.security.Security;
+import java.util.Arrays;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class PEMToJWKTests {
 
-    public static final String PRIME256v1PrivatePKCS8 = "-----BEGIN PRIVATE KEY-----\n" +
+    private static final String PRIME256v1PrivatePKCS8 = "-----BEGIN PRIVATE KEY-----\n" +
             "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgR7xUBrtHikGBXsJk\n" +
             "DekdUxWWC2YhYMKTDXILREc4/7uhRANCAAQrHJ52L8MTrBl0LWyEx5hXH0i9JeXX\n" +
             "hFGn9nm1mMGh2lF7be9CQr3tHP6bmbI8kx7Sw+sXwb6CN31aIfVs4R/j\n" +
             "-----END PRIVATE KEY-----";
 
-    public static final String PRIME256v1PrivateSEC1 = "-----BEGIN EC PRIVATE KEY-----\n" +
+    private static final String PRIME256v1PrivateSEC1 = "-----BEGIN EC PRIVATE KEY-----\n" +
             "MHcCAQEEIEe8VAa7R4pBgV7CZA3pHVMVlgtmIWDCkw1yC0RHOP+7oAoGCCqGSM49\n" +
             "AwEHoUQDQgAEKxyedi/DE6wZdC1shMeYVx9IvSXl14RRp/Z5tZjBodpRe23vQkK9\n" +
             "7Rz+m5myPJMe0sPrF8G+gjd9WiH1bOEf4w==\n" +
             "-----END EC PRIVATE KEY-----\n";
 
-    public static final String PRIME256v1Public = "-----BEGIN PUBLIC KEY-----\n" +
+    private static final String PRIME256v1Public = "-----BEGIN PUBLIC KEY-----\n" +
             "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEKxyedi/DE6wZdC1shMeYVx9IvSXl\n" +
             "14RRp/Z5tZjBodpRe23vQkK97Rz+m5myPJMe0sPrF8G+gjd9WiH1bOEf4w==\n" +
             "-----END PUBLIC KEY-----\n";
 
 
-    public static final String SECP256K1PrivateSEC1 = "-----BEGIN EC PRIVATE KEY-----\n" +
+    private static final String SECP256K1PrivateSEC1 = "-----BEGIN EC PRIVATE KEY-----\n" +
             "MHQCAQEEIPN7f0wS3vreE9CjEEGOqGciNPoj9nqyu8TyBTgP9henoAcGBSuBBAAK\n" +
             "oUQDQgAE8/GY7z+hgeR8UripTXvk8LCx0m18tYlrMmwkEYr0VyrPAuIDUwingBqA\n" +
             "sH2vsEMgMZaXXSrsQYQNWo2SBIN0lQ==\n" +
             "-----END EC PRIVATE KEY-----\n";
 
-    public static final String SECP256K1PrivatePKCS8 = "-----BEGIN PRIVATE KEY-----\n" +
+    private static final String SECP256K1PrivatePKCS8 = "-----BEGIN PRIVATE KEY-----\n" +
             "MIGEAgEAMBAGByqGSM49AgEGBSuBBAAKBG0wawIBAQQg83t/TBLe+t4T0KMQQY6o\n" +
             "ZyI0+iP2erK7xPIFOA/2F6ehRANCAATz8ZjvP6GB5HxSuKlNe+TwsLHSbXy1iWsy\n" +
             "bCQRivRXKs8C4gNTCKeAGoCwfa+wQyAxlpddKuxBhA1ajZIEg3SV\n" +
             "-----END PRIVATE KEY-----\n";
 
-    public static final String SECP256K1Public = "-----BEGIN PUBLIC KEY-----\n" +
+    private static final String SECP256K1Public = "-----BEGIN PUBLIC KEY-----\n" +
             "MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAE8/GY7z+hgeR8UripTXvk8LCx0m18tYlr\n" +
             "MmwkEYr0VyrPAuIDUwingBqAsH2vsEMgMZaXXSrsQYQNWo2SBIN0lQ==\n" +
             "-----END PUBLIC KEY-----\n";
 
-    public static final String SECP384R1PrivatePKCS8 = "-----BEGIN PRIVATE KEY-----\n" +
+    private static final String SECP384R1PrivatePKCS8 = "-----BEGIN PRIVATE KEY-----\n" +
             "MIG2AgEAMBAGByqGSM49AgEGBSuBBAAiBIGeMIGbAgEBBDAkpfmck1kNnG1L3MSL\n" +
             "wALFQOxIBriwc499iT6687Qh8iXU+qFrY8RJyuzDVGe46L2hZANiAAT80M09vag9\n" +
             "hHCeyJnmIXho1Yu628/AT1o0STyfSi4ZkB2tLWmrrmaIeKZist4OfvpK0BGhRFcb\n" +
             "Y4cljodjnEbYjoeib/dlewwTYpxuUJCgXSdo2Bf7/gi8e70fKTb1awI=\n" +
             "-----END PRIVATE KEY-----\n";
 
-    public static final String SECP384R1PrivateSEC1 = "-----BEGIN EC PRIVATE KEY-----\n" +
+    private static final String SECP384R1PrivateSEC1 = "-----BEGIN EC PRIVATE KEY-----\n" +
             "MIGkAgEBBDAkpfmck1kNnG1L3MSLwALFQOxIBriwc499iT6687Qh8iXU+qFrY8RJ\n" +
             "yuzDVGe46L2gBwYFK4EEACKhZANiAAT80M09vag9hHCeyJnmIXho1Yu628/AT1o0\n" +
             "STyfSi4ZkB2tLWmrrmaIeKZist4OfvpK0BGhRFcbY4cljodjnEbYjoeib/dlewwT\n" +
             "YpxuUJCgXSdo2Bf7/gi8e70fKTb1awI=\n" +
             "-----END EC PRIVATE KEY-----\n";
 
-    public static final String SECP384R1Public =  "-----BEGIN PUBLIC KEY-----\n" +
+    private static final String SECP384R1Public =  "-----BEGIN PUBLIC KEY-----\n" +
             "MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAE/NDNPb2oPYRwnsiZ5iF4aNWLutvPwE9a\n" +
             "NEk8n0ouGZAdrS1pq65miHimYrLeDn76StARoURXG2OHJY6HY5xG2I6Hom/3ZXsM\n" +
             "E2KcblCQoF0naNgX+/4IvHu9Hyk29WsC\n" +
             "-----END PUBLIC KEY-----\n";
 
-    public static final String SECP521R1PrivatePCKS8 = "-----BEGIN PRIVATE KEY-----\n" +
+    private static final String SECP521R1PrivatePCKS8 = "-----BEGIN PRIVATE KEY-----\n" +
             "MIHuAgEAMBAGByqGSM49AgEGBSuBBAAjBIHWMIHTAgEBBEIAtat9ezvGvb3BUxwR\n" +
             "OPol+8amfRTtQcFvFWNnyOfNJF0GxcoZS9wuIIK3vaFKl4fOh7zd3pwZ1WErSxzA\n" +
             "DS8TY0WhgYkDgYYABAHzfrOZwPomdJFAzKpUqLMz80/XjL2Brv1S26nJo1eh+m1X\n" +
@@ -96,7 +100,7 @@ class PEMToJWKTests {
             "Ew==\n" +
             "-----END PRIVATE KEY-----\n";
 
-    public static final String SECP521R1PrivateSEC1 = "-----BEGIN EC PRIVATE KEY-----\n" +
+    private static final String SECP521R1PrivateSEC1 = "-----BEGIN EC PRIVATE KEY-----\n" +
             "MIHcAgEBBEIAtat9ezvGvb3BUxwROPol+8amfRTtQcFvFWNnyOfNJF0GxcoZS9wu\n" +
             "IIK3vaFKl4fOh7zd3pwZ1WErSxzADS8TY0WgBwYFK4EEACOhgYkDgYYABAHzfrOZ\n" +
             "wPomdJFAzKpUqLMz80/XjL2Brv1S26nJo1eh+m1XyV3jKGZhZFtEx5/UVW491LJk\n" +
@@ -104,7 +108,7 @@ class PEMToJWKTests {
             "+kxd73FsqjI506m3gBUS0oRiWKtR/6UX/spFaglSEw==\n" +
             "-----END EC PRIVATE KEY-----\n";
 
-    public static final String SECP521R1Public = "-----BEGIN PUBLIC KEY-----\n" +
+    private static final String SECP521R1Public = "-----BEGIN PUBLIC KEY-----\n" +
             "MIGbMBAGByqGSM49AgEGBSuBBAAjA4GGAAQB836zmcD6JnSRQMyqVKizM/NP14y9\n" +
             "ga79UtupyaNXofptV8ld4yhmYWRbRMef1FVuPdSyZPou1fLQmULt3KUhddEAxyT+\n" +
             "vpVYixL60g/sIG3m9d34nYrrldlbFTsAUKC9yhiUNvpMXe9xbKoyOdOpt4AVEtKE\n" +
@@ -112,15 +116,15 @@ class PEMToJWKTests {
             "-----END PUBLIC KEY-----\n";
 
 
-    public static final String X25519Private = "-----BEGIN PRIVATE KEY-----\n" +
+    private static final String X25519Private = "-----BEGIN PRIVATE KEY-----\n" +
             "MC4CAQAwBQYDK2VuBCIEIPgRPKqga++sfwqOIBjZ7HFEPbJ03wqa/xbbIZ27T6BM\n" +
             "-----END PRIVATE KEY-----\n";
 
-    public static final String X25519Public = "-----BEGIN PUBLIC KEY-----\n" +
+    private static final String X25519Public = "-----BEGIN PUBLIC KEY-----\n" +
             "MCowBQYDK2VuAyEAwkCeJq/OWjW7jEXyLFnFOz/ZMfEcTssin8MPvl4PEyI=\n" +
             "-----END PUBLIC KEY-----\n";
 
-    public static final String RSA512Private = "-----BEGIN RSA PRIVATE KEY-----\n" +
+    private static final String RSA512Private = "-----BEGIN RSA PRIVATE KEY-----\n" +
             "MIIBOgIBAAJBAPPJiFwXk7ZgPdPCHvGLxdliseVYhTB8LMCUHOEtBaugH3yMpo/G\n" +
             "OSQg8gjCUrW/mC9LVfRRfp+ZnvyQw0bPYfkCAwEAAQJBAILvSASmSRiX4j0csr/q\n" +
             "4U2bW46hl49t8h9QrZ4nLzd4kXYsx1Sq7rrCWKl6N15rvMU1FuxT7rSb0xBTlltc\n" +
@@ -130,12 +134,12 @@ class PEMToJWKTests {
             "dw0Ervattq78H6ryQfZaec//c5AHdsFOqwei+6pN\n" +
             "-----END RSA PRIVATE KEY-----\n";
 
-    public static final String RSA512Public = "-----BEGIN PUBLIC KEY-----\n" +
+    private static final String RSA512Public = "-----BEGIN PUBLIC KEY-----\n" +
             "MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAPPJiFwXk7ZgPdPCHvGLxdliseVYhTB8\n" +
             "LMCUHOEtBaugH3yMpo/GOSQg8gjCUrW/mC9LVfRRfp+ZnvyQw0bPYfkCAwEAAQ==\n" +
             "-----END PUBLIC KEY-----\n";
 
-    public static final String RSA1024Private = "-----BEGIN RSA PRIVATE KEY-----\n" +
+    private static final String RSA1024Private = "-----BEGIN RSA PRIVATE KEY-----\n" +
             "MIICWwIBAAKBgQC/Xgl6Ks3JBFA+68XabvonzWBRzx8ZSgtZptRsze7Og8aYrrn4\n" +
             "XzRuoaXsu40TM22E7rt684YzfRLzwCLEs9fH6i+r/2ymkJOf/MXpRKUih2xDpH/x\n" +
             "IhRLz/LD3zYiO+iJ14/VSHKE1V9EwANnoOYxHGj8xqVY0i3wZVEY+5skwQIDAQAB\n" +
@@ -151,14 +155,14 @@ class PEMToJWKTests {
             "Sk+vHfigwzUxYFSl/XwKhPzX0Um0Vq/cvO2rEJfMUg==\n" +
             "-----END RSA PRIVATE KEY-----\n";
 
-    public static final String RSA1024Public = "-----BEGIN PUBLIC KEY-----\n" +
+    private static final String RSA1024Public = "-----BEGIN PUBLIC KEY-----\n" +
             "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC/Xgl6Ks3JBFA+68XabvonzWBR\n" +
             "zx8ZSgtZptRsze7Og8aYrrn4XzRuoaXsu40TM22E7rt684YzfRLzwCLEs9fH6i+r\n" +
             "/2ymkJOf/MXpRKUih2xDpH/xIhRLz/LD3zYiO+iJ14/VSHKE1V9EwANnoOYxHGj8\n" +
             "xqVY0i3wZVEY+5skwQIDAQAB\n" +
             "-----END PUBLIC KEY-----\n";
 
-    public static final String RSA2048Private = "-----BEGIN RSA PRIVATE KEY-----\n" +
+    private static final String RSA2048Private = "-----BEGIN RSA PRIVATE KEY-----\n" +
             "MIIEpAIBAAKCAQEAzSL+XrvMUim9vq+tj9j7TSKn6d3DI9saRTMJPj8S6mADSgZG\n" +
             "4JE6ZOtFwzV9NHllcuxnIFxpo/iq0K3hVdQP1R6UvTSk9jxnufR2fiPN3Nc7WdAZ\n" +
             "6bxOAkATootjoMG5BMIbU34tdRK5UBiN1ewznRn3ZV2kNUkw1RElCyyXWOteuZVP\n" +
@@ -186,7 +190,7 @@ class PEMToJWKTests {
             "+JvNmGVK1CC0mitNctz6rxsURSSnaJF86k2CigfPlkVs8cW5DMIZZg==\n" +
             "-----END RSA PRIVATE KEY-----\n";
 
-    public static final String RSA2048Public = "-----BEGIN PUBLIC KEY-----\n" +
+    private static final String RSA2048Public = "-----BEGIN PUBLIC KEY-----\n" +
             "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzSL+XrvMUim9vq+tj9j7\n" +
             "TSKn6d3DI9saRTMJPj8S6mADSgZG4JE6ZOtFwzV9NHllcuxnIFxpo/iq0K3hVdQP\n" +
             "1R6UvTSk9jxnufR2fiPN3Nc7WdAZ6bxOAkATootjoMG5BMIbU34tdRK5UBiN1ewz\n" +
@@ -196,7 +200,7 @@ class PEMToJWKTests {
             "4wIDAQAB\n" +
             "-----END PUBLIC KEY-----\n";
 
-    public static final String RSA3072Private = "-----BEGIN RSA PRIVATE KEY-----\n" +
+    private static final String RSA3072Private = "-----BEGIN RSA PRIVATE KEY-----\n" +
             "MIIG5QIBAAKCAYEAveNnew9oJECmfopx2wzFJaXKT4KgJ0vp8SmRl5wGVq5toU50\n" +
             "BTIj1m1tJuMDS9NAI8vYt9IUaqZ/wdKudV2cnD2bTz32lbcur/SgDj7aWr/Mhzw/\n" +
             "+qwS3N4FTacVT+Fqfj2D37Xe6SlyhO0X9qrV2ugQlwTmu4QubvIKkPeJcnoheYAf\n" +
@@ -236,7 +240,7 @@ class PEMToJWKTests {
             "73KEn+LfoSq53tDTwxfB/0XgiBsacQM3Qr/7vqQeCbCTgztTnLpSUhE=\n" +
             "-----END RSA PRIVATE KEY-----\n";
 
-    public static final String RSA3072Public = "-----BEGIN PUBLIC KEY-----\n" +
+    private static final String RSA3072Public = "-----BEGIN PUBLIC KEY-----\n" +
             "MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAveNnew9oJECmfopx2wzF\n" +
             "JaXKT4KgJ0vp8SmRl5wGVq5toU50BTIj1m1tJuMDS9NAI8vYt9IUaqZ/wdKudV2c\n" +
             "nD2bTz32lbcur/SgDj7aWr/Mhzw/+qwS3N4FTacVT+Fqfj2D37Xe6SlyhO0X9qrV\n" +
@@ -248,7 +252,7 @@ class PEMToJWKTests {
             "3DWqyTqhM5RKj9t9Hc1ocqdQh0uAHIhJVZUzk32d/C6lAgMBAAE=\n" +
             "-----END PUBLIC KEY-----\n";
 
-    public static final String RSA4096Private = "-----BEGIN RSA PRIVATE KEY-----\n" +
+    private static final String RSA4096Private = "-----BEGIN RSA PRIVATE KEY-----\n" +
             "MIIJJwIBAAKCAgEAxA5+ROF30GELK7WyRUt5kYx2anaBDazJFDsVfuNNFcYfrwLZ\n" +
             "8D25hoR2dyC50YZ3uHb+KsCfQxNJwKur6FbBgtVZJIPkEeJSCb14Oh4trrlIpb0d\n" +
             "+RNntlgPK9UDkOAVTjHMI1LPB99osNJ1wTaxxB+gfqWSDijeMEBdhZ3/ZX+/x3ER\n" +
@@ -300,7 +304,7 @@ class PEMToJWKTests {
             "saeqYmS9IbkuZloqvCqTQqfFSfgXMdvgT+CixyqfgakwudAY+T+BgLPOxQ==\n" +
             "-----END RSA PRIVATE KEY-----\n";
 
-    public static final String RSA4096Public = "-----BEGIN PUBLIC KEY-----\n" +
+    private static final String RSA4096Public = "-----BEGIN PUBLIC KEY-----\n" +
             "MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAxA5+ROF30GELK7WyRUt5\n" +
             "kYx2anaBDazJFDsVfuNNFcYfrwLZ8D25hoR2dyC50YZ3uHb+KsCfQxNJwKur6FbB\n" +
             "gtVZJIPkEeJSCb14Oh4trrlIpb0d+RNntlgPK9UDkOAVTjHMI1LPB99osNJ1wTax\n" +
@@ -315,36 +319,36 @@ class PEMToJWKTests {
             "P+0k/a2t/7GLu2GL/d5AFv0CAwEAAQ==\n" +
             "-----END PUBLIC KEY-----\n";
 
-    public static String ED448Private = "-----BEGIN PRIVATE KEY-----\n" +
+    private static final String ED448Private = "-----BEGIN PRIVATE KEY-----\n" +
             "MEcCAQAwBQYDK2VxBDsEOShHsf2xx7zi/GQOknZExKC8xcO3xdDrDFKyEY8TKdrZ\n" +
             "Y84Y+XpGx9is96BqgpDYK5Avq5vUsgTmHA==\n" +
             "-----END PRIVATE KEY-----\n";
 
-    public static String ED448Public = "-----BEGIN PUBLIC KEY-----\n" +
+    private static final String ED448Public = "-----BEGIN PUBLIC KEY-----\n" +
             "MEMwBQYDK2VxAzoAy4WecbUYEP3O7++Bt0/7oDWhKHsP2uRYWLfD4TO0LpW8w4cM\n" +
             "uj6Wl78QYoYr2Sc2poyjt4BeNiKA\n" +
             "-----END PUBLIC KEY-----\n";
 
-    public static final String ED25519Private = "-----BEGIN PRIVATE KEY-----\n" +
+    private static final String ED25519Private = "-----BEGIN PRIVATE KEY-----\n" +
             "MC4CAQAwBQYDK2VwBCIEIOTL3VV2R9BELspLlaOR3nBmJApK99kuBKx/Lzr2v1sa\n" +
             "-----END PRIVATE KEY-----\n";
 
-    public static final String ED25519Public = "-----BEGIN PUBLIC KEY-----\n" +
+    private static final String ED25519Public = "-----BEGIN PUBLIC KEY-----\n" +
             "MCowBQYDK2VwAyEAIOp8VZPD2Qx5Hgd+gsJUQBThqOnvxruxuDUoAMIn3Ow=\n" +
             "-----END PUBLIC KEY-----\n";
 
-    public static String X448Private = "-----BEGIN PRIVATE KEY-----\n" +
+    private static final String X448Private = "-----BEGIN PRIVATE KEY-----\n" +
             "MEYCAQAwBQYDK2VvBDoEOOhbOc3z/5awW274AWzUTnvZh6IIBFRcYTWDtjgGDGbb\n" +
             "yQbJyU200FnveqlcPHQK8cr+ahhDf6uf\n" +
             "-----END PRIVATE KEY-----\n";
 
-    public static String X448Public = "-----BEGIN PUBLIC KEY-----\n" +
+    private static final String X448Public = "-----BEGIN PUBLIC KEY-----\n" +
             "MEIwBQYDK2VvAzkALZAQ06R+yE4SMldgYX/zXjpB0GzE+xl7B4S7hDenvbCf7XxC\n" +
             "cKGtMu6M9wWC7+F9zO64rwmOux8=\n" +
             "-----END PUBLIC KEY-----\n";
 
 
-    public static final String[] ECPrivate = {
+    static final String[] ECPrivate = {
             PRIME256v1PrivateSEC1,
             PRIME256v1PrivatePKCS8,
             SECP256K1PrivateSEC1,
@@ -355,14 +359,14 @@ class PEMToJWKTests {
             SECP521R1PrivatePCKS8
     };
 
-    public static final String[] ECPublic = {
+    static final String[] ECPublic = {
             PRIME256v1Public,
             SECP256K1Public,
             SECP384R1Public,
             SECP521R1Public
     };
 
-    public static final String[] RSAPrivate = {
+    static final String[] RSAPrivate = {
             RSA512Private,
             RSA1024Private,
             RSA2048Private,
@@ -370,7 +374,7 @@ class PEMToJWKTests {
             RSA4096Private,
     };
 
-    public static final String[] RSAPublic = {
+    static final String[] RSAPublic = {
             RSA512Public,
             RSA1024Public,
             RSA2048Public,
@@ -378,122 +382,135 @@ class PEMToJWKTests {
             RSA4096Public
     };
 
-    public static final String [] OKPPrivate = {
+    static final String [] OKPPrivate = {
             ED448Private,
             ED25519Private,
             X448Private,
             X25519Private
     };
 
-    public static final String [] OKPPublic = {
+    static final String [] OKPPublic = {
             ED448Public,
             ED25519Public,
             X448Public,
             X25519Public
     };
 
-    static {
+    @BeforeAll
+    static void addBouncyCastle() {
         Security.addProvider(new BouncyCastleProvider());
     }
 
-    @Test
-    void pemToECKeyPairValid() throws PEMUtils.PemException {
-        for(String pem: ECPrivate) {
-            ECKey ecKey = PEMUtils.pemToECKey(pem);
-            assertTrue(ecKey.isPrivate());
-        }
-
-        for(String pem: ECPublic) {
-            ECKey ecKey = PEMUtils.pemToECKey(pem);
-            assertFalse(ecKey.isPrivate());
-        }
+    private static Stream<String> ecPrivateValidPEMs() {
+        return Stream.of(ECPrivate);
     }
 
-    @Test
-    void pemToECKeyPairInvalid() {
-
-        String[][] invalidPEMS = {RSAPublic, RSAPrivate, OKPPrivate, OKPPublic};
-
-        for(String[] invalid: invalidPEMS){
-            for(String pem: invalid){
-                Assertions.assertThrows(PEMUtils.PemException.class, () -> {
-                    ECKey keyPair = PEMUtils.pemToECKey(pem);
-                });
-            }
-        }
+    @ParameterizedTest
+    @MethodSource("ecPrivateValidPEMs")
+    void pemToECKeyPrivateValid(String pem) throws PemException {
+        ECKey ecKey = PEMUtils.pemToECKey(pem);
+        assertTrue(ecKey.isPrivate());
     }
 
-    @Test
-    void pemToRSAKeyPairValid() throws PEMUtils.PemException {
-        for(String pem: RSAPrivate) {
-            RSAKey rsaKey = PEMUtils.pemToRSAKey(pem);
-            assertTrue(rsaKey.isPrivate());
-        }
-
-        for(String pem: RSAPublic) {
-            RSAKey rsaKey = PEMUtils.pemToRSAKey(pem);
-            assertFalse(rsaKey.isPrivate());
-        }
+    private static Stream<String> ecPublicValidPEMs() {
+        return Stream.of(ECPublic);
     }
 
-    @Test
-    void pemToRSAKeyPairInvalid() {
-
-        String[][] invalidPEMS = {ECPublic, ECPrivate, OKPPrivate, OKPPublic};
-
-        for(String[] invalid: invalidPEMS){
-            for(String pem: invalid){
-                Assertions.assertThrows(PEMUtils.PemException.class, () -> {
-                    RSAKey rsaKey = PEMUtils.pemToRSAKey(pem);
-                });
-            }
-        }
+    @ParameterizedTest
+    @MethodSource("ecPublicValidPEMs")
+    void pemToECKeyPublicValid(String pem) throws PemException {
+        ECKey ecKey = PEMUtils.pemToECKey(pem);
+        assertFalse(ecKey.isPrivate());
     }
 
-    @Test
-    void pemToOctetKeyPairValid() throws PEMUtils.PemException {
-        for(String pem: OKPPrivate) {
-            OctetKeyPair octetKeyPair = PEMUtils.pemToOctetKeyPair(pem);
-            assertNotNull(octetKeyPair.getD());
-            assertNotNull(octetKeyPair.getX());
-            assertTrue(octetKeyPair.isPrivate());
-        }
-
-        for(String pem: OKPPublic) {
-            OctetKeyPair octetKeyPair = PEMUtils.pemToOctetKeyPair(pem);
-            assertNotNull(octetKeyPair.getX());
-            assertNull(octetKeyPair.getD());
-            assertFalse(octetKeyPair.isPrivate());
-        }
+    private static Stream<String> ecInvalidPEMs() {
+        return Stream.of(RSAPublic, RSAPrivate, OKPPrivate, OKPPublic).flatMap(Arrays::stream);
     }
 
-    @Test
-    void pemToOctetKeyPairInvalid() {
-
-        String[][] invalidPEMS = {ECPublic, ECPrivate, RSAPrivate, RSAPublic};
-
-        for(String[] invalid: invalidPEMS){
-            for(String pem: invalid){
-                Assertions.assertThrows(PEMUtils.PemException.class, () -> {
-                    OctetKeyPair octetKeyPair = PEMUtils.pemToOctetKeyPair(pem);
-                });
-            }
-        }
+    @ParameterizedTest
+    @MethodSource("ecInvalidPEMs")
+    void pemToECKeyPairInvalid(String pem) {
+        assertThrows(PemException.class, () -> PEMUtils.pemToECKey(pem));
     }
 
-    @Test
-    void octetKeyPairToPem() throws PEMUtils.PemException {
+    private static Stream<String> rsaPrivateValidPEMs() {
+        return Stream.of(RSAPrivate);
+    }
 
-        for(String pem: OKPPrivate) {
-            OctetKeyPair octetKeyPair = PEMUtils.pemToOctetKeyPair(pem);
-            String newPem = PEMUtils.octetKeyPairToPem(octetKeyPair);
-            assertEquals(pem, newPem);
-        }
+    @ParameterizedTest
+    @MethodSource("rsaPrivateValidPEMs")
+    void pemToRSAKeyPrivateValid(String pem) throws PemException {
+        RSAKey rsaKey = PEMUtils.pemToRSAKey(pem);
+        assertTrue(rsaKey.isPrivate());
+    }
 
-        for(String pem: OKPPublic) {
-            OctetKeyPair octetKeyPair = PEMUtils.pemToOctetKeyPair(pem);
-            String newPem = PEMUtils.octetKeyPairToPem(octetKeyPair);
-            assertEquals(pem, newPem);
-        }
+    private static Stream<String> rsaPublicValidPEMs() {
+        return Stream.of(RSAPublic);
+    }
+
+    @ParameterizedTest
+    @MethodSource("rsaPublicValidPEMs")
+    void pemToRSAKeyPairPublicValid(String pem) throws PemException {
+        RSAKey rsaKey = PEMUtils.pemToRSAKey(pem);
+        assertFalse(rsaKey.isPrivate());
+    }
+
+    private static Stream<String> rsaInvalidPEMs() {
+        return Stream.of(ECPublic, ECPrivate, OKPPrivate, OKPPublic).flatMap(Arrays::stream);
+    }
+
+    @ParameterizedTest
+    @MethodSource("rsaInvalidPEMs")
+    void pemToRSAKeyPairInvalid(String pem) {
+        assertThrows(PemException.class, () -> PEMUtils.pemToRSAKey(pem));
+    }
+
+    private static Stream<String> ocpPrivateValidPEMs() {
+        return Stream.of(OKPPrivate);
+    }
+
+    @ParameterizedTest
+    @MethodSource("ocpPrivateValidPEMs")
+    void pemToOctetKeyPairPrivateValid(String pem) throws PemException {
+        OctetKeyPair octetKeyPair = PEMUtils.pemToOctetKeyPair(pem);
+
+        assertNotNull(octetKeyPair.getX());
+        assertTrue(octetKeyPair.isPrivate());
+        assertNotNull(octetKeyPair.getD());
+    }
+
+    private static Stream<String> ocpPublicValidPEMs() {
+        return Stream.of(OKPPublic);
+    }
+
+    @ParameterizedTest
+    @MethodSource("ocpPublicValidPEMs")
+    void pemToOctetKeyPairPublicValid(String pem) throws PemException {
+        OctetKeyPair octetKeyPair = PEMUtils.pemToOctetKeyPair(pem);
+        assertNotNull(octetKeyPair.getX());
+        assertFalse(octetKeyPair.isPrivate());
+        assertNull(octetKeyPair.getD());
+    }
+
+    private static Stream<String> ocpInvalidPEMs() {
+        return Stream.of(ECPublic, ECPrivate, RSAPrivate, RSAPublic).flatMap(Arrays::stream);
+    }
+
+    @ParameterizedTest
+    @MethodSource("ocpInvalidPEMs")
+    void pemToOctetKeyPairInvalid(String pem) {
+        assertThrows(PemException .class, () -> PEMUtils.pemToOctetKeyPair(pem));
+    }
+
+    private static Stream<String> ocpValidPEMs() {
+        return Stream.of(OKPPrivate, OKPPublic).flatMap(Arrays::stream);
+    }
+
+    @ParameterizedTest
+    @MethodSource("ocpValidPEMs")
+    void octetKeyPairPemRoundTrip(String pem) throws PemException {
+        OctetKeyPair octetKeyPair = PEMUtils.pemToOctetKeyPair(pem);
+        String newPem = PEMUtils.octetKeyPairToPem(octetKeyPair);
+        assertEquals(pem, newPem);
     }
 }
