@@ -18,6 +18,7 @@ limitations under the License.
 
 package com.blackberry.jwteditor;
 
+import com.blackberry.jwteditor.utils.JWKToPemConverterFactory;
 import com.blackberry.jwteditor.utils.PEMUtils;
 import com.blackberry.jwteditor.utils.PEMUtils.PemException;
 import com.nimbusds.jose.jwk.ECKey;
@@ -85,7 +86,7 @@ class PEMToJWKTests {
             "YpxuUJCgXSdo2Bf7/gi8e70fKTb1awI=\n" +
             "-----END EC PRIVATE KEY-----\n";
 
-    private static final String SECP384R1Public =  "-----BEGIN PUBLIC KEY-----\n" +
+    private static final String SECP384R1Public = "-----BEGIN PUBLIC KEY-----\n" +
             "MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAE/NDNPb2oPYRwnsiZ5iF4aNWLutvPwE9a\n" +
             "NEk8n0ouGZAdrS1pq65miHimYrLeDn76StARoURXG2OHJY6HY5xG2I6Hom/3ZXsM\n" +
             "E2KcblCQoF0naNgX+/4IvHu9Hyk29WsC\n" +
@@ -382,14 +383,14 @@ class PEMToJWKTests {
             RSA4096Public
     };
 
-    static final String [] OKPPrivate = {
+    static final String[] OKPPrivate = {
             ED448Private,
             ED25519Private,
             X448Private,
             X25519Private
     };
 
-    static final String [] OKPPublic = {
+    static final String[] OKPPublic = {
             ED448Public,
             ED25519Public,
             X448Public,
@@ -499,7 +500,7 @@ class PEMToJWKTests {
     @ParameterizedTest
     @MethodSource("ocpInvalidPEMs")
     void pemToOctetKeyPairInvalid(String pem) {
-        assertThrows(PemException .class, () -> PEMUtils.pemToOctetKeyPair(pem));
+        assertThrows(PemException.class, () -> PEMUtils.pemToOctetKeyPair(pem));
     }
 
     private static Stream<String> ocpValidPEMs() {
@@ -510,7 +511,19 @@ class PEMToJWKTests {
     @MethodSource("ocpValidPEMs")
     void octetKeyPairPemRoundTrip(String pem) throws PemException {
         OctetKeyPair octetKeyPair = PEMUtils.pemToOctetKeyPair(pem);
-        String newPem = PEMUtils.octetKeyPairToPem(octetKeyPair);
+        String newPem = octetKeyPairToPem(octetKeyPair);
         assertThat(pem).isEqualTo(newPem);
+    }
+
+
+    /**
+     * Convert an OKP to PEM
+     *
+     * @param octetKeyPair the OKP
+     * @return a PEM string
+     * @throws PEMUtils.PemException if PEM conversion fails
+     */
+    private static String octetKeyPairToPem(OctetKeyPair octetKeyPair) throws PEMUtils.PemException {
+        return JWKToPemConverterFactory.converterFor(octetKeyPair).convertToPem();
     }
 }

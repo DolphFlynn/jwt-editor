@@ -37,7 +37,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.ResourceBundle;
 import java.util.regex.Matcher;
@@ -161,26 +160,6 @@ public class Utils {
             }
         }
         return stringBuilder.toString();
-    }
-
-    /**
-     * Remove all instances of the specified byte from the end of a byte array
-     *
-     * @param byteArray array of bytes to trim
-     * @param trailingByte byte to remove
-     * @return trimmed byte array
-     */
-    public static byte[] trimTrailingBytes(byte[] byteArray, byte trailingByte){
-        // Find the earliest position from the end of the continuous sequence of trailingByte
-        int i;
-        for(i= byteArray.length - 1; i > 0; i--){
-            if(byteArray[i] != trailingByte){
-                break;
-            }
-        }
-
-        // Return the subarray to the index
-        return Arrays.copyOfRange(byteArray, 0, i);
     }
 
     /**

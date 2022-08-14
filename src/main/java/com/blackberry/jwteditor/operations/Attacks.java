@@ -18,12 +18,12 @@ limitations under the License.
 
 package com.blackberry.jwteditor.operations;
 
-import com.blackberry.jwteditor.utils.CryptoUtils;
-import com.blackberry.jwteditor.utils.PEMUtils;
 import com.blackberry.jwteditor.model.jose.JWS;
 import com.blackberry.jwteditor.model.keys.JWKKey;
 import com.blackberry.jwteditor.model.keys.Key;
-import com.blackberry.jwteditor.utils.Utils;
+import com.blackberry.jwteditor.utils.ByteArrayUtils;
+import com.blackberry.jwteditor.utils.CryptoUtils;
+import com.blackberry.jwteditor.utils.PEMUtils;
 import com.nimbusds.jose.JOSEObjectType;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
@@ -59,7 +59,7 @@ public class Attacks {
 
         // Remove any trailing /n (0xOA) characters from the PEM
         if(stripTrailingNewlines){
-            pemBytes = Utils.trimTrailingBytes(pemBytes, (byte) 0x0A);
+            pemBytes = ByteArrayUtils.trimTrailingBytes(pemBytes, (byte) 0x0A);
         }
 
         // Build a new header for the chosen HMAC algorithm
@@ -110,5 +110,4 @@ public class Attacks {
 
         return CryptoUtils.sign(jwsHeader.toBase64URL(), jws.getEncodedPayload(), key, jwsHeader);
     }
-
 }

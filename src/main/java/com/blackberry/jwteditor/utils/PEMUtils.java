@@ -18,33 +18,39 @@ limitations under the License.
 
 package com.blackberry.jwteditor.utils;
 
-import com.blackberry.jwteditor.model.keys.JWKKey;
-import com.blackberry.jwteditor.model.keys.Key.UnsupportedKeyException;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.*;
 import com.nimbusds.jose.util.Base64URL;
 import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
-import org.bouncycastle.crypto.params.*;
+import org.bouncycastle.crypto.params.Ed25519PrivateKeyParameters;
+import org.bouncycastle.crypto.params.Ed448PrivateKeyParameters;
+import org.bouncycastle.crypto.params.X25519PrivateKeyParameters;
+import org.bouncycastle.crypto.params.X448PrivateKeyParameters;
 import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPrivateKey;
 import org.bouncycastle.jce.spec.ECParameterSpec;
 import org.bouncycastle.jce.spec.ECPublicKeySpec;
 import org.bouncycastle.math.ec.ECPoint;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
-import org.bouncycastle.openssl.jcajce.JcaPKCS8Generator;
 import org.bouncycastle.util.io.pem.PemObject;
-import org.bouncycastle.util.io.pem.PemWriter;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.math.BigInteger;
-import java.security.*;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.PrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Map;
 
+import static com.blackberry.jwteditor.utils.ByteArrayUtils.trimByteArray;
 import static java.util.Arrays.stream;
 
 /**
@@ -58,143 +64,13 @@ public class PEMUtils {
     }
 
     /**
-     * Convert a sequence of DER bytes to a PEM string
-     * @param header the PEM header ("e.g RSA PRIVATE KEY")
-     * @param derBytes the DER bytes to encode
-     * @return a PEM string
-     * @throws IOException if conversion fails
-     */
-    private static String derToPEMString(String header, byte[] derBytes) throws IOException {
-        return pemObjectToString(new PemObject(header, derBytes));
-    }
-
-    /**
-     * Convert a BouncyCastle PemObject to its String representation
-     * @param pemObject the PemObject
-     * @return a PEM string
-     * @throws IOException if conversion fails
-     */
-    private static String pemObjectToString(PemObject pemObject) throws IOException {
-        StringWriter stringWriter = new StringWriter();
-        PemWriter pemWriter = new PemWriter(stringWriter);
-        pemWriter.writeObject(pemObject);
-        pemWriter.close();
-        stringWriter.close();
-        return stringWriter.toString();
-    }
-
-    /**
-     * Trim a byte[] to an expected length
-     * @param bytes input byte[]
-     * @param expectedLength expected length
-     * @return trimmed byte[]
-     */
-    private static byte[] trimByteArray(byte[] bytes, int expectedLength){
-        return Arrays.copyOfRange(bytes, 0, expectedLength);
-    }
-
-    /**
      * Convert a JWK object to its PEM representation
      * @param jwk JWK to convert
      * @return a PEM string
      * @throws PemException if PEM conversion fails
      */
     public static String jwkToPem(JWK jwk) throws PemException {
-        try {
-            JWKKey jwkKey = new JWKKey(jwk);
-
-            switch (jwkKey.getKeyType()){
-                case RSA:
-                    return rsaKeyToPem((RSAKey) jwk);
-                case EC:
-                    return ecKeyToPem((ECKey) jwk);
-                case OKP:
-                    return octetKeyPairToPem((OctetKeyPair) jwk);
-                default:
-                    throw new PemException("Invalid JWK type for PEM conversions");
-            }
-        } catch (UnsupportedKeyException e) {
-            throw new PemException("Invalid JWK type for PEM conversions");
-        }
-    }
-
-    /**
-     * Convert an Elliptic Curve key to PEM
-     * @param ecKey the EC key
-     * @return a PEM string
-     * @throws PemException if PEM conversion fails
-     */
-    public static String ecKeyToPem(ECKey ecKey) throws PemException {
-        try {
-            if (ecKey.isPrivate()) {
-                JcaPKCS8Generator jcaPKCS8Generator = new JcaPKCS8Generator(ecKey.toECPrivateKey(), null);
-                return pemObjectToString(jcaPKCS8Generator.generate());
-            } else {
-                return derToPEMString("PUBLIC KEY", ecKey.toECPublicKey().getEncoded()); //NON-NLS
-            }
-        } catch (IOException | JOSEException e) {
-            throw new PemException("PEM conversion error");
-        }
-    }
-
-    /**
-     * Convert an RSA key to PEM
-     * @param rsaKey the RSA key
-     * @return a PEM string
-     * @throws PemException if PEM conversion fails
-     */
-    public static String rsaKeyToPem(RSAKey rsaKey) throws PemException {
-        try {
-            if (rsaKey.isPrivate()) {
-                PrivateKeyInfo privateKeyInfo = PrivateKeyInfo.getInstance(rsaKey.toRSAPrivateKey().getEncoded());
-                ASN1Encodable asn1Encodable = privateKeyInfo.parsePrivateKey();
-                ASN1Primitive asn1Primitive = asn1Encodable.toASN1Primitive();
-                byte[] privateKeyPKCS8 = asn1Primitive.getEncoded(ASN1Encoding.DER);
-                return derToPEMString("RSA PRIVATE KEY", privateKeyPKCS8); //NON-NLS
-            } else {
-                return derToPEMString("PUBLIC KEY", rsaKey.toPublicKey().getEncoded()); //NON-NLS
-            }
-        } catch (IOException | JOSEException e) {
-            throw new PemException("PEM conversion error");
-        }
-    }
-
-    /**
-     * Convert an OKP to PEM
-     * @param octetKeyPair the OKP
-     * @return a PEM string
-     * @throws PemException if PEM conversion fails
-     */
-    public static String octetKeyPairToPem(OctetKeyPair octetKeyPair) throws PemException {
-        OKPCurve curve = OKPCurve.fromStandardName(octetKeyPair.getCurve().getStdName());
-
-        // Build a sequence for the ASN.1 algorithm id based on the curve type
-        DLSequence algorithmSequence = new DLSequence(curve.oid);
-
-        try {
-            if(octetKeyPair.isPrivate()){
-                // Build a DER sequence for the private key bytes
-                byte[] privateKeyBytes = octetKeyPair.getD().decode();
-
-                DEROctetString innerOctetString = new DEROctetString(privateKeyBytes);
-                DEROctetString outerOctetString = new DEROctetString(innerOctetString.getEncoded());
-                ASN1Integer integer = new ASN1Integer(0);
-
-                DLSequence outerSequence = new DLSequence(new ASN1Encodable[] {integer, algorithmSequence, outerOctetString});
-
-                return derToPEMString("PRIVATE KEY", outerSequence.getEncoded()); //NON-NLS
-            }
-            else{
-                // Build a DER sequence for the public key bytes
-                byte[] publicKeyBytes = trimByteArray(octetKeyPair.getX().decode(), curve.keyLength);
-                DERBitString bitString = new DERBitString(publicKeyBytes);
-                DLSequence outerSequence = new DLSequence(new ASN1Encodable[]{algorithmSequence, bitString});
-                return derToPEMString("PUBLIC KEY", outerSequence.getEncoded()); //NON-NLS
-            }
-
-        } catch (IOException e) {
-            throw new PemException("PEM conversion error");
-        }
+        return JWKToPemConverterFactory.converterFor(jwk).convertToPem();
     }
 
     /**
@@ -396,7 +272,7 @@ public class PEMUtils {
         }
     }
 
-    private enum OKPCurve {
+    enum OKPCurve {
         X25519(Curve.X25519, 32, "1.3.101.110"),
         X448(Curve.X448, 56, "1.3.101.111"),
         ED25519(Curve.Ed25519, 32, "1.3.101.112"),
@@ -426,6 +302,14 @@ public class PEMUtils {
         OctetKeyPair buildPublicKeyFrom(byte[] octets) {
             Base64URL x = Base64URL.encode(trimByteArray(octets, keyLength));
             return new OctetKeyPair.Builder(curve, x).build();
+        }
+
+        ASN1Encodable objectIdentifier() {
+            return oid;
+        }
+
+        int keyLength() {
+            return keyLength;
         }
 
         private byte[] extractPublicKeyFromPrivateKey(byte[] octets) throws PemException {
