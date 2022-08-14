@@ -22,6 +22,7 @@ import com.blackberry.jwteditor.pem.JWKToPemConverterFactory;
 import com.blackberry.jwteditor.utils.PEMUtils;
 import com.blackberry.jwteditor.utils.PEMUtils.PemException;
 import com.nimbusds.jose.jwk.ECKey;
+import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.OctetKeyPair;
 import com.nimbusds.jose.jwk.RSAKey;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -409,8 +410,9 @@ class PEMToJWKTests {
     @ParameterizedTest
     @MethodSource("ecPrivateValidPEMs")
     void pemToECKeyPrivateValid(String pem) throws PemException {
-        ECKey ecKey = PEMUtils.pemToECKey(pem);
-        assertThat(ecKey.isPrivate()).isTrue();
+        JWK jwk = PEMUtils.pemToECKey(pem);
+        assertThat(jwk).isInstanceOf(ECKey.class);
+        assertThat(jwk.isPrivate()).isTrue();
     }
 
     private static Stream<String> ecPublicValidPEMs() {
@@ -420,8 +422,9 @@ class PEMToJWKTests {
     @ParameterizedTest
     @MethodSource("ecPublicValidPEMs")
     void pemToECKeyPublicValid(String pem) throws PemException {
-        ECKey ecKey = PEMUtils.pemToECKey(pem);
-        assertThat(ecKey.isPrivate()).isFalse();
+        JWK jwk = PEMUtils.pemToECKey(pem);
+        assertThat(jwk).isInstanceOf(ECKey.class);
+        assertThat(jwk.isPrivate()).isFalse();
     }
 
     private static Stream<String> ecInvalidPEMs() {
@@ -441,8 +444,9 @@ class PEMToJWKTests {
     @ParameterizedTest
     @MethodSource("rsaPrivateValidPEMs")
     void pemToRSAKeyPrivateValid(String pem) throws PemException {
-        RSAKey rsaKey = PEMUtils.pemToRSAKey(pem);
-        assertThat(rsaKey.isPrivate()).isTrue();
+        JWK jwk = PEMUtils.pemToRSAKey(pem);
+        assertThat(jwk).isInstanceOf(RSAKey.class);
+        assertThat(jwk.isPrivate()).isTrue();
     }
 
     private static Stream<String> rsaPublicValidPEMs() {
@@ -452,8 +456,9 @@ class PEMToJWKTests {
     @ParameterizedTest
     @MethodSource("rsaPublicValidPEMs")
     void pemToRSAKeyPairPublicValid(String pem) throws PemException {
-        RSAKey rsaKey = PEMUtils.pemToRSAKey(pem);
-        assertThat(rsaKey.isPrivate()).isFalse();
+        JWK jwk = PEMUtils.pemToRSAKey(pem);
+        assertThat(jwk).isInstanceOf(RSAKey.class);
+        assertThat(jwk.isPrivate()).isFalse();
     }
 
     private static Stream<String> rsaInvalidPEMs() {
@@ -473,8 +478,10 @@ class PEMToJWKTests {
     @ParameterizedTest
     @MethodSource("ocpPrivateValidPEMs")
     void pemToOctetKeyPairPrivateValid(String pem) throws PemException {
-        OctetKeyPair octetKeyPair = PEMUtils.pemToOctetKeyPair(pem);
+        JWK jwk = PEMUtils.pemToOctetKeyPair(pem);
 
+        assertThat(jwk).isInstanceOf(OctetKeyPair.class);
+        OctetKeyPair octetKeyPair = (OctetKeyPair) jwk;
         assertThat(octetKeyPair.getX()).isNotNull();
         assertThat(octetKeyPair.isPrivate()).isTrue();
         assertThat(octetKeyPair.getD()).isNotNull();
@@ -487,7 +494,10 @@ class PEMToJWKTests {
     @ParameterizedTest
     @MethodSource("ocpPublicValidPEMs")
     void pemToOctetKeyPairPublicValid(String pem) throws PemException {
-        OctetKeyPair octetKeyPair = PEMUtils.pemToOctetKeyPair(pem);
+        JWK jwk = PEMUtils.pemToOctetKeyPair(pem);
+
+        assertThat(jwk).isInstanceOf(OctetKeyPair.class);
+        OctetKeyPair octetKeyPair = (OctetKeyPair) jwk;
         assertThat(octetKeyPair.getX()).isNotNull();
         assertThat(octetKeyPair.isPrivate()).isFalse();
         assertThat(octetKeyPair.getD()).isNull();
@@ -510,7 +520,10 @@ class PEMToJWKTests {
     @ParameterizedTest
     @MethodSource("ocpValidPEMs")
     void octetKeyPairPemRoundTrip(String pem) throws PemException {
-        OctetKeyPair octetKeyPair = PEMUtils.pemToOctetKeyPair(pem);
+        JWK jwk = PEMUtils.pemToOctetKeyPair(pem);
+
+        assertThat(jwk).isInstanceOf(OctetKeyPair.class);
+        OctetKeyPair octetKeyPair = (OctetKeyPair) jwk;
         String newPem = octetKeyPairToPem(octetKeyPair);
         assertThat(pem).isEqualTo(newPem);
     }

@@ -20,7 +20,10 @@ package com.blackberry.jwteditor.utils;
 
 import com.blackberry.jwteditor.pem.JWKToPemConverterFactory;
 import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.jwk.*;
+import com.nimbusds.jose.jwk.Curve;
+import com.nimbusds.jose.jwk.ECKey;
+import com.nimbusds.jose.jwk.JWK;
+import com.nimbusds.jose.jwk.RSAKey;
 import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPrivateKey;
@@ -100,7 +103,7 @@ public class PEMUtils {
      * @return the RSAKey
      * @throws PemException if conversion fails
      */
-    public static RSAKey pemToRSAKey(String pem) throws PemException {
+    public static JWK pemToRSAKey(String pem) throws PemException {
         JWK rsaKey;
         try {
             rsaKey = RSAKey.parseFromPEMEncodedObjects(pem);
@@ -112,8 +115,7 @@ public class PEMUtils {
             throw new PemException("Invalid key type");
         }
 
-        return (RSAKey) rsaKey;
-
+        return rsaKey;
     }
 
     /**
@@ -123,8 +125,8 @@ public class PEMUtils {
      * @return the ECKey
      * @throws PemException if conversion fails
      */
-    public static ECKey pemToECKey(String pem, String keyId) throws PemException {
-        return (ECKey) embedKid(pemToECKey(pem), keyId);
+    public static JWK pemToECKey(String pem, String keyId) throws PemException {
+        return embedKid(pemToECKey(pem), keyId);
     }
 
     /**
@@ -133,7 +135,7 @@ public class PEMUtils {
      * @return the ECKey
      * @throws PemException if conversion fails
      */
-    public static ECKey pemToECKey(String pem) throws PemException {
+    public static JWK pemToECKey(String pem) throws PemException {
         JWK ecKey = null;
         boolean parsed;
 
@@ -187,7 +189,7 @@ public class PEMUtils {
             throw new PemException("Invalid key type");
         }
 
-        return (ECKey) ecKey;
+        return ecKey;
     }
 
     /**
@@ -197,8 +199,8 @@ public class PEMUtils {
      * @return the OctetKeyPair
      * @throws PemException if conversion fails
      */
-    public static OctetKeyPair pemToOctetKeyPair(String pem, String keyId) throws PemException {
-        return (OctetKeyPair) embedKid(pemToOctetKeyPair(pem), keyId);
+    public static JWK pemToOctetKeyPair(String pem, String keyId) throws PemException {
+        return embedKid(pemToOctetKeyPair(pem), keyId);
     }
 
     /**
@@ -207,7 +209,7 @@ public class PEMUtils {
      * @return the OctetKeyPair
      * @throws PemException if conversion fails
      */
-    public static OctetKeyPair pemToOctetKeyPair(String pem) throws PemException {
+    public static JWK pemToOctetKeyPair(String pem) throws PemException {
         try {
             InputStream inputStream = new ByteArrayInputStream(pem.getBytes());
             InputStreamReader inputStreamReader = new InputStreamReader(inputStream);

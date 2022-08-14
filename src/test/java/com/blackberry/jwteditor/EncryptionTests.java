@@ -28,10 +28,8 @@ import com.blackberry.jwteditor.utils.PEMUtils;
 import com.nimbusds.jose.EncryptionMethod;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWEAlgorithm;
-import com.nimbusds.jose.jwk.ECKey;
-import com.nimbusds.jose.jwk.OctetKeyPair;
+import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.OctetSequenceKey;
-import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.gen.OctetSequenceKeyGenerator;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.jupiter.api.BeforeAll;
@@ -59,7 +57,7 @@ class EncryptionTests {
         String[][] pemCollections = new String[][]{PEMToJWKTests.RSAPublic, PEMToJWKTests.RSAPrivate};
         for (String[] pemCollection: pemCollections) {
             for (String pem : pemCollection) {
-                RSAKey rsaKey = PEMUtils.pemToRSAKey(pem);
+                JWK rsaKey = PEMUtils.pemToRSAKey(pem);
                 JWKKey key = new JWKKey(rsaKey);
                 if (key.canEncrypt()) {
                     for (JWEAlgorithm kek : key.getKeyEncryptionKeyAlgorithms()) {
@@ -87,7 +85,7 @@ class EncryptionTests {
 
         for (String[] pemCollection: pemCollections) {
             for (String pem : pemCollection) {
-                ECKey ecKey = PEMUtils.pemToECKey(pem);
+                JWK ecKey = PEMUtils.pemToECKey(pem);
                 JWKKey key = new JWKKey(ecKey);
                 if (key.canEncrypt()) {
                     for (JWEAlgorithm kek : key.getKeyEncryptionKeyAlgorithms()) {
@@ -115,7 +113,7 @@ class EncryptionTests {
 
         for (String[] pemCollection: pemCollections) {
             for (String pem : pemCollection) {
-                OctetKeyPair octetKeyPair = PEMUtils.pemToOctetKeyPair(pem);
+                JWK octetKeyPair = PEMUtils.pemToOctetKeyPair(pem);
                 JWKKey key = new JWKKey(octetKeyPair);
                 if (key.canEncrypt()) {
                     for (JWEAlgorithm kek : key.getKeyEncryptionKeyAlgorithms()) {

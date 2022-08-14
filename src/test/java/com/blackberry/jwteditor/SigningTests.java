@@ -27,10 +27,8 @@ import com.blackberry.jwteditor.utils.PEMUtils;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
-import com.nimbusds.jose.jwk.ECKey;
-import com.nimbusds.jose.jwk.OctetKeyPair;
+import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.OctetSequenceKey;
-import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.gen.OctetSequenceKeyGenerator;
 import com.nimbusds.jose.util.Base64URL;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -60,7 +58,7 @@ class SigningTests {
         boolean atLeastOne = false;
 
         for (String pem : PEMToJWKTests.RSAPrivate) {
-            RSAKey rsaKey = PEMUtils.pemToRSAKey(pem);
+            JWK rsaKey = PEMUtils.pemToRSAKey(pem);
             JWKKey key = new JWKKey(rsaKey);
             if(key.canSign()) {
                 for (JWSAlgorithm algorithm : key.getSigningAlgorithms()) {
@@ -79,7 +77,7 @@ class SigningTests {
         boolean atLeastOne = false;
 
         for (String pem : PEMToJWKTests.ECPrivate){
-            ECKey ecKey = PEMUtils.pemToECKey(pem);
+            JWK ecKey = PEMUtils.pemToECKey(pem);
             JWKKey key = new JWKKey(ecKey);
             if(key.canSign()) {
                 for (JWSAlgorithm algorithm : key.getSigningAlgorithms()) {
@@ -98,7 +96,7 @@ class SigningTests {
         boolean atLeastOne = false;
 
         for (String pem : PEMToJWKTests.OKPPrivate){
-            OctetKeyPair octetKeyPair = PEMUtils.pemToOctetKeyPair(pem);
+            JWK octetKeyPair = PEMUtils.pemToOctetKeyPair(pem);
             JWKKey privateKey = new JWKKey(octetKeyPair);
             JWKKey publicKey = new JWKKey(octetKeyPair.toPublicJWK());
             if(privateKey.canSign()) {

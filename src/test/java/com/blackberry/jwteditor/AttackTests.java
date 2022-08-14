@@ -26,7 +26,8 @@ import com.blackberry.jwteditor.utils.CryptoUtils;
 import com.blackberry.jwteditor.utils.PEMUtils;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
-import com.nimbusds.jose.jwk.*;
+import com.nimbusds.jose.jwk.JWK;
+import com.nimbusds.jose.jwk.OctetSequenceKey;
 import com.nimbusds.jose.jwk.gen.OctetSequenceKeyGenerator;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.jupiter.api.BeforeAll;
@@ -100,7 +101,7 @@ class AttackTests {
         JWS jws = JWS.parse(HMAC_KEY_CONFUSION_JWS);
 
         for (String pem : PEMToJWKTests.RSAPrivate) {
-            RSAKey rsaKey = PEMUtils.pemToRSAKey(pem);
+            JWK rsaKey = PEMUtils.pemToRSAKey(pem);
             JWKKey jwk = new JWKKey(rsaKey);
             for (JWSAlgorithm alg : jwk.getSigningAlgorithms()) {
                 Attacks.embeddedJWK(jws, jwk, alg);
@@ -108,7 +109,7 @@ class AttackTests {
         }
 
         for (String pem : PEMToJWKTests.ECPrivate) {
-            ECKey ecKey = PEMUtils.pemToECKey(pem);
+            JWK ecKey = PEMUtils.pemToECKey(pem);
             JWKKey jwk = new JWKKey(ecKey);
             for (JWSAlgorithm alg : jwk.getSigningAlgorithms()) {
                 Attacks.embeddedJWK(jws, jwk, alg);
@@ -116,7 +117,7 @@ class AttackTests {
         }
 
         for (String pem : PEMToJWKTests.OKPPrivate) {
-            OctetKeyPair octetKeyPair = PEMUtils.pemToOctetKeyPair(pem);
+            JWK octetKeyPair = PEMUtils.pemToOctetKeyPair(pem);
             JWKKey jwk = new JWKKey(octetKeyPair);
             for (JWSAlgorithm alg : jwk.getSigningAlgorithms()) {
                 Attacks.embeddedJWK(jws, jwk, alg);

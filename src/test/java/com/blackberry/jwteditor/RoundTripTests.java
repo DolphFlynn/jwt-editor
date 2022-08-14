@@ -20,6 +20,7 @@ package com.blackberry.jwteditor;
 
 import com.blackberry.jwteditor.utils.PEMUtils;
 import com.nimbusds.jose.jwk.ECKey;
+import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.OctetKeyPair;
 import com.nimbusds.jose.jwk.RSAKey;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -40,13 +41,13 @@ class RoundTripTests {
     @Test
     void rsaPEMtoJWK() throws PEMUtils.PemException {
         for(String pem: PEMToJWKTests.RSAPrivate) {
-            RSAKey rsaKey = PEMUtils.pemToRSAKey(pem);
+            JWK rsaKey = PEMUtils.pemToRSAKey(pem);
             String newPem = PEMUtils.jwkToPem(rsaKey);
             assertThat(pem).isEqualTo(newPem);
         }
 
         for(String pem: PEMToJWKTests.RSAPublic) {
-            RSAKey rsaKey = PEMUtils.pemToRSAKey(pem);
+            JWK rsaKey = PEMUtils.pemToRSAKey(pem);
             String newPem = PEMUtils.jwkToPem(rsaKey);
             assertThat(pem).isEqualTo(newPem);
         }
@@ -70,13 +71,13 @@ class RoundTripTests {
     @Test
     void ecKeyPEMtoJWK() throws PEMUtils.PemException {
         for(String pem: PEMToJWKTests.ECPrivate) {
-            ECKey ecKey = PEMUtils.pemToECKey(pem);
+            JWK ecKey = PEMUtils.pemToECKey(pem);
             String newPem = PEMUtils.jwkToPem(ecKey);
             //assertEquals(pem, newPem);
         }
 
         for(String pem: PEMToJWKTests.ECPublic) {
-            ECKey ecKey = PEMUtils.pemToECKey(pem);
+            JWK ecKey = PEMUtils.pemToECKey(pem);
             String newPem = PEMUtils.jwkToPem(ecKey);
             assertThat(pem).isEqualTo(newPem);
         }
@@ -87,25 +88,25 @@ class RoundTripTests {
         for(String jwkString: JWKToPEMTests.ECPrivate) {
             ECKey ecKey = ECKey.parse(jwkString);
             String pem = PEMUtils.jwkToPem(ecKey);
-            ECKey newKey = PEMUtils.pemToECKey(pem);
+            JWK newKey = PEMUtils.pemToECKey(pem);
         }
 
         for(String jwkString: JWKToPEMTests.ECPublic) {
             ECKey ecKey = ECKey.parse(jwkString);
             String pem = PEMUtils.jwkToPem(ecKey);
-            ECKey newKey = PEMUtils.pemToECKey(pem);
+            JWK newKey = PEMUtils.pemToECKey(pem);
         }
     }
 
     @Test
     void octetKeyPairPEMtoJWK() throws PEMUtils.PemException {
         for(String pem: PEMToJWKTests.OKPPrivate) {
-            OctetKeyPair octetKeyPair = PEMUtils.pemToOctetKeyPair(pem);
+            JWK octetKeyPair = PEMUtils.pemToOctetKeyPair(pem);
             String newPem = PEMUtils.jwkToPem(octetKeyPair);
         }
 
         for(String pem: PEMToJWKTests.OKPPublic) {
-            OctetKeyPair octetKeyPair = PEMUtils.pemToOctetKeyPair(pem);
+            JWK octetKeyPair = PEMUtils.pemToOctetKeyPair(pem);
             String newPem = PEMUtils.jwkToPem(octetKeyPair);
         }
     }
@@ -115,13 +116,13 @@ class RoundTripTests {
         for(String jwkString: JWKToPEMTests.OKPPrivate) {
             OctetKeyPair octetKeyPair = OctetKeyPair.parse(jwkString);
             String pem = PEMUtils.jwkToPem(octetKeyPair);
-            OctetKeyPair newKey = PEMUtils.pemToOctetKeyPair(pem);
+            JWK newKey = PEMUtils.pemToOctetKeyPair(pem);
         }
 
         for(String jwkString: JWKToPEMTests.OKPPublic) {
             OctetKeyPair octetKeyPair = OctetKeyPair.parse(jwkString);
             String pem = PEMUtils.jwkToPem(octetKeyPair);
-            OctetKeyPair newKey = PEMUtils.pemToOctetKeyPair(pem);
+            JWK newKey = PEMUtils.pemToOctetKeyPair(pem);
         }
     }
 
