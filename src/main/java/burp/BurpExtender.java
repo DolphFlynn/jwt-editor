@@ -20,7 +20,7 @@ import java.text.ParseException;
  * Burp extension main class
  */
 @SuppressWarnings("unused")
-public class BurpExtender implements IBurpExtender, IMessageEditorTabFactory, IHttpListener {
+public class BurpExtender implements IBurpExtender, IMessageEditorTabFactory, IProxyListener {
 
     private IExtensionHelpers extensionHelpers;
     private PresenterStore presenters;
@@ -76,33 +76,33 @@ public class BurpExtender implements IBurpExtender, IMessageEditorTabFactory, IH
         callbacks.setExtensionName(Utils.getResourceString("tool_name"));
         callbacks.addSuiteTab(burpView);
         callbacks.registerMessageEditorTabFactory(this);
-        callbacks.registerHttpListener(this);
+        callbacks.registerProxyListener(this);
     }
 
     @Override
-    public void processHttpMessage(int toolFlag, boolean messageIsRequest, IHttpRequestResponse messageInfo) {
+    public void processProxyMessage(boolean messageIsRequest, IInterceptedProxyMessage message) {
         // Highlight any messages in HTTP History that contain JWE/JWSs
-        if (toolFlag == IBurpExtenderCallbacks.TOOL_PROXY && proxyConfig.highlightJWT()) {
-            // Get the request or response depending on the message type
-            byte[] messageBytes = messageIsRequest ? messageInfo.getRequest() : messageInfo.getResponse();
+        IHttpRequestResponse messageInfo = message.getMessageInfo();
 
-            // Extract and count JWE/JWSs from the HTTP message
-            int jwsCount = 0;
-            int jweCount = 0;
-            for(JOSEObjectPair joseObjectPair: Utils.extractJOSEObjects(extensionHelpers.bytesToString(messageBytes))){
-                if(joseObjectPair.getModified() instanceof JWS){
-                    jwsCount++;
-                }
-                else{
-                    jweCount++;
-                }
-            }
+        // Get the request or response depending on the message type
+        byte[] messageBytes = messageIsRequest ? messageInfo.getRequest() : messageInfo.getResponse();
 
-            // If there are JWE or JWSs in the message, highlight the entry in HTTP History and set the count in the comment
-            if(jweCount + jwsCount > 0){
-                messageInfo.setHighlight(proxyConfig.highlightColor().burpColor);
-                messageInfo.setComment(proxyConfig.comment(jwsCount, jweCount));
+        // Extract and count JWE/JWSs from the HTTP message
+        int jwsCount = 0;
+        int jweCount = 0;
+
+        for (JOSEObjectPair joseObjectPair : Utils.extractJOSEObjects(extensionHelpers.bytesToString(messageBytes))) {
+            if (joseObjectPair.getModified() instanceof JWS) {
+                jwsCount++;
+            } else {
+                jweCount++;
             }
+        }
+
+        // If there are JWE or JWSs in the message, highlight the entry in HTTP History and set the count in the comment
+        if (jweCount + jwsCount > 0) {
+            messageInfo.setHighlight(proxyConfig.highlightColor().burpColor);
+            messageInfo.setComment(proxyConfig.comment(jwsCount, jweCount));
         }
     }
 
