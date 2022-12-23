@@ -27,7 +27,7 @@ import org.json.JSONObject;
 /**
  * Class for password-based secrets
  */
-public class PasswordKey extends Key {
+public class PasswordKey implements Key {
 
     private final int iterations;
     private final String password;
@@ -145,6 +145,11 @@ public class PasswordKey extends Key {
      */
     @Override
     public boolean hasPEM() {
+        return false;
+    }
+
+    @Override
+    public boolean canConvertToPem() {
         return false;
     }
 

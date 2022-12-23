@@ -74,9 +74,11 @@ public class KeyConfusionAttackDialog extends JDialog {
         // call onCancel() on ESCAPE
         contentPane.registerKeyboardAction(e -> onCancel(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
-        // Convert the signingKeys List to an Array
-        Key[] signingKeysArray = new Key[signingKeys.size()];
-        signingKeys.toArray(signingKeysArray);
+        // Convert appropriate signingKeys List to an Array
+        Key[] signingKeysArray = signingKeys
+                .stream()
+                .filter(Key::canConvertToPem)
+                .toArray(Key[]::new);
 
         // Populate the dropdown with the signing keys
         comboBoxSigningKey.setModel(new DefaultComboBoxModel<>(signingKeysArray));
