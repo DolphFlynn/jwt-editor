@@ -19,7 +19,6 @@ limitations under the License.
 package com.blackberry.jwteditor.view;
 
 import burp.IBurpExtenderCallbacks;
-import burp.ITab;
 import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.model.KeysModel;
 import com.blackberry.jwteditor.presenter.KeysPresenter;
@@ -38,10 +37,10 @@ import java.util.ArrayList;
 /**
  * View class for the Keys tab
  */
-public class KeysView implements ITab {
-    private KeysPresenter presenter;
+public class KeysView {
+    private final KeysPresenter presenter;
+    private final JFrame parent;
 
-    private JFrame parent;
     private JButton buttonNewSymmetric;
     private JButton buttonNewRSA;
     private JButton buttonNewEC;
@@ -57,18 +56,22 @@ public class KeysView implements ITab {
     JMenuItem menuItemCopyPublicPEM;
     JMenuItem menuItemCopyPassword;
 
-    @Deprecated
-    public KeysView(){
-    }
-
-    public KeysView(JFrame parent, PresenterStore presenters, KeysModel keysModel, RstaFactory rstaFactory){
-        this(parent, presenters, null, keysModel, rstaFactory);
-    }
-
-    public KeysView(JFrame parent, PresenterStore presenters, IBurpExtenderCallbacks callbacks, KeysModel keysModel, RstaFactory rstaFactory) {
+    public KeysView(
+            JFrame parent,
+            PresenterStore presenters,
+            IBurpExtenderCallbacks callbacks,
+            KeysModel keysModel,
+            RstaFactory rstaFactory) {
         this.parent = parent;
+
         // Initialise the presenter
-        presenter = new KeysPresenter(this, presenters, callbacks, keysModel, rstaFactory);
+        presenter = new KeysPresenter(
+                this,
+                presenters,
+                callbacks,
+                keysModel,
+                rstaFactory
+        );
 
         // Attach event handlers for button clicks
         buttonNewSymmetric.addActionListener(e -> presenter.onButtonNewSymmetricClick());
@@ -198,22 +201,6 @@ public class KeysView implements ITab {
      */
     public int getSelectedRow() {
         return tableKeys.getSelectedRow();
-    }
-
-    /**
-     * Get the name of the tab for display in BurpSuite
-     * @return the tab name
-     */
-    public String getTabCaption() {
-        return Utils.getResourceString("burp_keys_tab");
-    }
-
-    /**
-     * Get the view instance for display in BurpSuite
-     * @return the view as a Component
-     */
-    public Component getUiComponent() {
-        return panel;
     }
 
     /**

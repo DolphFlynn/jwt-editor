@@ -45,5 +45,4 @@ public class PresenterStore {
     public void register(Presenter presenter){
         presenters.put(presenter.getClass(), presenter);
     }
-
 }

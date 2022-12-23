@@ -109,7 +109,13 @@ public class StandaloneView {
             keysModel = new KeysModel();
         }
 
-        keysView = new KeysView(parent, presenters, keysModel, rstaFactory);
+        keysView = new KeysView(
+                parent,
+                presenters,
+                null,
+                keysModel,
+                rstaFactory
+        );
     }
 
     /**

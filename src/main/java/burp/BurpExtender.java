@@ -1,12 +1,14 @@
 package burp;
 
+import com.blackberry.jwteditor.model.KeysModel;
+import com.blackberry.jwteditor.model.config.ProxyConfig;
 import com.blackberry.jwteditor.model.jose.JOSEObjectPair;
 import com.blackberry.jwteditor.model.jose.JWS;
-import com.blackberry.jwteditor.utils.Utils;
-import com.blackberry.jwteditor.model.KeysModel;
+import com.blackberry.jwteditor.model.persistence.ProxyConfigPersistence;
 import com.blackberry.jwteditor.presenter.PresenterStore;
+import com.blackberry.jwteditor.utils.Utils;
+import com.blackberry.jwteditor.view.BurpView;
 import com.blackberry.jwteditor.view.EditorView;
-import com.blackberry.jwteditor.view.KeysView;
 import com.blackberry.jwteditor.view.RstaFactory;
 import com.blackberry.jwteditor.view.RstaFactory.BurpThemeAwareRstaFactory;
 
@@ -24,6 +26,7 @@ public class BurpExtender implements IBurpExtender, IMessageEditorTabFactory, IH
     private PresenterStore presenters;
     private JFrame burp_frame;
     private RstaFactory rstaFactory;
+    private ProxyConfig proxyConfig;
 
     public void registerExtenderCallbacks(IBurpExtenderCallbacks callbacks) {
         presenters = new PresenterStore();
@@ -50,17 +53,28 @@ public class BurpExtender implements IBurpExtender, IMessageEditorTabFactory, IH
             }
         }
 
+        ProxyConfigPersistence proxyConfigPersistence = new ProxyConfigPersistence(callbacks);
+        proxyConfig = proxyConfigPersistence.loadOrCreateNew();
+
         rstaFactory = new BurpThemeAwareRstaFactory(callbacks);
 
-        // Create the Keys tab
-        KeysView keysView = new KeysView(burp_frame, presenters, callbacks, keysModel, rstaFactory);
+        // Create the tab
+        BurpView burpView = new BurpView(
+                burp_frame,
+                presenters,
+                callbacks,
+                keysModel,
+                rstaFactory,
+                proxyConfigPersistence,
+                proxyConfig
+        );
 
         // Save the helpers for use in the HTTP processing callback
         extensionHelpers = callbacks.getHelpers();
 
         // Add the Keys tab and register the message editor tab and HTTP highlighter
         callbacks.setExtensionName(Utils.getResourceString("tool_name"));
-        callbacks.addSuiteTab(keysView);
+        callbacks.addSuiteTab(burpView);
         callbacks.registerMessageEditorTabFactory(this);
         callbacks.registerHttpListener(this);
     }
@@ -68,7 +82,7 @@ public class BurpExtender implements IBurpExtender, IMessageEditorTabFactory, IH
     @Override
     public void processHttpMessage(int toolFlag, boolean messageIsRequest, IHttpRequestResponse messageInfo) {
         // Highlight any messages in HTTP History that contain JWE/JWSs
-        if(toolFlag == IBurpExtenderCallbacks.TOOL_PROXY){
+        if (toolFlag == IBurpExtenderCallbacks.TOOL_PROXY && proxyConfig.highlightJWT()) {
             // Get the request or response depending on the message type
             byte[] messageBytes = messageIsRequest ? messageInfo.getRequest() : messageInfo.getResponse();
 
@@ -86,8 +100,8 @@ public class BurpExtender implements IBurpExtender, IMessageEditorTabFactory, IH
 
             // If there are JWE or JWSs in the message, highlight the entry in HTTP History and set the count in the comment
             if(jweCount + jwsCount > 0){
-                messageInfo.setHighlight("green");
-                messageInfo.setComment(String.format(Utils.getResourceString("burp_proxy_comment"), jwsCount, jweCount));
+                messageInfo.setHighlight(proxyConfig.highlightColor().burpColor);
+                messageInfo.setComment(proxyConfig.comment(jwsCount, jweCount));
             }
         }
     }
