@@ -18,25 +18,37 @@ limitations under the License.
 
 package com.blackberry.jwteditor;
 
-import com.blackberry.jwteditor.utils.CryptoUtils;
-import com.blackberry.jwteditor.utils.PEMUtils;
 import com.blackberry.jwteditor.model.jose.JWE;
 import com.blackberry.jwteditor.model.jose.JWS;
 import com.blackberry.jwteditor.model.keys.JWKKey;
 import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.model.keys.PasswordKey;
-import com.nimbusds.jose.*;
-import com.nimbusds.jose.jwk.*;
+import com.blackberry.jwteditor.utils.CryptoUtils;
+import com.blackberry.jwteditor.utils.PEMUtils;
+import com.nimbusds.jose.EncryptionMethod;
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.JWEAlgorithm;
+import com.nimbusds.jose.jwk.ECKey;
+import com.nimbusds.jose.jwk.OctetKeyPair;
+import com.nimbusds.jose.jwk.OctetSequenceKey;
+import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.gen.OctetSequenceKeyGenerator;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.security.Security;
 import java.text.ParseException;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class EncryptionTests {
+    private static final String TEST_JWS = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJUZXN0In0.WVLalefVZ5Rj991Cjgh0qBjKSIQaqC_CgN3b-30GKpQ";
 
-    final String TEST_JWS = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJUZXN0In0.WVLalefVZ5Rj991Cjgh0qBjKSIQaqC_CgN3b-30GKpQ";
+    @BeforeAll
+    static void addBouncyCastle() {
+        Security.addProvider(new BouncyCastleProvider());
+    }
 
     @Test
     void rsaEncryption() throws PEMUtils.PemException, Key.UnsupportedKeyException, ParseException, CryptoUtils.EncryptionException, CryptoUtils.DecryptionException {
