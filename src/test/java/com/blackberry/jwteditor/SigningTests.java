@@ -33,24 +33,30 @@ import com.nimbusds.jose.jwk.OctetSequenceKey;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.gen.OctetSequenceKeyGenerator;
 import com.nimbusds.jose.util.Base64URL;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import java.text.ParseException;
+import java.security.Security;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
-public class SigningTests {
-
-    private static JWS TEST_JWS = new JWS(
+class SigningTests {
+    private static final JWS TEST_JWS = new JWS(
             Base64URL.encode("{\"typ\":\"JWT\",\"alg\":\"HS256\"}"), //NON-NLS
             Base64URL.encode("{\"sub\":\"Test\"}"), //NON-NLS
             Base64URL.encode(new byte[0])
-        );
+    );
+
+    @BeforeAll
+    static void addBouncyCastle() {
+        Security.addProvider(new BouncyCastleProvider());
+    }
 
     @Test
-    void rsaSigning() throws PEMUtils.PemException, Key.UnsupportedKeyException, CryptoUtils.SigningException, ParseException, CryptoUtils.VerificationException {
+    void rsaSigning() throws PEMUtils.PemException, Key.UnsupportedKeyException, CryptoUtils.SigningException, CryptoUtils.VerificationException {
         boolean atLeastOne = false;
 
         for (String pem : PEMToJWKTests.RSAPrivate) {
@@ -69,7 +75,7 @@ public class SigningTests {
     }
 
     @Test
-    void ecSigning() throws PEMUtils.PemException, Key.UnsupportedKeyException, CryptoUtils.SigningException, ParseException, CryptoUtils.VerificationException {
+    void ecSigning() throws PEMUtils.PemException, Key.UnsupportedKeyException, CryptoUtils.SigningException, CryptoUtils.VerificationException {
         boolean atLeastOne = false;
 
         for (String pem : PEMToJWKTests.ECPrivate){
@@ -88,7 +94,7 @@ public class SigningTests {
     }
 
     @Test
-    void okpSigning() throws PEMUtils.PemException, Key.UnsupportedKeyException, CryptoUtils.SigningException, ParseException, CryptoUtils.VerificationException {
+    void okpSigning() throws PEMUtils.PemException, Key.UnsupportedKeyException, CryptoUtils.SigningException, CryptoUtils.VerificationException {
         boolean atLeastOne = false;
 
         for (String pem : PEMToJWKTests.OKPPrivate){
@@ -108,7 +114,7 @@ public class SigningTests {
     }
 
     @Test
-    void octSigning() throws JOSEException, Key.UnsupportedKeyException, CryptoUtils.SigningException, ParseException, CryptoUtils.VerificationException {
+    void octSigning() throws JOSEException, Key.UnsupportedKeyException, CryptoUtils.SigningException, CryptoUtils.VerificationException {
         boolean atLeastOne = false;
 
         OctetSequenceKey[] octetSequenceKeys = new OctetSequenceKey[]{
