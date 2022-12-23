@@ -131,5 +131,4 @@ public class OKPDecrypter extends ECDHCryptoProvider implements JWEDecrypter {
         // Decrypt using the agreed key
         return this.decryptWithZ(header, new SecretKeySpec(z, "AES"), encryptedKey, iv, cipherText, authTag);
     }
-
 }
