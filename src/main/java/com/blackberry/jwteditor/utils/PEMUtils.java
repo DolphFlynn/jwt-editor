@@ -19,6 +19,7 @@ limitations under the License.
 package com.blackberry.jwteditor.utils;
 
 import com.blackberry.jwteditor.model.keys.JWKKey;
+import com.blackberry.jwteditor.model.keys.Key.UnsupportedKeyException;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.*;
 import com.nimbusds.jose.util.Base64URL;
@@ -44,16 +45,12 @@ import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Map;
 
+import static java.util.Arrays.stream;
+
 /**
  * Class containing utilities to convert between PEM and nimbus-jose JWK formats
  */
 public class PEMUtils {
-
-    private static final int X25519_KEY_LENGTH = 32;
-    private static final int X448_KEY_LENGTH = 56;
-    private static final int ED25519_KEY_LENGTH = 32;
-    private static final int ED448_KEY_LENGTH = 57;
-
     public static class PemException extends Exception{
         public PemException(String msg) {
             super(msg);
@@ -63,18 +60,12 @@ public class PEMUtils {
     /**
      * Convert a sequence of DER bytes to a PEM string
      * @param header the PEM header ("e.g RSA PRIVATE KEY")
-     * @param der_bytes the DER bytes to encode
+     * @param derBytes the DER bytes to encode
      * @return a PEM string
      * @throws IOException if conversion fails
      */
-    private static String derToPEMString(String header, byte[] der_bytes) throws IOException {
-        StringWriter stringWriter = new StringWriter();
-        PemWriter pemWriter = new PemWriter(stringWriter);
-        PemObject pemObject = new PemObject(header, der_bytes);
-        pemWriter.writeObject(pemObject);
-        pemWriter.close();
-        stringWriter.close();
-        return stringWriter.toString();
+    private static String derToPEMString(String header, byte[] derBytes) throws IOException {
+        return pemObjectToString(new PemObject(header, derBytes));
     }
 
     /**
@@ -122,7 +113,7 @@ public class PEMUtils {
                 default:
                     throw new PemException("Invalid JWK type for PEM conversions");
             }
-        } catch (com.blackberry.jwteditor.model.keys.Key.UnsupportedKeyException e) {
+        } catch (UnsupportedKeyException e) {
             throw new PemException("Invalid JWK type for PEM conversions");
         }
     }
@@ -175,35 +166,12 @@ public class PEMUtils {
      * @throws PemException if PEM conversion fails
      */
     public static String octetKeyPairToPem(OctetKeyPair octetKeyPair) throws PemException {
+        OKPCurve curve = OKPCurve.fromStandardName(octetKeyPair.getCurve().getStdName());
+
+        // Build a sequence for the ASN.1 algorithm id based on the curve type
+        DLSequence algorithmSequence = new DLSequence(curve.oid);
+
         try {
-            ASN1ObjectIdentifier algorithmIdentifier;
-            int keyLength;
-
-            // Set the ASN.1 algorithm id and key length based on the curve type
-            switch(octetKeyPair.getCurve().getStdName()){
-                case "X25519": //NON-NLS
-                    keyLength = X25519_KEY_LENGTH;
-                    algorithmIdentifier = new ASN1ObjectIdentifier("1.3.101.110");
-                    break; //NON-NLS
-                case "X448": //NON-NLS
-                    keyLength = X448_KEY_LENGTH;
-                    algorithmIdentifier = new ASN1ObjectIdentifier("1.3.101.111");
-                    break;
-                case "Ed25519": //NON-NLS
-                    keyLength = ED25519_KEY_LENGTH;
-                    algorithmIdentifier = new ASN1ObjectIdentifier("1.3.101.112");
-                    break;
-                case "Ed448": //NON-NLS
-                    keyLength = ED448_KEY_LENGTH;
-                    algorithmIdentifier = new ASN1ObjectIdentifier("1.3.101.113");
-                    break;
-                default:
-                    throw new PemException("Invalid curve");
-            }
-
-            // Build a sequence for the algorithm id
-            DLSequence algorithmSequence = new DLSequence(algorithmIdentifier);
-
             if(octetKeyPair.isPrivate()){
                 // Build a DER sequence for the private key bytes
                 byte[] privateKeyBytes = octetKeyPair.getD().decode();
@@ -218,7 +186,7 @@ public class PEMUtils {
             }
             else{
                 // Build a DER sequence for the public key bytes
-                byte[] publicKeyBytes = trimByteArray(octetKeyPair.getX().decode(), keyLength);
+                byte[] publicKeyBytes = trimByteArray(octetKeyPair.getX().decode(), curve.keyLength);
                 DERBitString bitString = new DERBitString(publicKeyBytes);
                 DLSequence outerSequence = new DLSequence(new ASN1Encodable[]{algorithmSequence, bitString});
                 return derToPEMString("PUBLIC KEY", outerSequence.getEncoded()); //NON-NLS
@@ -399,81 +367,21 @@ public class PEMUtils {
 
                 ASN1OctetString innerOctetString = (ASN1OctetString) ASN1Primitive.fromByteArray(outerOctetString.getOctets());
 
-                Curve curve;
-                Base64URL x, d;
-                switch(algorithmIdentifier.getId()){
-                    case "1.3.101.110":
-                        if(innerOctetString.getOctets().length != X25519_KEY_LENGTH) throw new PemException("Invalid key length");
-                        curve = Curve.X25519;
-                        X25519PrivateKeyParameters x25519PrivateKeyParameters = new X25519PrivateKeyParameters(innerOctetString.getOctets(), 0);
-                        X25519PublicKeyParameters x25519PublicKeyParameters = x25519PrivateKeyParameters.generatePublicKey();
-                        d = Base64URL.encode(innerOctetString.getOctets());
-                        x = Base64URL.encode(x25519PublicKeyParameters.getEncoded());
-                        break;
-                    case "1.3.101.111":
-                        if(innerOctetString.getOctets().length != X448_KEY_LENGTH) throw new PemException("Invalid key length");
-                        curve = Curve.X448;
-                        X448PrivateKeyParameters x448PrivateKeyParameters = new X448PrivateKeyParameters(innerOctetString.getOctets(), 0);
-                        X448PublicKeyParameters x448PublicKeyParameters = x448PrivateKeyParameters.generatePublicKey();
-                        d = Base64URL.encode(innerOctetString.getOctets());
-                        x = Base64URL.encode(x448PublicKeyParameters.getEncoded());
-                        break;
-                    case "1.3.101.112":
-                        if(innerOctetString.getOctets().length != ED25519_KEY_LENGTH) throw new PemException("Invalid key length");
-                        curve = Curve.Ed25519;
-                        Ed25519PrivateKeyParameters ed25519PrivateKeyParameters = new Ed25519PrivateKeyParameters(innerOctetString.getOctets(), 0);
-                        Ed25519PublicKeyParameters ed25519PublicKeyParameters = ed25519PrivateKeyParameters.generatePublicKey();
-                        d = Base64URL.encode(innerOctetString.getOctets());
-                        x = Base64URL.encode(ed25519PublicKeyParameters.getEncoded());
-                        break;
-                    case "1.3.101.113":
-                        if(innerOctetString.getOctets().length != ED448_KEY_LENGTH) throw new PemException("Invalid key length");
-                        curve = Curve.Ed448;
-                        Ed448PrivateKeyParameters ed448PrivateKeyParameters = new Ed448PrivateKeyParameters(innerOctetString.getOctets(), 0);
-                        Ed448PublicKeyParameters ed448PublicKeyParameters = ed448PrivateKeyParameters.generatePublicKey();
-                        d = Base64URL.encode(innerOctetString.getOctets());
-                        x = Base64URL.encode(ed448PublicKeyParameters.getEncoded());
-                        break;
-                    default:
-                        throw new PemException("Invalid curve");
-                }
+                OKPCurve okpCurve = OKPCurve.fromAlgorithmId(algorithmIdentifier.getId());
 
-                return new OctetKeyPair.Builder(curve, x).d(d).build();
-
+                return okpCurve.buildPrivateKeyFrom(innerOctetString.getOctets());
             }
             // Public key
             else if (integerOrSequencePrimitive instanceof ASN1Sequence){
                 DLSequence algorithmSequence = (DLSequence) outerSequence.getObjectAt(0);
-                ASN1ObjectIdentifier algorithmIdentifer = (ASN1ObjectIdentifier) algorithmSequence.getObjectAt(0);
+                ASN1ObjectIdentifier algorithmIdentifier = (ASN1ObjectIdentifier) algorithmSequence.getObjectAt(0);
                 DERBitString bitString = (DERBitString) outerSequence.getObjectAt(1);
 
                 byte[] keyBytes = Arrays.copyOfRange(bitString.getBytes(), 0, bitString.getEncoded().length);
 
-                Curve curve;
-                int keyLength;
-                switch(algorithmIdentifer.getId()){
-                    case "1.3.101.110":
-                        curve = Curve.X25519;
-                        keyLength = X25519_KEY_LENGTH;
-                        break;
-                    case "1.3.101.111":
-                        curve = Curve.X448;
-                        keyLength = X448_KEY_LENGTH;
-                        break;
-                    case "1.3.101.112":
-                        curve = Curve.Ed25519;
-                        keyLength = ED25519_KEY_LENGTH;
-                        break;
-                    case "1.3.101.113":
-                        curve = Curve.Ed448;
-                        keyLength = ED448_KEY_LENGTH;
-                        break;
-                    default:
-                        throw new PemException("Invalid curve");
-                }
+                OKPCurve okpCurve = OKPCurve.fromAlgorithmId(algorithmIdentifier.getId());
 
-                Base64URL d = Base64URL.encode(trimByteArray(keyBytes, keyLength));
-                return new OctetKeyPair.Builder(curve, d).build();
+                return okpCurve.buildPublicKeyFrom(keyBytes);
             }
             else{
                 throw new PemException("Invalid PEM");
@@ -485,6 +393,72 @@ public class PEMUtils {
             throw new PemException("Invalid number of ASN1 objects");
         } catch (ClassCastException e){
             throw new PemException("Invalid ASN1");
+        }
+    }
+
+    private enum OKPCurve {
+        X25519(Curve.X25519, 32, "1.3.101.110"),
+        X448(Curve.X448, 56, "1.3.101.111"),
+        ED25519(Curve.Ed25519, 32, "1.3.101.112"),
+        ED448(Curve.Ed448, 57, "1.3.101.113");
+
+        private final Curve curve;
+        private final int keyLength;
+        private final ASN1ObjectIdentifier oid;
+
+        OKPCurve(Curve curve, int keyLength, String oid) {
+            this.curve = curve;
+            this.keyLength = keyLength;
+            this.oid = new ASN1ObjectIdentifier(oid);
+        }
+
+        OctetKeyPair buildPrivateKeyFrom(byte[] octets) throws PemException {
+            if (octets.length != keyLength) {
+                throw new PemException("Invalid key length");
+            }
+
+            Base64URL x = Base64URL.encode(extractPublicKeyFromPrivateKey(octets));
+            Base64URL d = Base64URL.encode(octets);
+
+            return new OctetKeyPair.Builder(curve, x).d(d).build();
+        }
+
+        OctetKeyPair buildPublicKeyFrom(byte[] octets) {
+            Base64URL x = Base64URL.encode(trimByteArray(octets, keyLength));
+            return new OctetKeyPair.Builder(curve, x).build();
+        }
+
+        private byte[] extractPublicKeyFromPrivateKey(byte[] octets) throws PemException {
+            switch (this) {
+                case X25519:
+                    return new X25519PrivateKeyParameters(octets).generatePublicKey().getEncoded();
+
+                case X448:
+                    return new X448PrivateKeyParameters(octets).generatePublicKey().getEncoded();
+
+                case ED25519:
+                    return new Ed25519PrivateKeyParameters(octets).generatePublicKey().getEncoded();
+
+                case ED448:
+                    return new Ed448PrivateKeyParameters(octets).generatePublicKey().getEncoded();
+
+                default:
+                    throw new PemException("Unsupported curve " + this);
+            }
+        }
+
+        static OKPCurve fromStandardName(String name) throws PemException {
+            return stream(values())
+                    .filter(curve -> curve.curve.getStdName().equals(name))
+                    .findFirst()
+                    .orElseThrow(() -> new PemException("Invalid curve with name: " + name));
+        }
+
+        static OKPCurve fromAlgorithmId(String oid) throws PemException {
+            return stream(values())
+                    .filter(curve -> curve.oid.getId().equals(oid))
+                    .findFirst()
+                    .orElseThrow(() -> new PemException("Invalid curve with OID: " + oid));
         }
     }
 }
