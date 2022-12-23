@@ -8,6 +8,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <bouncycastle.version>1.70</bouncycastle.version>
+        <gui.designer.version>223.8214.52</gui.designer.version>
     </properties>
 
     <repositories>
@@ -135,22 +137,22 @@
         <dependency>
             <groupId>com.fifesoft</groupId>
             <artifactId>rsyntaxtextarea</artifactId>
-            <version>3.2.0</version>
+            <version>3.3.1</version>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk15on</artifactId>
-            <version>1.70</version>
+            <version>${bouncycastle.version}</version>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcpkix-jdk15on</artifactId>
-            <version>1.70</version>
+            <version>${bouncycastle.version}</version>
         </dependency>
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-            <version>20220320</version>
+            <version>20220924</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -170,25 +172,25 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>5.8.2</version>
+            <version>5.9.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>4.6.1</version>
+            <version>4.10.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.jetbrains.intellij.java</groupId>
             <artifactId>java-gui-forms-rt</artifactId>
-            <version>212.5284.40</version>
+            <version>${gui.designer.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.jetbrains.intellij.java</groupId>
             <artifactId>java-compiler-ant-tasks</artifactId>
-            <version>212.5284.40</version>
+            <version>${gui.designer.version}</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
