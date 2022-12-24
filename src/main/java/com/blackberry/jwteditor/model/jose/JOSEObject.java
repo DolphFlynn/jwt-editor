@@ -24,8 +24,11 @@ import com.nimbusds.jose.util.Base64URL;
  * Abstract class representing common elements of JWE/JWT
  */
 public abstract class JOSEObject {
+    final Base64URL header;
 
-    Base64URL header;
+    JOSEObject(Base64URL header) {
+        this.header = header;
+    }
 
     /**
      * Get the JOSE header

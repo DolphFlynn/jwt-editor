@@ -23,11 +23,12 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.text.ParseException;
 
+import static java.util.Arrays.stream;
+
 /**
  * Class representing a JWE
  */
 public class JWE extends JOSEObject {
-
     private final Base64URL encryptedKey;
     private final Base64URL iv;
     private final Base64URL ciphertext;
@@ -36,14 +37,14 @@ public class JWE extends JOSEObject {
     /**
      * Construct a JWE from encoded components
      *
-     * @param header base64 encoded header
+     * @param header       base64 encoded header
      * @param encryptedKey base64 encoded encrypted key
-     * @param iv base64 encoded iv
-     * @param ciphertext base64 encoded ciphertext
-     * @param tag base64 encoded tag
+     * @param iv           base64 encoded iv
+     * @param ciphertext   base64 encoded ciphertext
+     * @param tag          base64 encoded tag
      */
     public JWE(Base64URL header, Base64URL encryptedKey, Base64URL iv, Base64URL ciphertext, Base64URL tag) {
-        this.header = header;
+        super(header);
         this.encryptedKey = encryptedKey;
         this.iv = iv;
         this.ciphertext = ciphertext;
@@ -58,20 +59,15 @@ public class JWE extends JOSEObject {
      * @throws ParseException if the value is not a valid JWE
      */
     public static JWE parse(String compactJWE) throws ParseException {
-        if(StringUtils.countMatches(compactJWE, ".") != 4){
+        if (StringUtils.countMatches(compactJWE, ".") != 4) {
             throw new ParseException("Invalid number of encoded fields", 0);
         }
 
         Base64URL[] parts = com.nimbusds.jose.JOSEObject.split(compactJWE);
 
-        boolean allEmpty = true;
-        for(Base64URL part: parts){
-            if(part.decodeToString().length() > 0){
-                allEmpty = false;
-            }
-        }
+        boolean allEmpty = stream(parts).allMatch(part -> part.decodeToString().isEmpty());
 
-        if(allEmpty){
+        if (allEmpty) {
             throw new ParseException("All sections empty", 0);
         }
 
@@ -85,7 +81,7 @@ public class JWE extends JOSEObject {
      */
     @Override
     public String serialize() {
-        return String.format("%s.%s.%s.%s.%s", header.toString(), encryptedKey.toString(), iv.toString(), ciphertext.toString(), tag.toString()); //NON-NLS
+        return"%s.%s.%s.%s.%s".formatted(header.toString(), encryptedKey.toString(), iv.toString(), ciphertext.toString(), tag.toString());
     }
 
     /**
@@ -93,13 +89,8 @@ public class JWE extends JOSEObject {
      *
      * @return the decoded encrypted key
      */
-    public byte[] getEncryptedKey(){
-        if(encryptedKey == null){
-            return new byte[0];
-        }
-        else {
-            return encryptedKey.decode();
-        }
+    public byte[] getEncryptedKey() {
+        return encryptedKey == null ? new byte[0] : encryptedKey.decode();
     }
 
     /**
@@ -107,7 +98,7 @@ public class JWE extends JOSEObject {
      *
      * @return the encoded encrypted key
      */
-    public Base64URL getEncodedEncryptedKey(){
+    public Base64URL getEncodedEncryptedKey() {
         return encryptedKey;
     }
 
@@ -116,7 +107,7 @@ public class JWE extends JOSEObject {
      *
      * @return the decoded ciphertext
      */
-    public byte[] getCiphertext(){
+    public byte[] getCiphertext() {
         return ciphertext.decode();
     }
 
@@ -125,7 +116,7 @@ public class JWE extends JOSEObject {
      *
      * @return the encoded ciphertext
      */
-    public Base64URL getEncodedCiphertext(){
+    public Base64URL getEncodedCiphertext() {
         return ciphertext;
     }
 
@@ -134,7 +125,7 @@ public class JWE extends JOSEObject {
      *
      * @return the decoded tag
      */
-    public byte[] getTag(){
+    public byte[] getTag() {
         return tag.decode();
     }
 
@@ -143,7 +134,7 @@ public class JWE extends JOSEObject {
      *
      * @return the encoded tag
      */
-    public Base64URL getEncodedTag(){
+    public Base64URL getEncodedTag() {
         return tag;
     }
 
@@ -152,7 +143,7 @@ public class JWE extends JOSEObject {
      *
      * @return the decoded iv
      */
-    public byte[] getIV(){
+    public byte[] getIV() {
         return iv.decode();
     }
 
@@ -161,8 +152,7 @@ public class JWE extends JOSEObject {
      *
      * @return the encoded iv
      */
-    public Base64URL getEncodedIV(){
+    public Base64URL getEncodedIV() {
         return iv;
     }
-
 }

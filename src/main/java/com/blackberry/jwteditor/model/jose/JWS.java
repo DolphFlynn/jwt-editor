@@ -39,7 +39,7 @@ public class JWS extends JOSEObject {
      * @param signature the encoded signature
      */
     public JWS(Base64URL header, Base64URL payload, Base64URL signature) {
-        this.header = header;
+        super(header);
         this.payload = payload;
         this.signature = signature;
     }
@@ -94,7 +94,6 @@ public class JWS extends JOSEObject {
      */
     public Base64URL getEncodedSignature() { return signature; }
 
-
     /**
      * Serialize the JWS to compact form
      *
@@ -102,6 +101,6 @@ public class JWS extends JOSEObject {
      */
     @Override
     public String serialize() {
-        return String.format("%s.%s.%s", header.toString(), payload.toString(), signature.toString()); //NON-NLS
+        return "%s.%s.%s".formatted(header.toString(), payload.toString(), signature.toString());
     }
 }
