@@ -97,25 +97,7 @@
                 <version>3.3.0</version>
                 <configuration>
                     <finalName>jwt-editor-${project.version}</finalName>
-
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                    <archive>
-                        <manifest>
-                            <mainClass>com.blackberry.jwteditor.JWTEditor</mainClass>
-                        </manifest>
-                    </archive>
                 </configuration>
-                <executions>
-                    <execution>
-                        <id>make-assembly</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>
@@ -124,11 +106,6 @@
             <groupId>com.nimbusds</groupId>
             <artifactId>nimbus-jose-jwt</artifactId>
             <version>9.21</version>
-        </dependency>
-        <dependency>
-            <groupId>net.sourceforge.argparse4j</groupId>
-            <artifactId>argparse4j</artifactId>
-            <version>0.9.0</version>
         </dependency>
         <dependency>
             <groupId>org.exbin.deltahex</groupId>
