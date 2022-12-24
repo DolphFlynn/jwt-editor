@@ -30,13 +30,6 @@ import java.util.function.Consumer;
 public interface RstaFactory {
     RSyntaxTextArea build();
 
-    class DefaultRstaFactory implements RstaFactory {
-        @Override
-        public RSyntaxTextArea build() {
-            return new RSyntaxTextArea();
-        }
-    }
-
     class BurpThemeAwareRstaFactory implements RstaFactory {
         private final Consumer<String> errorLogger;
 
