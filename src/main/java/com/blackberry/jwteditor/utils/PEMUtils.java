@@ -18,6 +18,7 @@ limitations under the License.
 
 package com.blackberry.jwteditor.utils;
 
+import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.pem.JWKToPemConverterFactory;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.Curve;

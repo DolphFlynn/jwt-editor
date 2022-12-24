@@ -33,8 +33,6 @@ import org.json.JSONObject;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -56,10 +54,6 @@ public class Utils {
     private static final Pattern JOSE_OBJECT_PATTERN = Pattern.compile(String.format("(%s)|(%s)", JWE_REGEX, JWS_REGEX)); //NON-NLS
     private static final Pattern HEX_PATTERN = Pattern.compile("^([0-9a-fA-F]{2})+$"); //NON-NLS
     private static final Pattern BASE64_PATTERN = Pattern.compile(String.format("^%s+$", BASE64_REGEX)); //NON-NLS
-
-    // On-disk storage constants
-    private static final String KEYS_DIR = ".jwt-editor"; //NON-NLS
-    private static final String KEYS_FILE = "keys.json"; //NON-NLS
 
     /**
      * Pretty print a string containing JSON using standard indentation
@@ -263,23 +257,5 @@ public class Utils {
         byte[] data = new byte[size];
         binaryData.copyToArray(0L, data, 0, size);
         return data;
-    }
-
-    /**
-     * Get the filesystem folder for the key store
-     *
-     * @return Path to key store folder
-     */
-    public static Path getKeysDir(){
-        return Paths.get(System.getProperty("user.home"), KEYS_DIR);
-    }
-
-    /**
-     * Get the file on the filesystem for the key store
-     *
-     * @return Path to the key store
-     */
-    public static Path getKeysFile(){
-        return Paths.get(getKeysDir().toString(), KEYS_FILE);
     }
 }

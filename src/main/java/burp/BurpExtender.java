@@ -5,8 +5,10 @@ import com.blackberry.jwteditor.model.config.ProxyConfig;
 import com.blackberry.jwteditor.model.jose.JOSEObjectPair;
 import com.blackberry.jwteditor.model.jose.JWS;
 import com.blackberry.jwteditor.model.persistence.ProxyConfigPersistence;
-import com.blackberry.jwteditor.presenter.PresenterStore;
+import com.blackberry.jwteditor.model.persistence.BurpKeysModelPersistence;
+import com.blackberry.jwteditor.model.persistence.KeysModelPersistence;
 import com.blackberry.jwteditor.utils.Utils;
+import com.blackberry.jwteditor.presenter.PresenterStore;
 import com.blackberry.jwteditor.view.BurpView;
 import com.blackberry.jwteditor.view.EditorView;
 import com.blackberry.jwteditor.view.RstaFactory;
@@ -14,7 +16,6 @@ import com.blackberry.jwteditor.view.RstaFactory.BurpThemeAwareRstaFactory;
 import com.blackberry.jwteditor.view.utils.WindowUtils;
 
 import java.awt.*;
-import java.text.ParseException;
 
 /**
  * Burp extension main class
@@ -32,23 +33,10 @@ public class BurpExtender implements IBurpExtender, IMessageEditorTabFactory, IP
     public void registerExtenderCallbacks(IBurpExtenderCallbacks callbacks) {
         presenters = new PresenterStore();
 
-        // Try to load the keystore from the Burp project
-        String json = callbacks.loadExtensionSetting("com.blackberry.jwteditor.keystore");
-
-        // If this fails (empty), create a new keystore
-        KeysModel keysModel;
-        if(json != null) {
-            try {
-                keysModel = KeysModel.parse(json);
-            } catch (ParseException e) {
-                keysModel = new KeysModel();
-            }
-        }
-        else {
-            keysModel = new KeysModel();
-        }
-
         suiteWindow = WindowUtils.findWindowWithName(BURP_SUITE_FRAME_NAME);
+
+        KeysModelPersistence keysModelPersistence = new BurpKeysModelPersistence(callbacks);
+        KeysModel keysModel = keysModelPersistence.loadOrCreateNew();
 
         ProxyConfigPersistence proxyConfigPersistence = new ProxyConfigPersistence(callbacks);
         proxyConfig = proxyConfigPersistence.loadOrCreateNew();
@@ -59,7 +47,7 @@ public class BurpExtender implements IBurpExtender, IMessageEditorTabFactory, IP
         BurpView burpView = new BurpView(
                 suiteWindow,
                 presenters,
-                callbacks,
+                keysModelPersistence,
                 keysModel,
                 rstaFactory,
                 proxyConfigPersistence,

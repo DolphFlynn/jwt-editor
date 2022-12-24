@@ -19,16 +19,13 @@ limitations under the License.
 package com.blackberry.jwteditor.view;
 
 import com.blackberry.jwteditor.model.KeysModel;
-import com.blackberry.jwteditor.presenter.*;
-import com.blackberry.jwteditor.utils.Utils;
+import com.blackberry.jwteditor.model.persistence.KeysModelPersistence;
+import com.blackberry.jwteditor.model.persistence.StandaloneKeysModelPersistence;
+import com.blackberry.jwteditor.presenter.PresenterStore;
+import com.blackberry.jwteditor.presenter.StandalonePresenter;
 import com.blackberry.jwteditor.view.RstaFactory.DefaultRstaFactory;
 
 import javax.swing.*;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.text.ParseException;
 
 /**
  * View class for standalone mode (i.e outside of BurpSuite)
@@ -88,31 +85,13 @@ public class StandaloneView {
         editorView = new EditorView(parent, presenters, rstaFactory);
 
         // Get the storage directory for the keystore (~/.jwt-editor) and create it if it doesn't exist
-        Path keys_dir = Utils.getKeysDir();
-        if(!Files.exists(keys_dir)) {
-            try {
-                Files.createDirectory(keys_dir);
-            } catch (IOException e) {
-                System.err.println(Utils.getResourceString("error_keystore_directory"));
-                System.exit(1);
-            }
-        }
-
-        // Load keys from the key store file, or create an empty keystore if it doesn't exist
-        KeysModel keysModel;
-        try {
-            Path keys_file = Utils.getKeysFile();
-            String json = new String(Files.readAllBytes(keys_file), StandardCharsets.UTF_8);
-            keysModel = KeysModel.parse(json);
-        }
-        catch (ParseException | IOException e) {
-            keysModel = new KeysModel();
-        }
+        KeysModelPersistence keysModelPersistence = new StandaloneKeysModelPersistence();
+        KeysModel keysModel = keysModelPersistence.loadOrCreateNew();
 
         keysView = new KeysView(
                 parent,
                 presenters,
-                null,
+                keysModelPersistence,
                 keysModel,
                 rstaFactory
         );
@@ -134,6 +113,4 @@ public class StandaloneView {
     public JFrame getParent() {
         return parent;
     }
-
-
 }

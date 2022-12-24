@@ -18,7 +18,8 @@ limitations under the License.
 
 package com.blackberry.jwteditor.view;
 
-import burp.IBurpExtenderCallbacks;
+import com.blackberry.jwteditor.model.persistence.KeysModelPersistence;
+import com.blackberry.jwteditor.model.persistence.KeysModelPersistence;
 import com.blackberry.jwteditor.model.KeysModel;
 import com.blackberry.jwteditor.presenter.KeysPresenter;
 import com.blackberry.jwteditor.presenter.PresenterStore;
@@ -59,7 +60,7 @@ public class KeysView {
     public KeysView(
             Window parent,
             PresenterStore presenters,
-            IBurpExtenderCallbacks callbacks,
+            KeysModelPersistence keysModelPersistence,
             KeysModel keysModel,
             RstaFactory rstaFactory) {
         this.parent = parent;
@@ -68,7 +69,7 @@ public class KeysView {
         presenter = new KeysPresenter(
                 this,
                 presenters,
-                callbacks,
+                keysModelPersistence,
                 keysModel,
                 rstaFactory
         );
