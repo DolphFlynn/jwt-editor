@@ -18,35 +18,39 @@ limitations under the License.
 
 package com.blackberry.jwteditor;
 
-import com.blackberry.jwteditor.utils.Utils;
-import org.junit.jupiter.api.Test;
+import com.blackberry.jwteditor.utils.JSONUtils;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class JSONTests {
-    private static final String PRETTY_PRINTED_JSON = "{\n" +
-            "    \"kid\": \"dfc6a9df-916c-406d-84de-ce5b49d50ad0\",\n" +
-            "    \"typ\": \"JWT\",\n" +
-            "    \"alg\": \"RS256\",\n" +
-            "    \"jwk\": {\n" +
-            "        \"kty\": \"RSA\",\n" +
-            "        \"e\": \"AQAB\",\n" +
-            "        \"kid\": \"dfc6a9df-916c-406d-84de-ce5b49d50ad0\",\n" +
-            "        \"n\": \"p0U0MdHFLPovX5j91oH-dc54oeJDIDapuPDM9gYHjhX2Bwj4fFhqvaAfIhn-w7zm-6HZsH-VxPCngl7GkWxx1F7Cobkg8TOD4UusFFo8srSFDExWCQ4MRFDRcLN9bmfXeiR-MvGE1tHZNJCOnxsx32-ueF0T2xo880-073skum8sS9vi7RuNhaCY_liJNkrznqQCEbNLR_-V_-IQaFG_obDNqEHroKC3lxz34s4CPpUwen8IFJm8_vbcFiI_jZrw_VTwJM4Il5Hr2uJLv_ahsZTLomumJmabvXulgQFBK4hEd-FH4c72glbFfFLEkzRQz-ozCzySudbRG9UvhubPyQ\"\n" +
-            "    }\n" +
-            "}";
+    private static final String PRETTY_PRINTED_JSON = """
+            {
+                "kid": "dfc6a9df-916c-406d-84de-ce5b49d50ad0",
+                "typ": "JWT",
+                "alg": "RS256",
+                "jwk": {
+                    "kty": "RSA",
+                    "e": "AQAB",
+                    "kid": "dfc6a9df-916c-406d-84de-ce5b49d50ad0",
+                    "n": "p0U0MdHFLPovX5j91oH-dc54oeJDIDapuPDM9gYHjhX2Bwj4fFhqvaAfIhn-w7zm-6HZsH-VxPCngl7GkWxx1F7Cobkg8TOD4UusFFo8srSFDExWCQ4MRFDRcLN9bmfXeiR-MvGE1tHZNJCOnxsx32-ueF0T2xo880-073skum8sS9vi7RuNhaCY_liJNkrznqQCEbNLR_-V_-IQaFG_obDNqEHroKC3lxz34s4CPpUwen8IFJm8_vbcFiI_jZrw_VTwJM4Il5Hr2uJLv_ahsZTLomumJmabvXulgQFBK4hEd-FH4c72glbFfFLEkzRQz-ozCzySudbRG9UvhubPyQ"
+                }
+            }""";
 
     private static final String COMPACTED_JSON = "{\"kid\":\"dfc6a9df-916c-406d-84de-ce5b49d50ad0\",\"typ\":\"JWT\",\"alg\":\"RS256\",\"jwk\":{\"kty\":\"RSA\",\"e\":\"AQAB\",\"kid\":\"dfc6a9df-916c-406d-84de-ce5b49d50ad0\",\"n\":\"p0U0MdHFLPovX5j91oH-dc54oeJDIDapuPDM9gYHjhX2Bwj4fFhqvaAfIhn-w7zm-6HZsH-VxPCngl7GkWxx1F7Cobkg8TOD4UusFFo8srSFDExWCQ4MRFDRcLN9bmfXeiR-MvGE1tHZNJCOnxsx32-ueF0T2xo880-073skum8sS9vi7RuNhaCY_liJNkrznqQCEbNLR_-V_-IQaFG_obDNqEHroKC3lxz34s4CPpUwen8IFJm8_vbcFiI_jZrw_VTwJM4Il5Hr2uJLv_ahsZTLomumJmabvXulgQFBK4hEd-FH4c72glbFfFLEkzRQz-ozCzySudbRG9UvhubPyQ\"}}";
 
-    @Test
-    void compactJSONTest(){
-        String compactedJSON = Utils.compactJSON(PRETTY_PRINTED_JSON);
+    @ParameterizedTest
+    @ValueSource(strings = {COMPACTED_JSON, PRETTY_PRINTED_JSON})
+    void compactJSONTest(String json) {
+        String compactedJSON = JSONUtils.compactJSON(json);
         assertThat(compactedJSON).isEqualTo(COMPACTED_JSON);
     }
 
-    @Test
-    void prettyPrintJSON(){
-        String prettyPrintedJSON = Utils.prettyPrintJSON(PRETTY_PRINTED_JSON);
+    @ParameterizedTest
+    @ValueSource(strings = {COMPACTED_JSON, PRETTY_PRINTED_JSON})
+    void prettyPrintJSON(String json) {
+        String prettyPrintedJSON = JSONUtils.prettyPrintJSON(json);
         assertThat(prettyPrintedJSON).isEqualTo(PRETTY_PRINTED_JSON);
     }
 }

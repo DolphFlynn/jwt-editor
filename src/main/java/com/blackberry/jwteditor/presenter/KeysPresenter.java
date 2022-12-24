@@ -23,6 +23,7 @@ import com.blackberry.jwteditor.model.keys.JWKKey;
 import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.model.keys.PasswordKey;
 import com.blackberry.jwteditor.model.persistence.KeysModelPersistence;
+import com.blackberry.jwteditor.utils.JSONUtils;
 import com.blackberry.jwteditor.utils.PEMUtils;
 import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.view.KeysView;
@@ -285,7 +286,7 @@ public class KeysPresenter extends Presenter {
     public void onPopupCopyJWK(int row) {
         JWKKey jwkKey = (JWKKey) model.getKey(row);
         JWK jwk = jwkKey.getJWK();
-        Utils.copyToClipboard(Utils.prettyPrintJSON(jwk.toJSONString()));
+        Utils.copyToClipboard(JSONUtils.prettyPrintJSON(jwk.toJSONString()));
     }
 
     /**
@@ -311,7 +312,7 @@ public class KeysPresenter extends Presenter {
     public void onPopupCopyPublicJWK(int row) {
         JWKKey jwkKey = (JWKKey) model.getKey(row);
         JWK jwk = jwkKey.getJWK().toPublicJWK();
-        Utils.copyToClipboard(Utils.prettyPrintJSON(jwk.toJSONString()));
+        Utils.copyToClipboard(JSONUtils.prettyPrintJSON(jwk.toJSONString()));
     }
 
     /**

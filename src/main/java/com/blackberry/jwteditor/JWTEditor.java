@@ -19,6 +19,7 @@ limitations under the License.
 package com.blackberry.jwteditor;
 
 import com.blackberry.jwteditor.presenter.PresenterStore;
+import com.blackberry.jwteditor.utils.JSONUtils;
 import com.blackberry.jwteditor.utils.PEMUtils;
 import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.view.StandaloneView;
@@ -163,13 +164,13 @@ public class JWTEditor {
         // Otherwise, print the private and public key if available, or just the public key
         if(jwk.isPrivate()){
             System.out.printf("============ %s ============%n", Utils.getResourceString("private_key")); //NON-NLS
-            System.out.println(Utils.prettyPrintJSON(jwk.toJSONString()));
+            System.out.println(JSONUtils.prettyPrintJSON(jwk.toJSONString()));
             System.out.printf("============ %s ============%n", Utils.getResourceString("public_key")); //NON-NLS
-            System.out.println(Utils.prettyPrintJSON(jwk.toPublicJWK().toJSONString()));
+            System.out.println(JSONUtils.prettyPrintJSON(jwk.toPublicJWK().toJSONString()));
         }
         else {
             System.out.printf("============ %s ============%n", Utils.getResourceString("public_key")); //NON-NLS
-            System.out.println(Utils.prettyPrintJSON(jwk.toJSONString()));
+            System.out.println(JSONUtils.prettyPrintJSON(jwk.toJSONString()));
         }
     }
 }

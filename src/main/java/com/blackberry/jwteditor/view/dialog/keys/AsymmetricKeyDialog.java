@@ -22,6 +22,7 @@ import com.blackberry.jwteditor.cryptography.okp.OKPGenerator;
 import com.blackberry.jwteditor.model.keys.JWKKey;
 import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.presenter.PresenterStore;
+import com.blackberry.jwteditor.utils.JSONUtils;
 import com.blackberry.jwteditor.utils.PEMUtils;
 import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.view.RstaFactory;
@@ -328,7 +329,7 @@ public class AsymmetricKeyDialog extends KeyDialog {
             }
             else{
                 // Otherwise, serialized the JWK to JSON and set the contents of the text box
-                textAreaKey.setText(Utils.prettyPrintJSON(jwk.toJSONString()));
+                textAreaKey.setText(JSONUtils.prettyPrintJSON(jwk.toJSONString()));
             }
 
             // Ordering is important here, these must come after the conversion above, otherwise they will trigger the
@@ -381,7 +382,7 @@ public class AsymmetricKeyDialog extends KeyDialog {
         radioButtonPEM.setEnabled(false);
 
         // Generate the new key on a background thread as this may be long running
-        SwingWorker<JWK, Void> generateTask = new SwingWorker<JWK, Void>() {
+        SwingWorker<JWK, Void> generateTask = new SwingWorker<>() {
             @Override
             protected JWK doInBackground() throws Exception {
                 // Generate a random key id
@@ -390,12 +391,12 @@ public class AsymmetricKeyDialog extends KeyDialog {
                 // Force using the BC provider, but fall-back to default if this fails
                 KeyStore keyStore = null;
                 Provider provider = Security.getProvider("BC");
-                if(provider != null){
+                if (provider != null) {
                     keyStore = KeyStore.getInstance(KeyStore.getDefaultType(), provider);
                 }
 
                 // Select the key generator and generate based on the dialog mode
-                switch(mode){
+                switch (mode) {
                     case EC:
                         //noinspection ConstantConditions
                         return new ECKeyGenerator((Curve) parameters).keyStore(keyStore).keyID(kid).generate();
@@ -419,10 +420,9 @@ public class AsymmetricKeyDialog extends KeyDialog {
                     JWK jwk = get();
 
                     // Set the key text fields based on whether JWK/PEM is selected in the radio button
-                    if(radioButtonJWK.isSelected()) {
-                        textAreaKey.setText(Utils.prettyPrintJSON(jwk.toJSONString()));
-                    }
-                    else {
+                    if (radioButtonJWK.isSelected()) {
+                        textAreaKey.setText(JSONUtils.prettyPrintJSON(jwk.toJSONString()));
+                    } else {
                         textFieldKeyId.setText(jwk.getKeyID());
                         textAreaKey.setText(PEMUtils.jwkToPem(jwk));
                     }

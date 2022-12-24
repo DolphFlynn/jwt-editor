@@ -19,6 +19,7 @@ limitations under the License.
 package com.blackberry.jwteditor.model.persistence;
 
 import com.blackberry.jwteditor.model.KeysModel;
+import com.blackberry.jwteditor.utils.JSONUtils;
 import com.blackberry.jwteditor.utils.Utils;
 
 import java.io.IOException;
@@ -51,7 +52,7 @@ public class StandaloneKeysModelPersistence implements KeysModelPersistence {
     public void save(KeysModel model) {
         // Serialise the keystore and save to disk
         try {
-            String json = Utils.prettyPrintJSON(model.serialize());
+            String json = JSONUtils.prettyPrintJSON(model.serialize());
             Files.write(getKeysFile(), json.getBytes(UTF_8));
         } catch (IOException e) {
             System.out.println(Utils.getResourceString("error_save")); //NON-NLS

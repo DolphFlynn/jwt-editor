@@ -21,6 +21,7 @@ package com.blackberry.jwteditor.view.dialog.keys;
 import com.blackberry.jwteditor.model.keys.JWKKey;
 import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.presenter.PresenterStore;
+import com.blackberry.jwteditor.utils.JSONUtils;
 import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.view.RstaFactory;
 import com.nimbusds.jose.jwk.OctetSequenceKey;
@@ -122,7 +123,7 @@ public class SymmetricKeyDialog extends KeyDialog {
         // Set the key id and key value fields if provided
         if(jwk != null) {
             originalId = jwk.getKeyID();
-            textAreaKey.setText(Utils.prettyPrintJSON(jwk.toJSONString()));
+            textAreaKey.setText(JSONUtils.prettyPrintJSON(jwk.toJSONString()));
             spinnerKeySize.setValue(jwk.size());
         }
     }
@@ -182,7 +183,7 @@ public class SymmetricKeyDialog extends KeyDialog {
         OctetSequenceKey octetSequenceKey = new OctetSequenceKey.Builder(key).keyID(keyId).build();
 
         // Set the text area contents to the JSON form of the newly generated key
-        textAreaKey.setText(Utils.prettyPrintJSON(octetSequenceKey.toJSONString()));
+        textAreaKey.setText(JSONUtils.prettyPrintJSON(octetSequenceKey.toJSONString()));
     }
 
     /**

@@ -24,6 +24,7 @@ import com.blackberry.jwteditor.model.jose.JWE;
 import com.blackberry.jwteditor.model.jose.JWS;
 import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.operations.Operations;
+import com.blackberry.jwteditor.utils.JSONUtils;
 import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.view.EditorView;
 import com.blackberry.jwteditor.view.dialog.operations.EncryptDialog;
@@ -119,8 +120,8 @@ public class EditorPresenter extends Presenter {
         // Check if the header survives pretty printing and compaction without changes (i.e it was compact when deserialized)
         String header = jws.getHeader();
         try {
-            String prettyPrintedJSON = Utils.prettyPrintJSON(header);
-            if(Utils.compactJSON(prettyPrintedJSON).equals(header)) {
+            String prettyPrintedJSON = JSONUtils.prettyPrintJSON(header);
+            if(JSONUtils.compactJSON(prettyPrintedJSON).equals(header)) {
                 // If it does, display the pretty printed version
                 view.setJWSHeaderCompact(true);
                 view.setJWSHeader(prettyPrintedJSON);
@@ -138,8 +139,8 @@ public class EditorPresenter extends Presenter {
         // Check if the payload survives pretty printing and compaction without changes (i.e it was compact when deserialized)
         String payload = jws.getPayload();
         try {
-            String prettyPrintedJSON = Utils.prettyPrintJSON(payload);
-            if(Utils.compactJSON(prettyPrintedJSON).equals(payload)) {
+            String prettyPrintedJSON = JSONUtils.prettyPrintJSON(payload);
+            if(JSONUtils.compactJSON(prettyPrintedJSON).equals(payload)) {
                 view.setJWSPayloadCompact(true);
                 view.setPayload(prettyPrintedJSON);
             }
@@ -168,7 +169,7 @@ public class EditorPresenter extends Presenter {
         // Return the entry encoded as-is if this fails, or the compact checkbox is unticked
         try {
             if (view.getJWSHeaderCompact()) {
-                header = Base64URL.encode(Utils.compactJSON(view.getJWSHeader()));
+                header = Base64URL.encode(JSONUtils.compactJSON(view.getJWSHeader()));
             } else {
                 header = Base64URL.encode(view.getJWSHeader());
             }
@@ -181,7 +182,7 @@ public class EditorPresenter extends Presenter {
         // Return the entry encoded as-is if this fails, or the compact checkbox is unticked
         try {
             if (view.getJWSPayloadCompact()) {
-                payload = Base64URL.encode(Utils.compactJSON(view.getPayload()));
+                payload = Base64URL.encode(JSONUtils.compactJSON(view.getPayload()));
             } else {
                 payload = Base64URL.encode(view.getPayload());
             }
@@ -206,8 +207,8 @@ public class EditorPresenter extends Presenter {
         // Check if the header survives pretty printing and compaction without changes (i.e it was compact when deserialized)
         String header = jwe.getHeader();
         try {
-            String prettyPrintedJSON = Utils.prettyPrintJSON(header);
-            if(Utils.compactJSON(prettyPrintedJSON).equals(header)) {
+            String prettyPrintedJSON = JSONUtils.prettyPrintJSON(header);
+            if(JSONUtils.compactJSON(prettyPrintedJSON).equals(header)) {
                 // If it does, display the pretty printed version
                 view.setJWEHeaderCompact(true);
                 view.setJWEHeader(prettyPrintedJSON);
@@ -245,7 +246,7 @@ public class EditorPresenter extends Presenter {
         // Return the entry encoded as-is if this fails, or the compact checkbox is unticked
         try {
             if (view.getJWEHeaderCompact()) {
-                header = Base64URL.encode(Utils.compactJSON(view.getJWEHeader()).getBytes(StandardCharsets.UTF_8));
+                header = Base64URL.encode(JSONUtils.compactJSON(view.getJWEHeader()).getBytes(StandardCharsets.UTF_8));
             } else {
                 header = Base64URL.encode(view.getJWEHeader().getBytes(StandardCharsets.UTF_8));
             }
@@ -531,7 +532,7 @@ public class EditorPresenter extends Presenter {
      */
     public void formatJWEHeader() {
         try {
-            view.setJWEHeader(Utils.prettyPrintJSON(view.getJWEHeader()));
+            view.setJWEHeader(JSONUtils.prettyPrintJSON(view.getJWEHeader()));
         }
         catch (JSONException e){
             JOptionPane.showMessageDialog(view.getPanel(), Utils.getResourceString("error_format_json"), Utils.getResourceString("error_title_unable_to_format_json"), JOptionPane.ERROR_MESSAGE);
@@ -543,7 +544,7 @@ public class EditorPresenter extends Presenter {
      */
     public void formatJWSHeader() {
         try {
-            view.setJWSHeader(Utils.prettyPrintJSON(view.getJWSHeader()));
+            view.setJWSHeader(JSONUtils.prettyPrintJSON(view.getJWSHeader()));
         }
         catch (JSONException e){
             JOptionPane.showMessageDialog(view.getPanel(), Utils.getResourceString("error_format_json"), Utils.getResourceString("error_title_unable_to_format_json"), JOptionPane.ERROR_MESSAGE);
@@ -555,7 +556,7 @@ public class EditorPresenter extends Presenter {
      */
     public void formatJWSPayload() {
         try {
-            view.setPayload(Utils.prettyPrintJSON(view.getPayload()));
+            view.setPayload(JSONUtils.prettyPrintJSON(view.getPayload()));
         }
         catch (JSONException e){
             JOptionPane.showMessageDialog(view.getPanel(), Utils.getResourceString("error_format_json"), Utils.getResourceString("error_title_unable_to_format_json"), JOptionPane.ERROR_MESSAGE);

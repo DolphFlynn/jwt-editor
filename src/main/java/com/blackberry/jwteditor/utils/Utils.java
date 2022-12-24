@@ -23,12 +23,8 @@ import com.blackberry.jwteditor.model.jose.JWE;
 import com.blackberry.jwteditor.model.jose.JWS;
 import com.nimbusds.jose.JWEObject;
 import com.nimbusds.jose.JWSObject;
-import org.apache.commons.lang3.StringUtils;
 import org.exbin.deltahex.swing.CodeArea;
 import org.exbin.utils.binary_data.BinaryData;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
@@ -45,7 +41,6 @@ import java.util.regex.Pattern;
  * Class containing general util methods used throughout the other classes
  */
 public class Utils {
-
     private static final String RESOURCE_BUNDLE = "strings"; //NON-NLS
 
     // Regular expressions for JWS/JWE extraction
@@ -55,107 +50,6 @@ public class Utils {
     private static final Pattern JOSE_OBJECT_PATTERN = Pattern.compile(String.format("(%s)|(%s)", JWE_REGEX, JWS_REGEX)); //NON-NLS
     private static final Pattern HEX_PATTERN = Pattern.compile("^([0-9a-fA-F]{2})+$"); //NON-NLS
     private static final Pattern BASE64_PATTERN = Pattern.compile(String.format("^%s+$", BASE64_REGEX)); //NON-NLS
-
-    /**
-     * Pretty print a string containing JSON using standard indentation
-     *
-     * @param json String containing JSON to pretty print
-     * @return String containing pretty printed JSON
-     */
-    public static String prettyPrintJSON(String json){
-        return prettyPrintJSON(json, 4);
-    }
-
-    /**
-     * Pretty print a string containing JSON
-     *
-     * @param json String containing JSON to pretty print
-     * @param indentation number of spaces to use for each indentation level
-     * @return String containing pretty printed JSON
-     */
-    public static String prettyPrintJSON(String json, int indentation){
-        // Strip any whitespace from the JSON string, also ensures the string actually contains valid JSON
-        json = compactJSON(json);
-
-        StringBuilder stringBuilder = new StringBuilder();
-
-        // Simple pretty printer that increases indentation for every new Object or Array and places each key/value pair on a new line
-        int indentationLevel = 0;
-        boolean stringContext = false;
-        for(char c: json.toCharArray()) {
-
-            if(stringContext){
-                stringBuilder.append(c);
-            }
-            else {
-                if (c == '{' || c == '[') {
-                    indentationLevel++;
-                    stringBuilder.append(c);
-                    stringBuilder.append('\n');
-                    stringBuilder.append(StringUtils.repeat(' ', indentationLevel * indentation));
-                }
-                else if (c == '}' || c == ']') {
-                    indentationLevel--;
-                    stringBuilder.append('\n');
-                    stringBuilder.append(StringUtils.repeat(' ', indentationLevel * indentation));
-                    stringBuilder.append(c);
-                }
-                else if (c == ':') {
-                    stringBuilder.append(": ");
-                }
-                else if (c == ',') {
-                    stringBuilder.append(",\n");
-                    stringBuilder.append(StringUtils.repeat(' ', indentationLevel * indentation));
-                }
-                else {
-                    stringBuilder.append(c);
-                }
-            }
-
-            if(c == '"'){
-                stringContext = !stringContext;
-            }
-        }
-        return stringBuilder.toString();
-    }
-
-    /**
-     * Strip the whitespace from a string containing JSON
-     *
-     * @param json JSON string containing whitespace
-     * @return JSON string without whitespace
-     */
-    public static String compactJSON(String json) {
-
-        // Use JSONObject or JSONArray to perform an initial parse to check the content of the string is JSON
-        try {
-            new JSONObject(json);
-        }
-        catch (JSONException e) {
-            try {
-                new JSONArray(json);
-            }
-            catch (JSONException e2){
-                throw e;
-            }
-        }
-
-        StringBuilder stringBuilder = new StringBuilder();
-        // Whitespace in JSON is four characters that are not inside a matched pair of double quotes
-        boolean stringContext = false;
-        for(char c: json.toCharArray()){
-            if (!stringContext && (c == 0x20 || c == 0x0A || c == 0x0D || c == 0x09)) {
-                continue;
-            }
-
-            stringBuilder.append(c);
-
-            if(c == '"'){
-                stringContext = !stringContext;
-            }
-        }
-        return stringBuilder.toString();
-    }
 
     /**
      * Copy a String to the default system clipboard
