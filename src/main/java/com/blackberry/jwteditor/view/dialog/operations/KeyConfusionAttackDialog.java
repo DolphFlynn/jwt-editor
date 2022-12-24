@@ -80,7 +80,7 @@ public class KeyConfusionAttackDialog extends JDialog {
         // Convert appropriate signingKeys List to an Array
         Key[] signingKeysArray = signingKeys
                 .stream()
-                .filter(PEMUtils::canConvertToPem)
+                .filter(Key::canConvertToPem)
                 .toArray(Key[]::new);
 
         // Populate the dropdown with the signing keys
