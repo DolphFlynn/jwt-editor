@@ -236,5 +236,4 @@ public class CryptoUtils {
             throw new DecryptionException("Unable to decrypt JWE");
         }
     }
-
 }

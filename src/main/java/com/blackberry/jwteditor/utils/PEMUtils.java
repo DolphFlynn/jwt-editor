@@ -18,7 +18,6 @@ limitations under the License.
 
 package com.blackberry.jwteditor.utils;
 
-import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.pem.JWKToPemConverterFactory;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.Curve;
@@ -94,8 +93,8 @@ public class PEMUtils {
      * @return the RSAKey
      * @throws PemException if conversion fails
      */
-    public static RSAKey pemToRSAKey(String pem, String keyId) throws PemException {
-        return (RSAKey) embedKid(pemToRSAKey(pem), keyId);
+    public static JWK pemToRSAKey(String pem, String keyId) throws PemException {
+        return embedKid(pemToRSAKey(pem), keyId);
     }
 
     /**
