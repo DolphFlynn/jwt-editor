@@ -133,7 +133,7 @@ class JWKToPEMTests {
         assertThrows(Exception.class, () -> ECKey.parse(jwkString));
     }
 
-    private static Stream<String> rsaPrivateValidJWKs() {
+    static Stream<String> rsaPrivateValidJWKs() {
         return Stream.of(RSAPrivate);
     }
 
@@ -147,7 +147,7 @@ class JWKToPEMTests {
          assertThat(pem).isNotEmpty();
     }
 
-    private static Stream<String> rsaPublicValidJWKs() {
+    static Stream<String> rsaPublicValidJWKs() {
         return Stream.of(RSAPublic);
     }
 
