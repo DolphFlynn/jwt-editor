@@ -36,6 +36,7 @@ import java.awt.datatransfer.StringSelection;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -218,8 +219,8 @@ public class Utils {
      * @param text text block
      * @return list of JOSEObjectPairs
      */
-    public static ArrayList<JOSEObjectPair> extractJOSEObjects(String text){
-        ArrayList<JOSEObjectPair> joseObjects = new ArrayList<>();
+    public static List<JOSEObjectPair> extractJOSEObjects(String text){
+        List<JOSEObjectPair> joseObjects = new ArrayList<>();
 
         // Get a list of potential matches from the text using a regular expression
         Matcher m = JOSE_OBJECT_PATTERN.matcher(text);

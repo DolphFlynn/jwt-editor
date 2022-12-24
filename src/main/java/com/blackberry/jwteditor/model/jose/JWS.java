@@ -23,13 +23,14 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.text.ParseException;
 
+import static java.util.Arrays.stream;
+
 /**
  * Class representing a JWS
  */
 public class JWS extends JOSEObject {
-
-    final Base64URL payload;
-    final Base64URL signature;
+    private final Base64URL payload;
+    private final Base64URL signature;
 
     /**
      * Construct a JWS from encoded components
@@ -57,14 +58,9 @@ public class JWS extends JOSEObject {
 
         Base64URL[] parts = com.nimbusds.jose.JOSEObject.split(compactJWS);
 
-        boolean allEmpty = true;
-        for(Base64URL part: parts){
-            if(part.decodeToString().length() > 0){
-                allEmpty = false;
-            }
-        }
+        boolean allEmpty = stream(parts).allMatch(part -> part.decodeToString().isEmpty());
 
-        if(allEmpty){
+        if (allEmpty) {
             throw new ParseException("All sections empty", 0);
         }
 
