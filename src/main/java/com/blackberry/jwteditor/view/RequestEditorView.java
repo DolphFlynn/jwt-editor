@@ -24,18 +24,13 @@ import burp.api.montoya.http.message.requests.HttpRequest;
 import burp.api.montoya.ui.editor.extension.ExtensionHttpRequestEditor;
 import com.blackberry.jwteditor.presenter.PresenterStore;
 
-import java.awt.*;
-
 import static burp.api.montoya.internal.ObjectFactoryLocator.FACTORY;
 
 public class RequestEditorView extends EditorView implements ExtensionHttpRequestEditor {
     private volatile HttpService httpService;
 
-    public RequestEditorView(Window parent,
-                             PresenterStore presenters,
-                             RstaFactory rstaFactory,
-                             boolean editable) {
-        super(parent, presenters, rstaFactory, editable);
+    public RequestEditorView(PresenterStore presenters, RstaFactory rstaFactory, boolean editable) {
+        super(presenters, rstaFactory, editable);
     }
 
     @Override

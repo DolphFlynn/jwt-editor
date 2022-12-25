@@ -51,7 +51,6 @@ public abstract class EditorView implements ExtensionHttpMessageEditor {
 
     private final RstaFactory rstaFactory;
     private final boolean editable;
-    private final Window parent;
 
     private int mode;
     private JTabbedPane tabbedPane;
@@ -85,8 +84,7 @@ public abstract class EditorView implements ExtensionHttpMessageEditor {
     private CodeArea codeAreaIV;
     private CodeArea codeAreaTag;
 
-    EditorView(Window parent, PresenterStore presenters, RstaFactory rstaFactory, boolean editable) {
-        this.parent = parent;
+    EditorView(PresenterStore presenters, RstaFactory rstaFactory, boolean editable) {
         this.rstaFactory = rstaFactory;
         this.editable = editable;
         this.presenter = new EditorPresenter(this, presenters);
@@ -465,8 +463,8 @@ public abstract class EditorView implements ExtensionHttpMessageEditor {
      * Get the view's parent Window
      * @return parent Window
      */
-    public Window getParent() {
-        return parent;
+    public Window window() {
+        return SwingUtilities.getWindowAncestor(panel);
     }
 
     /**

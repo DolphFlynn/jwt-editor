@@ -293,9 +293,9 @@ public class EditorPresenter extends Presenter {
         }
 
         // Create the key confusion attack dialog with the JWS currently in the editor fields
-        KeyConfusionAttackDialog keyConfusionAttackDialog = new KeyConfusionAttackDialog(view.getParent(), verificationKeys, getJWS());
+        KeyConfusionAttackDialog keyConfusionAttackDialog = new KeyConfusionAttackDialog(view.window(), verificationKeys, getJWS());
         keyConfusionAttackDialog.pack();
-        keyConfusionAttackDialog.setLocationRelativeTo(SwingUtilities.getWindowAncestor(view.uiComponent()));
+        keyConfusionAttackDialog.setLocationRelativeTo(view.window());
         keyConfusionAttackDialog.setVisible(true);
         // Blocks here until dialog finishes
 
@@ -311,9 +311,9 @@ public class EditorPresenter extends Presenter {
      */
     public void onAttackSignNoneClicked() {
         // Get the JWS from the editor, strip the signature and set the editor to the new JWS
-        NoneDialog noneDialog = new NoneDialog(view.getParent(), getJWS());
+        NoneDialog noneDialog = new NoneDialog(view.window(), getJWS());
         noneDialog.pack();
-        noneDialog.setLocationRelativeTo(SwingUtilities.getWindowAncestor(view.uiComponent()));
+        noneDialog.setLocationRelativeTo(view.window());
         noneDialog.setVisible(true);
 
         JWS unsignedJWS = noneDialog.getJWS();
@@ -345,9 +345,9 @@ public class EditorPresenter extends Presenter {
         }
 
         // Create a new signing dialog
-        SignDialog signDialog = new SignDialog(view.getParent(), keysPresenter.getSigningKeys(), getJWS(), mode);
+        SignDialog signDialog = new SignDialog(view.window(), keysPresenter.getSigningKeys(), getJWS(), mode);
         signDialog.pack();
-        signDialog.setLocationRelativeTo(SwingUtilities.getWindowAncestor(view.uiComponent()));
+        signDialog.setLocationRelativeTo(view.window());
         signDialog.setVisible(true);
         // Block here until dialog completes
 
@@ -393,9 +393,9 @@ public class EditorPresenter extends Presenter {
         }
 
         // Show the encryption dialog
-        EncryptDialog encryptDialog = new EncryptDialog(view.getParent(), getJWS(), keysPresenter.getEncryptionKeys());
+        EncryptDialog encryptDialog = new EncryptDialog(view.window(), getJWS(), keysPresenter.getEncryptionKeys());
         encryptDialog.pack();
-        encryptDialog.setLocationRelativeTo(SwingUtilities.getWindowAncestor(view.uiComponent()));
+        encryptDialog.setLocationRelativeTo(view.window());
         encryptDialog.setVisible(true);
         // Block here until dialog completes
 

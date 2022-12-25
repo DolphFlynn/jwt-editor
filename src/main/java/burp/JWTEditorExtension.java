@@ -62,7 +62,6 @@ public class JWTEditorExtension implements BurpExtension {
 
         userInterface.registerHttpRequestEditorProvider((httpRequestResponse, editorMode) ->
                 new RequestEditorView(
-                        suiteWindow,
                         presenters,
                         rstaFactory,
                         editorMode != READ_ONLY
@@ -71,7 +70,6 @@ public class JWTEditorExtension implements BurpExtension {
 
         userInterface.registerHttpResponseEditorProvider((httpRequestResponse, editorMode) ->
                 new ResponseEditorView(
-                        suiteWindow,
                         presenters,
                         rstaFactory,
                         editorMode != READ_ONLY
