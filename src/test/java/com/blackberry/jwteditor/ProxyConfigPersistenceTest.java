@@ -1,6 +1,6 @@
 package com.blackberry.jwteditor;
 
-import burp.IBurpExtenderCallbacks;
+import burp.api.montoya.persistence.Preferences;
 import com.blackberry.jwteditor.model.config.HighlightColor;
 import com.blackberry.jwteditor.model.config.ProxyConfig;
 import com.blackberry.jwteditor.model.persistence.ProxyConfigPersistence;
@@ -19,7 +19,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class ProxyConfigPersistenceTest {
-    private final IBurpExtenderCallbacks callbacks = mock(IBurpExtenderCallbacks.class);
+    private final Preferences callbacks = mock(Preferences.class);
 
     @Test
     void givenNoSavedConfig_whenLoadOrCreateCalled_thenDefaultInstanceReturned() {
@@ -53,7 +53,7 @@ class ProxyConfigPersistenceTest {
     @MethodSource("invalidProxyConfigJson")
     void givenInvalidSavedConfig_whenLoadOrCreateCalled_thenDefaultInstanceReturned(String invalidJson) {
         ProxyConfigPersistence configPersistence = new ProxyConfigPersistence(callbacks);
-        when(callbacks.loadExtensionSetting(PROXY_LISTENER_SETTINGS_NAME)).thenReturn(invalidJson);
+        when(callbacks.getString(PROXY_LISTENER_SETTINGS_NAME)).thenReturn(invalidJson);
 
         ProxyConfig proxyConfig = configPersistence.loadOrCreateNew();
 
@@ -81,7 +81,7 @@ class ProxyConfigPersistenceTest {
     @MethodSource("validProxyConfigJson")
     void givenValidSavedConfig_whenLoadOrCreateCalled_thenAppropriateInstanceReturned(String json, boolean listenerEnabled, HighlightColor highlightColor) {
         ProxyConfigPersistence configPersistence = new ProxyConfigPersistence(callbacks);
-        when(callbacks.loadExtensionSetting(PROXY_LISTENER_SETTINGS_NAME)).thenReturn(json);
+        when(callbacks.getString(PROXY_LISTENER_SETTINGS_NAME)).thenReturn(json);
 
         ProxyConfig proxyConfig = configPersistence.loadOrCreateNew();
 

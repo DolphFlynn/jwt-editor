@@ -26,22 +26,22 @@ import static java.util.Arrays.stream;
  * Enum for highlight colors
  */
 public enum HighlightColor {
-    RED("Red", "red", Color.RED),
-    ORANGE("Orange", "orange", Color.ORANGE),
-    YELLOW("Yellow", "yellow", Color.YELLOW),
-    GREEN("Green", "green", Color.GREEN),
-    CYAN("Cyan", "cyan", Color.CYAN),
-    BLUE("Blue", "blue", Color.BLUE),
-    PINK("Pink", "pink", Color.PINK),
-    MAGENTA("Magenta", "magenta", Color.MAGENTA),
-    GRAY("Gray", "gray", Color.GRAY);
+    RED("Red", burp.api.montoya.core.HighlightColor.RED, Color.RED),
+    ORANGE("Orange", burp.api.montoya.core.HighlightColor.ORANGE, Color.ORANGE),
+    YELLOW("Yellow", burp.api.montoya.core.HighlightColor.YELLOW, Color.YELLOW),
+    GREEN("Green", burp.api.montoya.core.HighlightColor.GREEN, Color.GREEN),
+    CYAN("Cyan", burp.api.montoya.core.HighlightColor.CYAN, Color.CYAN),
+    BLUE("Blue", burp.api.montoya.core.HighlightColor.BLUE, Color.BLUE),
+    PINK("Pink", burp.api.montoya.core.HighlightColor.PINK, Color.PINK),
+    MAGENTA("Magenta", burp.api.montoya.core.HighlightColor.MAGENTA, Color.MAGENTA),
+    GRAY("Gray", burp.api.montoya.core.HighlightColor.GRAY, Color.GRAY);
 
-    public final String burpColor;
+    public final burp.api.montoya.core.HighlightColor burpColor;
     public final Color color;
 
     private final String displayName;
 
-    HighlightColor(String displayName, String burpColor, Color color) {
+    HighlightColor(String displayName, burp.api.montoya.core.HighlightColor burpColor, Color color) {
         this.displayName = displayName;
         this.burpColor = burpColor;
         this.color = color;
@@ -53,13 +53,13 @@ public enum HighlightColor {
     }
 
     /**
-     * Factory method to build HighlightColor from Burp's color string
-     * @param burpColor Burp's color
+     * Factory method to build HighlightColor from display name string
+     * @param displayName Color's display name
      * @return highlight color instance
      */
-    public static HighlightColor from(String burpColor) {
+    public static HighlightColor from(String displayName) {
         return stream(values())
-                .filter(highlightColor -> highlightColor.burpColor.equals(burpColor))
+                .filter(highlightColor -> highlightColor.displayName.equalsIgnoreCase(displayName))
                 .findFirst()
                 .orElse(null);
     }

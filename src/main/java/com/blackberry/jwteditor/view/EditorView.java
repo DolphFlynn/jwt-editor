@@ -18,8 +18,6 @@ limitations under the License.
 
 package com.blackberry.jwteditor.view;
 
-import burp.IExtensionHelpers;
-import burp.IMessageEditorTab;
 import com.blackberry.jwteditor.presenter.EditorPresenter;
 import com.blackberry.jwteditor.presenter.PresenterStore;
 import com.blackberry.jwteditor.utils.Utils;
@@ -36,22 +34,21 @@ import javax.swing.text.JTextComponent;
 import java.awt.*;
 
 /**
- * View class for the Editor tab in standalone and BurpSuite mode
+ * View class for the Editor tab
  */
-public class EditorView implements IMessageEditorTab {
-
+public abstract class EditorView {
     public static final int MAX_JOSE_OBJECT_STRING_LENGTH = 55;
 
     public static final int TAB_JWS = 0;
     public static final int TAB_JWE = 1;
 
-    private IExtensionHelpers helpers;
-    private EditorPresenter presenter;
-    private RstaFactory rstaFactory;
-    private boolean editable;
-    private int mode;
+    final EditorPresenter presenter;
 
-    private Window parent;
+    private final RstaFactory rstaFactory;
+    private final boolean editable;
+    private final Window parent;
+
+    private int mode;
     private JTabbedPane tabbedPane;
     private JComboBox<String> comboBoxJOSEObject;
     private JButton buttonSign;
@@ -83,22 +80,11 @@ public class EditorView implements IMessageEditorTab {
     private CodeArea codeAreaIV;
     private CodeArea codeAreaTag;
 
-    @Deprecated
-    public EditorView() {
-
-    }
-
-    public EditorView(Window parent, PresenterStore presenters, RstaFactory rstaFactory) {
-        this(parent, presenters, null, rstaFactory, true);
-    }
-
-    public EditorView(Window parent, PresenterStore presenters, IExtensionHelpers helpers, RstaFactory rstaFactory, boolean editable) {
+    EditorView(Window parent, PresenterStore presenters, RstaFactory rstaFactory, boolean editable) {
         this.parent = parent;
         this.rstaFactory = rstaFactory;
-
-        presenter = new EditorPresenter(this, presenters);
-        this.helpers = helpers;
         this.editable = editable;
+        this.presenter = new EditorPresenter(this, presenters);
 
         // Event handler for Header / JWS payload change events
         DocumentListener documentListener = new DocumentListener() {
@@ -121,13 +107,12 @@ public class EditorView implements IMessageEditorTab {
         // Attach event handlers for form elements changing, forward to presenter
         textAreaJWSHeader.getDocument().addDocumentListener(documentListener);
         textAreaPayload.getDocument().addDocumentListener(documentListener);
-        codeAreaSignature.addDataChangedListener(() -> presenter.componentChanged());
-
+        codeAreaSignature.addDataChangedListener(presenter::componentChanged);
         textAreaJWEHeader.getDocument().addDocumentListener(documentListener);
-        codeAreaEncryptedKey.addDataChangedListener(() -> presenter.componentChanged());
-        codeAreaCiphertext.addDataChangedListener(() -> presenter.componentChanged());
-        codeAreaTag.addDataChangedListener(() -> presenter.componentChanged());
-        codeAreaIV.addDataChangedListener(() -> presenter.componentChanged());
+        codeAreaEncryptedKey.addDataChangedListener(presenter::componentChanged);
+        codeAreaCiphertext.addDataChangedListener(presenter::componentChanged);
+        codeAreaTag.addDataChangedListener(presenter::componentChanged);
+        codeAreaIV.addDataChangedListener(presenter::componentChanged);
 
         // Compact check box event handler
         checkBoxJWEHeaderCompactJSON.addActionListener(e -> presenter.componentChanged());
@@ -268,7 +253,6 @@ public class EditorView implements IMessageEditorTab {
         return Utils.getCodeAreaData(codeAreaTag);
     }
 
-
     /**
      * Set the IV value in the UI
      * @param iv iv bytes
@@ -290,7 +274,6 @@ public class EditorView implements IMessageEditorTab {
      * @return signature bytes
      */
     public byte[] getSignature() {
-
         return Utils.getCodeAreaData(codeAreaSignature);
     }
 
@@ -302,11 +285,8 @@ public class EditorView implements IMessageEditorTab {
     public void setSerialized(String text, boolean highlight) {
         textAreaSerialized.setText(text);
 
-        if (highlight) {
-            textAreaSerialized.setForeground(Color.RED);
-        } else {
-            textAreaSerialized.setForeground(Color.BLACK);
-        }
+        Color foreground = highlight ? Color.RED : Color.BLACK;
+        textAreaSerialized.setForeground(foreground);
     }
 
     /**
@@ -458,53 +438,8 @@ public class EditorView implements IMessageEditorTab {
         return panel;
     }
 
-    /**
-     * Get the value to display for the tab in the Burp HTTP editor
-     * @return the tab name
-     */
-    @Override
-    public String getTabCaption() {
+    String caption() {
         return Utils.getResourceString("burp_editor_tab");
-    }
-
-    /**
-     * Get the view to display in Burp
-     * @return view component
-     */
-    @Override
-    public Component getUiComponent() {
-        return getPanel();
-    }
-
-    /**
-     * Returns true/false if the HTTP content contains a JWS/JWE that can be edited by the extension
-     * @param content The message that is about to be displayed, or a zero-length
-     * array if the existing message is to be cleared.
-     * @param isRequest Indicates whether the message is a request or a
-     * response.
-     * @return true if the HTTP message contains a JWS/JWE
-     */
-    public boolean isEnabled(byte[] content, boolean isRequest) {
-        return presenter.isEnabled(helpers.bytesToString(content));
-    }
-
-    /**
-     * Set the content of the view from Burp
-     * @param content The message that is to be displayed, or
-     * <code>null</code> if the tab should clear its contents and disable any
-     * editable controls.
-     * @param isRequest Indicates whether the message is a request or a
-     */
-    public void setMessage(byte[] content, boolean isRequest) {
-        presenter.setMessage(helpers.bytesToString(content));
-    }
-
-    /**
-     * Get the modified HTTP message for Burp
-     * @return the modified HTTP message
-     */
-    public byte[] getMessage() {
-        return helpers.stringToBytes(presenter.getMessage());
     }
 
     /**
@@ -515,13 +450,7 @@ public class EditorView implements IMessageEditorTab {
         return presenter.isModified();
     }
 
-    /**
-     * Burp IMessageEditor method to return data selected by user. Not used.
-     * @return null
-     */
-    public byte[] getSelectedData() {
-        return null;
-    }
+    public abstract Component getUiComponent();
 
     /**
      * Get the view's parent Window

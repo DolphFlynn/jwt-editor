@@ -11,6 +11,7 @@
         <java.version>17</java.version>
         <bouncycastle.version>1.70</bouncycastle.version>
         <gui.designer.version>223.8214.52</gui.designer.version>
+        <extender.version>0.10.1</extender.version>
     </properties>
 
     <repositories>
@@ -90,14 +91,26 @@
                         <phase>none</phase>
                     </execution>
                 </executions>
-            </plugin> 
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>3.3.0</version>
                 <configuration>
                     <finalName>jwt-editor-${project.version}</finalName>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
@@ -143,9 +156,10 @@
             <version>1.15</version>
         </dependency>
         <dependency>
-            <groupId>net.portswigger.burp.extender</groupId>
-            <artifactId>burp-extender-api</artifactId>
-            <version>2.3</version>
+            <groupId>net.portswigger.burp.extensions</groupId>
+            <artifactId>montoya-api</artifactId>
+            <version>0.10.1</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>

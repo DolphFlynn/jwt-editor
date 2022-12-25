@@ -18,7 +18,7 @@ limitations under the License.
 
 package com.blackberry.jwteditor.model.persistence;
 
-import burp.IBurpExtenderCallbacks;
+import burp.api.montoya.persistence.Preferences;
 import com.blackberry.jwteditor.model.KeysModel;
 
 import java.text.ParseException;
@@ -26,15 +26,15 @@ import java.text.ParseException;
 public class BurpKeysModelPersistence implements KeysModelPersistence {
     private static final String KEYSTORE_SETTINGS_NAME = "com.blackberry.jwteditor.keystore";
 
-    private final IBurpExtenderCallbacks callbacks;
+    private final Preferences preferences;
 
-    public BurpKeysModelPersistence(IBurpExtenderCallbacks callbacks) {
-        this.callbacks = callbacks;
+    public BurpKeysModelPersistence(Preferences preferences) {
+        this.preferences = preferences;
     }
 
     @Override
     public KeysModel loadOrCreateNew() {
-        String json = callbacks.loadExtensionSetting(KEYSTORE_SETTINGS_NAME);
+        String json = preferences.getString(KEYSTORE_SETTINGS_NAME);
 
         // If this fails (empty), create a new keystore
         if (json != null) {
@@ -50,6 +50,6 @@ public class BurpKeysModelPersistence implements KeysModelPersistence {
     @Override
     public void save(KeysModel model) {
         // Serialise the keystore and save inside the active Burp session
-        callbacks.saveExtensionSetting(KEYSTORE_SETTINGS_NAME, model.serialize()); //NON-NLS
+        preferences.setString(KEYSTORE_SETTINGS_NAME, model.serialize());
     }
 }

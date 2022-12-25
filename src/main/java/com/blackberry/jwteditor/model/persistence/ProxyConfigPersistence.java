@@ -18,7 +18,7 @@ limitations under the License.
 
 package com.blackberry.jwteditor.model.persistence;
 
-import burp.IBurpExtenderCallbacks;
+import burp.api.montoya.persistence.Preferences;
 import com.blackberry.jwteditor.model.config.HighlightColor;
 import com.blackberry.jwteditor.model.config.ProxyConfig;
 import org.json.JSONException;
@@ -33,10 +33,10 @@ public class ProxyConfigPersistence {
     private static final String PROXY_LISTENER_ENABLED_KEY = "proxy_listener_enabled";  //NON-NLS
     private static final String PROXY_HISTORY_HIGHLIGHT_COLOR_KEY = "proxy_history_highlight_color";  //NON-NLS
 
-    private final IBurpExtenderCallbacks callbacks;
+    private final Preferences preferences;
 
-    public ProxyConfigPersistence(IBurpExtenderCallbacks callbacks) {
-        this.callbacks = callbacks;
+    public ProxyConfigPersistence(Preferences preferences) {
+        this.preferences = preferences;
     }
 
     /**
@@ -45,7 +45,7 @@ public class ProxyConfigPersistence {
      * @return instance of proxy config
      */
     public ProxyConfig loadOrCreateNew() {
-        String json = callbacks.loadExtensionSetting(PROXY_LISTENER_SETTINGS_NAME);
+        String json = preferences.getString(PROXY_LISTENER_SETTINGS_NAME);
 
         // If parse fails, create a new proxy config
         if (json != null) {
@@ -78,6 +78,6 @@ public class ProxyConfigPersistence {
         proxyConfigJson.put(PROXY_LISTENER_ENABLED_KEY, model.highlightJWT());
         proxyConfigJson.put(PROXY_HISTORY_HIGHLIGHT_COLOR_KEY, model.highlightColor().burpColor);
 
-        callbacks.saveExtensionSetting(PROXY_LISTENER_SETTINGS_NAME, proxyConfigJson.toString());
+        preferences.setString(PROXY_LISTENER_SETTINGS_NAME, proxyConfigJson.toString());
     }
 }

@@ -18,7 +18,8 @@ limitations under the License.
 
 package com.blackberry.jwteditor.view;
 
-import burp.ITab;
+import burp.api.montoya.ui.Theme;
+import burp.api.montoya.ui.UserInterface;
 import com.blackberry.jwteditor.model.KeysModel;
 import com.blackberry.jwteditor.model.config.ProxyConfig;
 import com.blackberry.jwteditor.model.persistence.KeysModelPersistence;
@@ -26,7 +27,6 @@ import com.blackberry.jwteditor.model.persistence.ProxyConfigPersistence;
 import com.blackberry.jwteditor.presenter.BurpPresenter;
 import com.blackberry.jwteditor.presenter.PresenterStore;
 import com.blackberry.jwteditor.utils.Utils;
-import com.blackberry.jwteditor.view.utils.ThemeDetector;
 
 import javax.swing.*;
 import java.awt.*;
@@ -35,19 +35,21 @@ import java.awt.event.HierarchyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.net.URL;
+import java.util.function.Supplier;
 
 import static java.awt.Image.SCALE_SMOOTH;
 
 /**
  * View class for the Burp extender ITab
  */
-public class BurpView implements ITab {
+public class BurpView {
     private final BurpPresenter presenter;
     private final Window parent;
     private final PresenterStore presenters;
     private final KeysModelPersistence keysModelPersistence;
     private final KeysModel keysModel;
     private final RstaFactory rstaFactory;
+    private final UserInterface userInterface;
 
     private JPanel panel;
     private JLabel configurationButton;
@@ -61,12 +63,14 @@ public class BurpView implements ITab {
             KeysModel keysModel,
             RstaFactory rstaFactory,
             ProxyConfigPersistence proxyConfigPersistence,
-            ProxyConfig proxyConfig) {
+            ProxyConfig proxyConfig,
+            UserInterface userInterface) {
         this.parent = parent;
         this.presenters = presenters;
         this.keysModelPersistence = keysModelPersistence;
         this.keysModel = keysModel;
         this.rstaFactory = rstaFactory;
+        this.userInterface = userInterface;
 
         // Initialise the presenter
         presenter = new BurpPresenter(
@@ -88,7 +92,6 @@ public class BurpView implements ITab {
      * Get the name of the tab for display in BurpSuite
      * @return the tab name
      */
-    @Override
     public String getTabCaption() {
         return Utils.getResourceString("burp_keys_tab");
     }
@@ -97,7 +100,6 @@ public class BurpView implements ITab {
      * Get the view instance for display in BurpSuite
      * @return the view as a Component
      */
-    @Override
     public Component getUiComponent() {
         return panel;
     }
@@ -114,7 +116,7 @@ public class BurpView implements ITab {
                 rstaFactory
         );
 
-        configurationButton = new ConfigurationButton();
+        configurationButton = new ConfigurationButton(userInterface::currentTheme);
     }
 
     private static class ConfigurationButton extends JLabel {
@@ -123,11 +125,13 @@ public class BurpView implements ITab {
         private static final URL LIGHT_CONFIGURATION_ICON_URL = KeysView.class.getResource(LIGHT_ICON_PATH);
         private static final URL DARK_CONFIGURATION_ICON_URL = KeysView.class.getResource(DARK_ICON_PATH);
 
+        private final Supplier<Theme> themeSupplier;
         private final Image lightImage;
         private final Image darkImage;
         private final Boolean initialized;
 
-        ConfigurationButton() {
+        ConfigurationButton(Supplier<Theme> themeSupplier) {
+            this.themeSupplier = themeSupplier;
             this.lightImage = LIGHT_CONFIGURATION_ICON_URL == null ? null : new ImageIcon(LIGHT_CONFIGURATION_ICON_URL).getImage();
             this.darkImage = DARK_CONFIGURATION_ICON_URL == null ? null : new ImageIcon(DARK_CONFIGURATION_ICON_URL).getImage();
             this.initialized = true;
@@ -165,7 +169,7 @@ public class BurpView implements ITab {
             int size = this.getHeight();
 
             if (size > 0) {
-                Image image = ThemeDetector.isLightTheme() ? lightImage : darkImage;
+                Image image =  themeSupplier.get() == Theme.LIGHT ? lightImage : darkImage;
                 Image scaledIcon = image.getScaledInstance(size, size, SCALE_SMOOTH);
                 setIcon(new ImageIcon(scaledIcon));
             }

@@ -18,37 +18,42 @@ limitations under the License.
 
 package com.blackberry.jwteditor.view;
 
-import burp.IBurpExtenderCallbacks;
-import com.blackberry.jwteditor.view.utils.ThemeDetector;
+import burp.api.montoya.logging.Logging;
+import burp.api.montoya.ui.Theme;
+import burp.api.montoya.ui.UserInterface;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
-import org.fife.ui.rsyntaxtextarea.Theme;
 
 import java.awt.event.HierarchyEvent;
 import java.io.IOException;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public interface RstaFactory {
     RSyntaxTextArea build();
 
     class BurpThemeAwareRstaFactory implements RstaFactory {
+        private final Supplier<Theme> themeDetector;
         private final Consumer<String> errorLogger;
 
-        public BurpThemeAwareRstaFactory(IBurpExtenderCallbacks callbacks) {
-            this.errorLogger = callbacks::printError;
+        public BurpThemeAwareRstaFactory(UserInterface userInterface, Logging logging) {
+            this.themeDetector = userInterface::currentTheme;
+            this.errorLogger = logging::logToError;
         }
 
         @Override
         public RSyntaxTextArea build() {
-            return new BurpThemeAwareRSyntaxTextArea(errorLogger);
+            return new BurpThemeAwareRSyntaxTextArea(themeDetector, errorLogger);
         }
 
         private static class BurpThemeAwareRSyntaxTextArea extends RSyntaxTextArea {
             private static final String DARK_THEME = "/org/fife/ui/rsyntaxtextarea/themes/dark.xml";
             private static final String LIGHT_THEME = "/org/fife/ui/rsyntaxtextarea/themes/default.xml";
 
+            private final Supplier<Theme> themeDetector;
             private final Consumer<String> errorLogger;
 
-            private BurpThemeAwareRSyntaxTextArea(Consumer<String> errorLogger) {
+            private BurpThemeAwareRSyntaxTextArea(Supplier<Theme> themeDetector, Consumer<String> errorLogger) {
+                this.themeDetector = themeDetector;
                 this.errorLogger = errorLogger;
 
                 this.addHierarchyListener(e -> {
@@ -75,10 +80,10 @@ public interface RstaFactory {
                     return;
                 }
 
-                String themeResource = ThemeDetector.isLightTheme() ? LIGHT_THEME : DARK_THEME;
+                String themeResource = themeDetector.get() == Theme.LIGHT ? LIGHT_THEME : DARK_THEME;
 
                 try {
-                    Theme theme = Theme.load(getClass().getResourceAsStream(themeResource));
+                    org.fife.ui.rsyntaxtextarea.Theme theme = org.fife.ui.rsyntaxtextarea.Theme.load(getClass().getResourceAsStream(themeResource));
                     theme.apply(this);
                 } catch (IOException e) {
                     errorLogger.accept(e.getMessage());
