@@ -28,12 +28,10 @@ import static burp.api.montoya.ui.editor.extension.EditorMode.READ_ONLY;
  */
 @SuppressWarnings("unused")
 public class JWTEditorExtension implements BurpExtension {
-    private PresenterStore presenters;
-    private Window suiteWindow;
-    private RstaFactory rstaFactory;
 
+    @Override
     public void initialize(MontoyaApi api) {
-        presenters = new PresenterStore();
+        PresenterStore presenters = new PresenterStore();
 
         api.extension().setName(Utils.getResourceString("tool_name"));
 
@@ -45,9 +43,9 @@ public class JWTEditorExtension implements BurpExtension {
         ProxyConfig proxyConfig = proxyConfigPersistence.loadOrCreateNew();
 
         UserInterface userInterface = api.userInterface();
-        suiteWindow = userInterface.swingUtils().suiteFrame();
+        Window suiteWindow = userInterface.swingUtils().suiteFrame();
 
-        rstaFactory = new BurpThemeAwareRstaFactory(userInterface, api.logging());
+        RstaFactory rstaFactory = new BurpThemeAwareRstaFactory(userInterface, api.logging());
 
         BurpView burpView = new BurpView(
                 suiteWindow,
@@ -83,8 +81,8 @@ public class JWTEditorExtension implements BurpExtension {
         Proxy proxy = api.proxy();
         ByteUtils byteUtils = api.utilities().byteUtils();
 
-        ProxyMessageHandler proxyMessageHandler = new ProxyMessageHandler(proxyConfig, byteUtils);
-        proxy.registerRequestHandler(proxyMessageHandler);
-        proxy.registerResponseHandler(proxyMessageHandler);
+        ProxyHttpMessageHandler proxyHttpMessageHandler = new ProxyHttpMessageHandler(proxyConfig, byteUtils);
+        proxy.registerRequestHandler(proxyHttpMessageHandler);
+        proxy.registerResponseHandler(proxyHttpMessageHandler);
     }
 }
