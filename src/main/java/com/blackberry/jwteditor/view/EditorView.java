@@ -437,10 +437,6 @@ public abstract class EditorView implements ExtensionHttpMessageEditor {
         return checkBoxJWEHeaderCompactJSON.isSelected();
     }
 
-    public Component getPanel() {
-        return uiComponent();
-    }
-
     @Override
     public String caption() {
         return Utils.getResourceString("burp_editor_tab");

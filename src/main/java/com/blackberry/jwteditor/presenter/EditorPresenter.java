@@ -288,7 +288,7 @@ public class EditorPresenter extends Presenter {
         }
 
         if(attackKeys.size() == 0) {
-            JOptionPane.showMessageDialog(view.getPanel(), Utils.getResourceString("error_no_signing_keys"), Utils.getResourceString("error_title_no_signing_keys"), JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(view.uiComponent(), Utils.getResourceString("error_no_signing_keys"), Utils.getResourceString("error_title_no_signing_keys"), JOptionPane.WARNING_MESSAGE);
             return;
         }
 
@@ -340,7 +340,7 @@ public class EditorPresenter extends Presenter {
 
         // Check there are signing keys in the keystore
         if(keysPresenter.getSigningKeys().size() == 0) {
-            JOptionPane.showMessageDialog(view.getPanel(), Utils.getResourceString("error_no_signing_keys"), Utils.getResourceString("error_title_no_signing_keys"), JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(view.uiComponent(), Utils.getResourceString("error_no_signing_keys"), Utils.getResourceString("error_title_no_signing_keys"), JOptionPane.WARNING_MESSAGE);
             return;
         }
 
@@ -366,17 +366,17 @@ public class EditorPresenter extends Presenter {
 
         // Check there are verification keys in the keystore
         if(keysPresenter.getVerificationKeys().size() == 0) {
-            JOptionPane.showMessageDialog(view.getPanel(), Utils.getResourceString("error_no_verification_keys"), Utils.getResourceString("error_title_no_verification_keys"), JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(view.uiComponent(), Utils.getResourceString("error_no_verification_keys"), Utils.getResourceString("error_title_no_verification_keys"), JOptionPane.WARNING_MESSAGE);
             return;
         }
 
         // Try to verify the contents of the editor with all signing keys available, display a message with the result
         if(Operations.verify(getJWS(), keysPresenter.getVerificationKeys())){
-            JOptionPane.showMessageDialog(view.getPanel(), Utils.getResourceString("editor_view_message_verified"), Utils.getResourceString("editor_view_message_title_verification"), JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(view.uiComponent(), Utils.getResourceString("editor_view_message_verified"), Utils.getResourceString("editor_view_message_title_verification"), JOptionPane.WARNING_MESSAGE);
 
         }
         else {
-            JOptionPane.showMessageDialog(view.getPanel(), Utils.getResourceString("editor_view_message_not_verified"), Utils.getResourceString("editor_view_message_title_verification"), JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(view.uiComponent(), Utils.getResourceString("editor_view_message_not_verified"), Utils.getResourceString("editor_view_message_title_verification"), JOptionPane.WARNING_MESSAGE);
         }
     }
 
@@ -388,7 +388,7 @@ public class EditorPresenter extends Presenter {
 
         // Check there are encryption keys in the keystore
         if(keysPresenter.getEncryptionKeys().size() == 0) {
-            JOptionPane.showMessageDialog(view.getPanel(), Utils.getResourceString("error_no_encryption_keys"), Utils.getResourceString("error_title_no_encryption_keys"), JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(view.uiComponent(), Utils.getResourceString("error_no_encryption_keys"), Utils.getResourceString("error_title_no_encryption_keys"), JOptionPane.WARNING_MESSAGE);
             return;
         }
 
@@ -415,7 +415,7 @@ public class EditorPresenter extends Presenter {
 
         // Check there are decryption keys in the keystore
         if(keysPresenter.getDecryptionKeys().size() == 0) {
-            JOptionPane.showMessageDialog(view.getPanel(), Utils.getResourceString("error_no_decryption_keys"), Utils.getResourceString("error_title_no_decryption_keys"), JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(view.uiComponent(), Utils.getResourceString("error_no_decryption_keys"), Utils.getResourceString("error_title_no_decryption_keys"), JOptionPane.WARNING_MESSAGE);
             return;
         }
 
@@ -424,7 +424,7 @@ public class EditorPresenter extends Presenter {
         try {
             jws = Operations.decrypt(getJWE(), keysPresenter.getDecryptionKeys());
         } catch (ParseException e) {
-            JOptionPane.showMessageDialog(view.getPanel(), Utils.getResourceString("error_decryption_invalid_header"), Utils.getResourceString("error_title_unable_to_decrypt"), JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(view.uiComponent(), Utils.getResourceString("error_decryption_invalid_header"), Utils.getResourceString("error_title_unable_to_decrypt"), JOptionPane.WARNING_MESSAGE);
         }
 
         // If decryption was successful, set the contents of the editor to the decrypted JWS and set the editor mode to JWS
@@ -433,7 +433,7 @@ public class EditorPresenter extends Presenter {
             setJWS(jws);
         }
         else {
-            JOptionPane.showMessageDialog(view.getPanel(), Utils.getResourceString("error_decryption_all_keys_failed"), Utils.getResourceString("error_title_unable_to_decrypt"), JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(view.uiComponent(), Utils.getResourceString("error_decryption_all_keys_failed"), Utils.getResourceString("error_title_unable_to_decrypt"), JOptionPane.WARNING_MESSAGE);
         }
     }
 
@@ -534,7 +534,7 @@ public class EditorPresenter extends Presenter {
             view.setJWEHeader(JSONUtils.prettyPrintJSON(view.getJWEHeader()));
         }
         catch (JSONException e){
-            JOptionPane.showMessageDialog(view.getPanel(), Utils.getResourceString("error_format_json"), Utils.getResourceString("error_title_unable_to_format_json"), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(view.uiComponent(), Utils.getResourceString("error_format_json"), Utils.getResourceString("error_title_unable_to_format_json"), JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -546,7 +546,7 @@ public class EditorPresenter extends Presenter {
             view.setJWSHeader(JSONUtils.prettyPrintJSON(view.getJWSHeader()));
         }
         catch (JSONException e){
-            JOptionPane.showMessageDialog(view.getPanel(), Utils.getResourceString("error_format_json"), Utils.getResourceString("error_title_unable_to_format_json"), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(view.uiComponent(), Utils.getResourceString("error_format_json"), Utils.getResourceString("error_title_unable_to_format_json"), JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -558,7 +558,7 @@ public class EditorPresenter extends Presenter {
             view.setPayload(JSONUtils.prettyPrintJSON(view.getPayload()));
         }
         catch (JSONException e){
-            JOptionPane.showMessageDialog(view.getPanel(), Utils.getResourceString("error_format_json"), Utils.getResourceString("error_title_unable_to_format_json"), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(view.uiComponent(), Utils.getResourceString("error_format_json"), Utils.getResourceString("error_title_unable_to_format_json"), JOptionPane.ERROR_MESSAGE);
         }
     }
 }
