@@ -20,7 +20,6 @@ package com.blackberry.jwteditor.view;
 
 import burp.api.montoya.http.message.HttpRequestResponse;
 import burp.api.montoya.http.message.responses.HttpResponse;
-import burp.api.montoya.ui.Selection;
 import burp.api.montoya.ui.editor.extension.ExtensionHttpResponseEditor;
 import com.blackberry.jwteditor.presenter.PresenterStore;
 
@@ -46,26 +45,6 @@ public class ResponseEditorView extends EditorView implements ExtensionHttpRespo
     public boolean isEnabledFor(HttpRequestResponse requestResponse) {
         String content = requestResponse.httpResponse().asBytes().toString();
         return presenter.isEnabled(content);
-    }
-
-    @Override
-    public String caption() {
-        return super.caption();
-    }
-
-    @Override
-    public Component getUiComponent() {
-        return getPanel();
-    }
-
-    @Override
-    public Component uiComponent() {
-        return getPanel();
-    }
-
-    @Override
-    public Selection selectedData() {
-        return null;
     }
 
     @Override

@@ -18,6 +18,8 @@ limitations under the License.
 
 package com.blackberry.jwteditor.view;
 
+import burp.api.montoya.ui.Selection;
+import burp.api.montoya.ui.editor.extension.ExtensionHttpMessageEditor;
 import com.blackberry.jwteditor.presenter.EditorPresenter;
 import com.blackberry.jwteditor.presenter.PresenterStore;
 import com.blackberry.jwteditor.utils.Utils;
@@ -33,10 +35,13 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.JTextComponent;
 import java.awt.*;
 
+import static org.exbin.deltahex.EditationAllowed.ALLOWED;
+import static org.exbin.deltahex.EditationAllowed.READ_ONLY;
+
 /**
  * View class for the Editor tab
  */
-public abstract class EditorView {
+public abstract class EditorView implements ExtensionHttpMessageEditor {
     public static final int MAX_JOSE_OBJECT_STRING_LENGTH = 55;
 
     public static final int TAB_JWS = 0;
@@ -350,7 +355,7 @@ public abstract class EditorView {
         checkBoxJWSPayloadCompactJSON.setEnabled(editable);
         textAreaJWSHeader.setEditable(editable);
         textAreaPayload.setEditable(editable);
-        codeAreaSignature.setEditationAllowed(editable ? EditationAllowed.ALLOWED : EditationAllowed.READ_ONLY);
+        codeAreaSignature.setEditationAllowed(editable ? ALLOWED : READ_ONLY);
     }
 
     /**
@@ -376,10 +381,12 @@ public abstract class EditorView {
         textAreaJWEHeader.setEditable(editable);
         textAreaJWEHeader.setEnabled(editable);
 
-        codeAreaEncryptedKey.setEditationAllowed(editable ? EditationAllowed.ALLOWED : EditationAllowed.READ_ONLY);
-        codeAreaIV.setEditationAllowed(editable ? EditationAllowed.ALLOWED : EditationAllowed.READ_ONLY);
-        codeAreaCiphertext.setEditationAllowed(editable ? EditationAllowed.ALLOWED : EditationAllowed.READ_ONLY);
-        codeAreaTag.setEditationAllowed(editable ? EditationAllowed.ALLOWED : EditationAllowed.READ_ONLY);
+        EditationAllowed editationAllowed = editable ? ALLOWED : READ_ONLY;
+
+        codeAreaEncryptedKey.setEditationAllowed(editationAllowed);
+        codeAreaIV.setEditationAllowed(editationAllowed);
+        codeAreaCiphertext.setEditationAllowed(editationAllowed);
+        codeAreaTag.setEditationAllowed(editationAllowed);
     }
 
     /**
@@ -430,27 +437,33 @@ public abstract class EditorView {
         return checkBoxJWEHeaderCompactJSON.isSelected();
     }
 
-    /**
-     * Get the view
-     * @return view JPanel
-     */
-    public JPanel getPanel() {
+    public Component getPanel() {
+        return uiComponent();
+    }
+
+    @Override
+    public String caption() {
+        return Utils.getResourceString("burp_editor_tab");
+    }
+
+    @Override
+    public Component uiComponent() {
         return panel;
     }
 
-    String caption() {
-        return Utils.getResourceString("burp_editor_tab");
+    @Override
+    public Selection selectedData() {
+        return null;
     }
 
     /**
      * Has the HTTP message been altered by the extension
      * @return true if the extension has altered the message
      */
+    @Override
     public boolean isModified() {
         return presenter.isModified();
     }
-
-    public abstract Component getUiComponent();
 
     /**
      * Get the view's parent Window
