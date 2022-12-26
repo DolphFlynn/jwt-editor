@@ -21,13 +21,13 @@ package com.blackberry.jwteditor;
 import com.blackberry.jwteditor.model.jose.JOSEObjectPair;
 import com.blackberry.jwteditor.model.jose.JWE;
 import com.blackberry.jwteditor.model.jose.JWS;
-import com.blackberry.jwteditor.utils.Utils;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.List;
 import java.util.stream.Stream;
 
+import static com.blackberry.jwteditor.model.jose.JOSEObjectFinder.extractJOSEObjects;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class JOSEParserTests {
@@ -89,7 +89,7 @@ class JOSEParserTests {
     @ParameterizedTest
     @MethodSource("validJws")
     void testValidJWS(String joseObjectString) {
-        List<JOSEObjectPair> joseObjects = Utils.extractJOSEObjects(joseObjectString);
+        List<JOSEObjectPair> joseObjects = extractJOSEObjects(joseObjectString);
 
         assertThat(joseObjects).hasSize(1);
         assertThat(joseObjects.get(0).getModified()).isInstanceOf(JWS.class);
@@ -98,7 +98,7 @@ class JOSEParserTests {
     @ParameterizedTest
     @MethodSource("invalidJws")
     void testInvalidJWS(String joseObjectString) {
-        List<JOSEObjectPair> joseObjects = Utils.extractJOSEObjects(joseObjectString);
+        List<JOSEObjectPair> joseObjects = extractJOSEObjects(joseObjectString);
 
         assertThat(joseObjects).isEmpty();
     }
@@ -106,7 +106,7 @@ class JOSEParserTests {
     @ParameterizedTest
     @MethodSource("validJwe")
     void testValidJWE(String joseObjectString) {
-        List<JOSEObjectPair> joseObjects = Utils.extractJOSEObjects(joseObjectString);
+        List<JOSEObjectPair> joseObjects = extractJOSEObjects(joseObjectString);
 
         assertThat(joseObjects).hasSize(1);
         assertThat(joseObjects.get(0).getModified()).isInstanceOf(JWE.class);
@@ -115,7 +115,7 @@ class JOSEParserTests {
     @ParameterizedTest
     @MethodSource("invalidJwe")
     void testInvalidJWE(String joseObjectString) {
-        List<JOSEObjectPair> joseObjects = Utils.extractJOSEObjects(joseObjectString);
+        List<JOSEObjectPair> joseObjects = extractJOSEObjects(joseObjectString);
 
         assertThat(joseObjects).isEmpty();
     }

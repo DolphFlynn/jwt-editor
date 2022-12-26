@@ -41,6 +41,8 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.blackberry.jwteditor.model.jose.JOSEObjectFinder.extractJOSEObjects;
+
 /**
  * Presenter class for the Editor tab
  */
@@ -76,7 +78,7 @@ public class EditorPresenter extends Presenter {
      * @return true if the content contains a JWE/JWS that can be edited
      */
     public boolean isEnabled(String content){
-        return Utils.extractJOSEObjects(content).size() > 0;
+        return extractJOSEObjects(content).size() > 0;
     }
 
     /**
@@ -91,7 +93,7 @@ public class EditorPresenter extends Presenter {
         joseObjectPairs.clear();
 
         // Extract JOSE Objects from the text, build a change set and add them to the dropdown
-        List<JOSEObjectPair> joseObjects = Utils.extractJOSEObjects(content);
+        List<JOSEObjectPair> joseObjects = extractJOSEObjects(content);
         String[] joseObjectStrings = new String[joseObjects.size()];
         for(int i = 0; i < joseObjects.size(); i++){
             joseObjectPairs.add(joseObjects.get(i));
