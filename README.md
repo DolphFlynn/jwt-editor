@@ -1,12 +1,8 @@
 # JWT Editor
 
-JWT Editor is a Burp Suite extension and standalone application for editing, signing, verifying, encrypting and decrypting JSON Web Tokens (JWTs).
+JWT Editor is a Burp Suite extension for editing, signing, verifying, encrypting and decrypting JSON Web Tokens (JWTs).
 
-When used within Burp Suite, it provides automatic detection and in-line editing of JWTs within HTTP requests/responses, signing and encrypting of tokens and automation of several well-known attacks against JWT implementations.
-
-Standalone mode provides the same functionality as the Burp Suite extension, but for offline JWTs which can be pasted into the tool.
-
-A command-line option is also available to convert PEM formatted public and private keys to JWK format.
+It provides automatic detection and in-line editing of JWTs within HTTP requests/responses, signing and encrypting of tokens and automation of several well-known attacks against JWT implementations.
 
 ## Keys View
 <img src="gitimg/keys.png" width="600"/>
@@ -163,24 +159,3 @@ The tool implements this attack using the steps outlined at https://www.nccgroup
 ## Embedded JWK
 
 JWS defines a 'jwk' field within the Header which is used for the ECDH-ES algorithms as a method of transporting the public key to the recipient. However, this field has been mistakenly used by library implementations as a source of the key for signature verification. By creating a new key, embedding the key for verification within the header, and then signing the JWS Payload, an attacker is able to produce arbitrary JWT payloads.
-
-# CLI Mode
-
-A command-line interface is provided for conversion of keys generated using other tools from PEM to JWK format.
-
-Usage:
-
-    usage: jwt-editor.jar convert [-h] [--kid KID] key_file
-    
-    positional arguments:
-    key_file               Public or Private Key PEM file to convert to JWK
-    
-    named arguments:
-    -h, --help             show this help message and exit
-    --kid KID              JWK Key ID to be used
-
-Example:
-
-`java -jar ./jwt-editor.jar convert key.pem --kid my-jwk`
-
-Key type is automatically detected from the PEM file.
