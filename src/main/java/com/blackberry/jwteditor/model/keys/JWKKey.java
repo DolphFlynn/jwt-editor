@@ -269,7 +269,7 @@ public class JWKKey implements Key {
      * @return allowed signing algorithms
      */
     public JWSAlgorithm[] getSigningAlgorithms(){
-        switch (keyType){
+        switch (keyType) {
             case RSA:
                 return switch (jwk.size()) {
                     case 512 -> new JWSAlgorithm[]{
@@ -326,10 +326,10 @@ public class JWKKey implements Key {
      *
      * @return list of allowed key encryption algorithms
      */
-    public JWEAlgorithm[] getKeyEncryptionKeyAlgorithms(){
+    public JWEAlgorithm[] getKeyEncryptionKeyAlgorithms() {
         switch (keyType){
             case RSA:
-                //noinspection deprecation
+                    //noinspection deprecation
                 return new JWEAlgorithm[]{JWEAlgorithm.RSA1_5, JWEAlgorithm.RSA_OAEP, JWEAlgorithm.RSA_OAEP_256};
             case EC:
                 return new JWEAlgorithm[]{JWEAlgorithm.ECDH_ES, JWEAlgorithm.ECDH_ES_A128KW, JWEAlgorithm.ECDH_ES_A192KW, JWEAlgorithm.ECDH_ES_A256KW};
@@ -337,7 +337,7 @@ public class JWKKey implements Key {
                 return new JWEAlgorithm[]{JWEAlgorithm.ECDH_ES};
             case OCT:
                 // OCT key encryption algorithms are dependant on the key size
-                switch(jwk.size()){
+                    switch (jwk.size()) {
                     case 128:
                         return new JWEAlgorithm[]{JWEAlgorithm.DIR, JWEAlgorithm.A128KW, JWEAlgorithm.A128GCMKW};
                     case 192:
