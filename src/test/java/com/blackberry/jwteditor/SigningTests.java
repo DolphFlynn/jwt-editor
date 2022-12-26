@@ -41,6 +41,7 @@ import java.security.Security;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static com.blackberry.jwteditor.KeyUtils.*;
 import static com.blackberry.jwteditor.PEMToJWKTests.*;
 import static com.nimbusds.jose.JWSAlgorithm.*;
 import static java.util.Collections.emptyList;
@@ -103,73 +104,8 @@ class SigningTests {
         assertThat(key.getSigningAlgorithms()).containsExactlyElementsOf(expectedAlgorithms);
     }
 
-    private static Stream<Arguments> keySigningAlgorithmPairs() throws Exception {
-        return Stream.of(
-                // 512-bit RSA
-                arguments(rsaKeyFrom(RSA512Private), RS256),
-                // 1024-bit RSA
-                arguments(rsaKeyFrom(RSA1024Private), RS256),
-                arguments(rsaKeyFrom(RSA1024Private), RS384),
-                arguments(rsaKeyFrom(RSA1024Private), RS512),
-                arguments(rsaKeyFrom(RSA1024Private), PS256),
-                arguments(rsaKeyFrom(RSA1024Private), PS384),
-                // 2048-bit RSA
-                arguments(rsaKeyFrom(RSA2048Private), RS256),
-                arguments(rsaKeyFrom(RSA2048Private), RS384),
-                arguments(rsaKeyFrom(RSA2048Private), RS512),
-                arguments(rsaKeyFrom(RSA2048Private), PS256),
-                arguments(rsaKeyFrom(RSA2048Private), PS384),
-                arguments(rsaKeyFrom(RSA2048Private), PS512),
-                // 3072-bit RSA
-                arguments(rsaKeyFrom(RSA3072Private), RS256),
-                arguments(rsaKeyFrom(RSA3072Private), RS384),
-                arguments(rsaKeyFrom(RSA3072Private), RS512),
-                arguments(rsaKeyFrom(RSA3072Private), PS256),
-                arguments(rsaKeyFrom(RSA3072Private), PS384),
-                arguments(rsaKeyFrom(RSA3072Private), PS512),
-                // 4096-bit RSA
-                arguments(rsaKeyFrom(RSA4096Private), RS256),
-                arguments(rsaKeyFrom(RSA4096Private), RS384),
-                arguments(rsaKeyFrom(RSA4096Private), RS512),
-                arguments(rsaKeyFrom(RSA4096Private), PS256),
-                arguments(rsaKeyFrom(RSA4096Private), PS384),
-                arguments(rsaKeyFrom(RSA4096Private), PS512),
-                // EC
-                arguments(ecKeyFrom(PRIME256v1PrivateSEC1), ES256),
-                arguments(ecKeyFrom(PRIME256v1PrivatePKCS8), ES256),
-                arguments(ecKeyFrom(SECP256K1PrivateSEC1), ES256K),
-                arguments(ecKeyFrom(SECP256K1PrivatePKCS8), ES256K),
-                arguments(ecKeyFrom(SECP384R1PrivateSEC1), ES384),
-                arguments(ecKeyFrom(SECP384R1PrivatePKCS8), ES384),
-                arguments(ecKeyFrom(SECP521R1PrivateSEC1), ES512),
-                arguments(ecKeyFrom(SECP521R1PrivatePCKS8), ES512),
-                // OKP
-                arguments(okpPrivateKeyFrom(ED448Private), EdDSA),
-                arguments(okpPrivateKeyFrom(ED25519Private), EdDSA),
-                // Octet Sequences - should be able to sign and verify with any supported algorithm
-                arguments(new JWKKey(new OctetSequenceKeyGenerator(128).generate()), HS256),
-                arguments(new JWKKey(new OctetSequenceKeyGenerator(128).generate()), HS384),
-                arguments(new JWKKey(new OctetSequenceKeyGenerator(128).generate()), HS512),
-                arguments(new JWKKey(new OctetSequenceKeyGenerator(192).generate()), HS256),
-                arguments(new JWKKey(new OctetSequenceKeyGenerator(192).generate()), HS384),
-                arguments(new JWKKey(new OctetSequenceKeyGenerator(192).generate()), HS512),
-                arguments(new JWKKey(new OctetSequenceKeyGenerator(256).generate()), HS256),
-                arguments(new JWKKey(new OctetSequenceKeyGenerator(256).generate()), HS384),
-                arguments(new JWKKey(new OctetSequenceKeyGenerator(256).generate()), HS512),
-                arguments(new JWKKey(new OctetSequenceKeyGenerator(384).generate()), HS256),
-                arguments(new JWKKey(new OctetSequenceKeyGenerator(384).generate()), HS384),
-                arguments(new JWKKey(new OctetSequenceKeyGenerator(384).generate()), HS512),
-                arguments(new JWKKey(new OctetSequenceKeyGenerator(512).generate()), HS256),
-                arguments(new JWKKey(new OctetSequenceKeyGenerator(512).generate()), HS384),
-                arguments(new JWKKey(new OctetSequenceKeyGenerator(512).generate()), HS512),
-                arguments(new JWKKey(new OctetSequenceKey.Builder("secret123".getBytes()).build()), HS256),
-                arguments(new JWKKey(new OctetSequenceKey.Builder("secret123".getBytes()).build()), HS384),
-                arguments(new JWKKey(new OctetSequenceKey.Builder("secret123".getBytes()).build()), HS512)
-        );
-    }
-
     @ParameterizedTest
-    @MethodSource("keySigningAlgorithmPairs")
+    @MethodSource("com.blackberry.jwteditor.KeyUtils#keySigningAlgorithmPairs")
     void keysCanSignCorrectly(JWKKey key, JWSAlgorithm algorithm) throws Exception {
         JWSHeader signingInfo = new JWSHeader.Builder(algorithm).build();
 
@@ -197,20 +133,5 @@ class SigningTests {
 
         assertThat(key.canSign()).isFalse();
         assertThat(key.canVerify()).isFalse();
-    }
-
-    private static JWKKey rsaKeyFrom(String pem) throws Exception {
-        JWK rsaKey = PEMUtils.pemToRSAKey(pem);
-        return new JWKKey(rsaKey);
-    }
-
-    private static JWKKey ecKeyFrom(String pem) throws Exception {
-        JWK ecKey = PEMUtils.pemToECKey(pem);
-        return new JWKKey(ecKey);
-    }
-
-    private static JWKKey okpPrivateKeyFrom(String pem) throws Exception {
-        JWK octetKeyPair = PEMUtils.pemToOctetKeyPair(pem);
-        return new JWKKey(octetKeyPair);
     }
 }
