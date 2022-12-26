@@ -27,7 +27,7 @@ import org.junit.jupiter.params.provider.Arguments;
 
 import java.util.stream.Stream;
 
-import static com.blackberry.jwteditor.PEMToJWKTests.*;
+import static com.blackberry.jwteditor.PemData.*;
 import static com.nimbusds.jose.JWSAlgorithm.*;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 

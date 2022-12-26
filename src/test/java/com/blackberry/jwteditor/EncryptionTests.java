@@ -38,6 +38,7 @@ import org.junit.jupiter.api.Test;
 import java.security.Security;
 import java.text.ParseException;
 
+import static com.blackberry.jwteditor.PemData.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class EncryptionTests {
@@ -54,7 +55,7 @@ class EncryptionTests {
 
         JWS jwsObject = JWS.parse(TEST_JWS);
 
-        String[][] pemCollections = new String[][]{PEMToJWKTests.RSAPublic, PEMToJWKTests.RSAPrivate};
+        String[][] pemCollections = new String[][]{RSAPublic, RSAPrivate};
         for (String[] pemCollection: pemCollections) {
             for (String pem : pemCollection) {
                 JWK rsaKey = PEMUtils.pemToRSAKey(pem);
@@ -81,7 +82,7 @@ class EncryptionTests {
         boolean atLeastOne = false;
         JWS jwsObject = JWS.parse(TEST_JWS);
 
-        String[][] pemCollections = new String[][]{PEMToJWKTests.ECPublic, PEMToJWKTests.ECPrivate};
+        String[][] pemCollections = new String[][]{ECPublic, ECPrivate};
 
         for (String[] pemCollection: pemCollections) {
             for (String pem : pemCollection) {
@@ -109,7 +110,7 @@ class EncryptionTests {
 
         JWS jwsObject = JWS.parse(TEST_JWS);
 
-        String[][] pemCollections = new String[][]{PEMToJWKTests.OKPPublic, PEMToJWKTests.OKPPrivate};
+        String[][] pemCollections = new String[][]{OKPPublic, OKPPrivate};
 
         for (String[] pemCollection: pemCollections) {
             for (String pem : pemCollection) {
