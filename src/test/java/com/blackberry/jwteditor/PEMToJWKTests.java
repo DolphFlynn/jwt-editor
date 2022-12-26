@@ -38,14 +38,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class PEMToJWKTests {
-    private static final String PRIME256v1PrivatePKCS8 = """
+    static final String PRIME256v1PrivatePKCS8 = """
             -----BEGIN PRIVATE KEY-----
             MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgR7xUBrtHikGBXsJk
             DekdUxWWC2YhYMKTDXILREc4/7uhRANCAAQrHJ52L8MTrBl0LWyEx5hXH0i9JeXX
             hFGn9nm1mMGh2lF7be9CQr3tHP6bmbI8kx7Sw+sXwb6CN31aIfVs4R/j
             -----END PRIVATE KEY-----""";
 
-    private static final String PRIME256v1PrivateSEC1 = """
+    static final String PRIME256v1PrivateSEC1 = """
             -----BEGIN EC PRIVATE KEY-----
             MHcCAQEEIEe8VAa7R4pBgV7CZA3pHVMVlgtmIWDCkw1yC0RHOP+7oAoGCCqGSM49
             AwEHoUQDQgAEKxyedi/DE6wZdC1shMeYVx9IvSXl14RRp/Z5tZjBodpRe23vQkK9
@@ -60,7 +60,7 @@ class PEMToJWKTests {
             -----END PUBLIC KEY-----
             """;
 
-    private static final String SECP256K1PrivateSEC1 = """
+    static final String SECP256K1PrivateSEC1 = """
             -----BEGIN EC PRIVATE KEY-----
             MHQCAQEEIPN7f0wS3vreE9CjEEGOqGciNPoj9nqyu8TyBTgP9henoAcGBSuBBAAK
             oUQDQgAE8/GY7z+hgeR8UripTXvk8LCx0m18tYlrMmwkEYr0VyrPAuIDUwingBqA
@@ -68,7 +68,7 @@ class PEMToJWKTests {
             -----END EC PRIVATE KEY-----
             """;
 
-    private static final String SECP256K1PrivatePKCS8 = """
+    static final String SECP256K1PrivatePKCS8 = """
             -----BEGIN PRIVATE KEY-----
             MIGEAgEAMBAGByqGSM49AgEGBSuBBAAKBG0wawIBAQQg83t/TBLe+t4T0KMQQY6o
             ZyI0+iP2erK7xPIFOA/2F6ehRANCAATz8ZjvP6GB5HxSuKlNe+TwsLHSbXy1iWsy
@@ -83,7 +83,7 @@ class PEMToJWKTests {
             -----END PUBLIC KEY-----
             """;
 
-    private static final String SECP384R1PrivatePKCS8 = """
+    static final String SECP384R1PrivatePKCS8 = """
             -----BEGIN PRIVATE KEY-----
             MIG2AgEAMBAGByqGSM49AgEGBSuBBAAiBIGeMIGbAgEBBDAkpfmck1kNnG1L3MSL
             wALFQOxIBriwc499iT6687Qh8iXU+qFrY8RJyuzDVGe46L2hZANiAAT80M09vag9
@@ -92,7 +92,7 @@ class PEMToJWKTests {
             -----END PRIVATE KEY-----
             """;
 
-    private static final String SECP384R1PrivateSEC1 = """
+    static final String SECP384R1PrivateSEC1 = """
             -----BEGIN EC PRIVATE KEY-----
             MIGkAgEBBDAkpfmck1kNnG1L3MSLwALFQOxIBriwc499iT6687Qh8iXU+qFrY8RJ
             yuzDVGe46L2gBwYFK4EEACKhZANiAAT80M09vag9hHCeyJnmIXho1Yu628/AT1o0
@@ -109,7 +109,7 @@ class PEMToJWKTests {
             -----END PUBLIC KEY-----
             """;
 
-    private static final String SECP521R1PrivatePCKS8 = """
+    static final String SECP521R1PrivatePCKS8 = """
             -----BEGIN PRIVATE KEY-----
             MIHuAgEAMBAGByqGSM49AgEGBSuBBAAjBIHWMIHTAgEBBEIAtat9ezvGvb3BUxwR
             OPol+8amfRTtQcFvFWNnyOfNJF0GxcoZS9wuIIK3vaFKl4fOh7zd3pwZ1WErSxzA
@@ -120,7 +120,7 @@ class PEMToJWKTests {
             -----END PRIVATE KEY-----
             """;
 
-    private static final String SECP521R1PrivateSEC1 = """
+    static final String SECP521R1PrivateSEC1 = """
             -----BEGIN EC PRIVATE KEY-----
             MIHcAgEBBEIAtat9ezvGvb3BUxwROPol+8amfRTtQcFvFWNnyOfNJF0GxcoZS9wu
             IIK3vaFKl4fOh7zd3pwZ1WErSxzADS8TY0WgBwYFK4EEACOhgYkDgYYABAHzfrOZ
@@ -140,7 +140,7 @@ class PEMToJWKTests {
             """;
 
 
-    private static final String X25519Private = """
+    static final String X25519Private = """
             -----BEGIN PRIVATE KEY-----
             MC4CAQAwBQYDK2VuBCIEIPgRPKqga++sfwqOIBjZ7HFEPbJ03wqa/xbbIZ27T6BM
             -----END PRIVATE KEY-----
@@ -152,7 +152,7 @@ class PEMToJWKTests {
             -----END PUBLIC KEY-----
             """;
 
-    private static final String RSA512Private = """
+    static final String RSA512Private = """
             -----BEGIN RSA PRIVATE KEY-----
             MIIBOgIBAAJBAPPJiFwXk7ZgPdPCHvGLxdliseVYhTB8LMCUHOEtBaugH3yMpo/G
             OSQg8gjCUrW/mC9LVfRRfp+ZnvyQw0bPYfkCAwEAAQJBAILvSASmSRiX4j0csr/q
@@ -164,14 +164,14 @@ class PEMToJWKTests {
             -----END RSA PRIVATE KEY-----
             """;
 
-    private static final String RSA512Public = """
+    static final String RSA512Public = """
             -----BEGIN PUBLIC KEY-----
             MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAPPJiFwXk7ZgPdPCHvGLxdliseVYhTB8
             LMCUHOEtBaugH3yMpo/GOSQg8gjCUrW/mC9LVfRRfp+ZnvyQw0bPYfkCAwEAAQ==
             -----END PUBLIC KEY-----
             """;
 
-    private static final String RSA1024Private = """
+    static final String RSA1024Private = """
             -----BEGIN RSA PRIVATE KEY-----
             MIICWwIBAAKBgQC/Xgl6Ks3JBFA+68XabvonzWBRzx8ZSgtZptRsze7Og8aYrrn4
             XzRuoaXsu40TM22E7rt684YzfRLzwCLEs9fH6i+r/2ymkJOf/MXpRKUih2xDpH/x
@@ -198,7 +198,7 @@ class PEMToJWKTests {
             -----END PUBLIC KEY-----
             """;
 
-    private static final String RSA2048Private = """
+    static final String RSA2048Private = """
             -----BEGIN RSA PRIVATE KEY-----
             MIIEpAIBAAKCAQEAzSL+XrvMUim9vq+tj9j7TSKn6d3DI9saRTMJPj8S6mADSgZG
             4JE6ZOtFwzV9NHllcuxnIFxpo/iq0K3hVdQP1R6UvTSk9jxnufR2fiPN3Nc7WdAZ
@@ -240,7 +240,7 @@ class PEMToJWKTests {
             -----END PUBLIC KEY-----
             """;
 
-    private static final String RSA3072Private = """
+    static final String RSA3072Private = """
             -----BEGIN RSA PRIVATE KEY-----
             MIIG5QIBAAKCAYEAveNnew9oJECmfopx2wzFJaXKT4KgJ0vp8SmRl5wGVq5toU50
             BTIj1m1tJuMDS9NAI8vYt9IUaqZ/wdKudV2cnD2bTz32lbcur/SgDj7aWr/Mhzw/
@@ -296,7 +296,7 @@ class PEMToJWKTests {
             -----END PUBLIC KEY-----
             """;
 
-    private static final String RSA4096Private = """
+    static final String RSA4096Private = """
             -----BEGIN RSA PRIVATE KEY-----
             MIIJJwIBAAKCAgEAxA5+ROF30GELK7WyRUt5kYx2anaBDazJFDsVfuNNFcYfrwLZ
             8D25hoR2dyC50YZ3uHb+KsCfQxNJwKur6FbBgtVZJIPkEeJSCb14Oh4trrlIpb0d
@@ -367,7 +367,7 @@ class PEMToJWKTests {
             -----END PUBLIC KEY-----
             """;
 
-    private static final String ED448Private = """
+    static final String ED448Private = """
             -----BEGIN PRIVATE KEY-----
             MEcCAQAwBQYDK2VxBDsEOShHsf2xx7zi/GQOknZExKC8xcO3xdDrDFKyEY8TKdrZ
             Y84Y+XpGx9is96BqgpDYK5Avq5vUsgTmHA==
@@ -381,7 +381,7 @@ class PEMToJWKTests {
             -----END PUBLIC KEY-----
             """;
 
-    private static final String ED25519Private = """
+    static final String ED25519Private = """
             -----BEGIN PRIVATE KEY-----
             MC4CAQAwBQYDK2VwBCIEIOTL3VV2R9BELspLlaOR3nBmJApK99kuBKx/Lzr2v1sa
             -----END PRIVATE KEY-----
@@ -393,7 +393,7 @@ class PEMToJWKTests {
             -----END PUBLIC KEY-----
             """;
 
-    private static final String X448Private = """
+    static final String X448Private = """
             -----BEGIN PRIVATE KEY-----
             MEYCAQAwBQYDK2VvBDoEOOhbOc3z/5awW274AWzUTnvZh6IIBFRcYTWDtjgGDGbb
             yQbJyU200FnveqlcPHQK8cr+ahhDf6uf

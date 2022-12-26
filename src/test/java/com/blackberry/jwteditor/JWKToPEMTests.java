@@ -67,7 +67,7 @@ class JWKToPEMTests {
             //RSA2048PrivateDEN
     };
 
-    static final String [] RSAPublic = {
+    static final String[] RSAPublic = {
             RSA2048Public
     };
 
@@ -120,7 +120,7 @@ class JWKToPEMTests {
         assertThat(ecKey.isPrivate()).isFalse();
 
         String pem = PEMUtils.jwkToPem(ecKey);
-         assertThat(pem).isNotEmpty();
+        assertThat(pem).isNotEmpty();
     }
 
     private static Stream<String> ecInvalidJWKs() {
@@ -144,7 +144,7 @@ class JWKToPEMTests {
         assertThat(rsaKey.isPrivate()).isTrue();
 
         String pem = PEMUtils.jwkToPem(rsaKey);
-         assertThat(pem).isNotEmpty();
+        assertThat(pem).isNotEmpty();
     }
 
     static Stream<String> rsaPublicValidJWKs() {
@@ -158,7 +158,7 @@ class JWKToPEMTests {
         assertThat(rsaKey.isPrivate()).isFalse();
 
         String pem = PEMUtils.jwkToPem(rsaKey);
-         assertThat(pem).isNotEmpty();
+        assertThat(pem).isNotEmpty();
     }
 
     private static Stream<String> rsaInvalidJWKs() {
@@ -182,7 +182,7 @@ class JWKToPEMTests {
         assertThat(octetKeyPair.isPrivate()).isTrue();
 
         String pem = PEMUtils.jwkToPem(octetKeyPair);
-         assertThat(pem).isNotEmpty();
+        assertThat(pem).isNotEmpty();
     }
 
     private static Stream<String> ocpPublicValidJWKs() {
@@ -196,7 +196,7 @@ class JWKToPEMTests {
         assertThat(octetKeyPair.isPrivate()).isFalse();
 
         String pem = PEMUtils.jwkToPem(octetKeyPair);
-         assertThat(pem).isNotEmpty();
+        assertThat(pem).isNotEmpty();
     }
 
     private static Stream<String> ocpInvalidJWKs() {

@@ -257,73 +257,65 @@ public class JWKKey implements Key {
 
     @Override
     public boolean canConvertToPem() {
-        switch (getKeyType()) {
-            case RSA:
-            case EC:
-            case OKP:
-                return true;
-
-            case OCT:
-            case PASSWORD:
-            default:
-                return false;
-        }
+        return switch (getKeyType()) {
+            case RSA, EC, OKP -> true;
+            case OCT, PASSWORD -> false;
+        };
     }
 
     /**
      * Get the signing algorithms that can be used with this key
      *
-     * @return list of allowed signing algorithms
+     * @return allowed signing algorithms
      */
     public JWSAlgorithm[] getSigningAlgorithms(){
         switch (keyType){
             case RSA:
-                switch(jwk.size()){
-                    case 512:
-                        return new JWSAlgorithm[]{JWSAlgorithm.RS256};
-                    case 1024:
-                        return new JWSAlgorithm[]{
+                return switch (jwk.size()) {
+                    case 512 -> new JWSAlgorithm[]{
+                            JWSAlgorithm.RS256
+                    };
+
+                    case 1024 -> new JWSAlgorithm[]{
                             JWSAlgorithm.RS256,
                             JWSAlgorithm.RS384,
                             JWSAlgorithm.RS512,
                             JWSAlgorithm.PS256,
                             JWSAlgorithm.PS384
-                        };
-                    default:
-                        return new JWSAlgorithm[]{
+                    };
+
+                    default -> new JWSAlgorithm[]{
                             JWSAlgorithm.RS256,
                             JWSAlgorithm.RS384,
                             JWSAlgorithm.RS512,
                             JWSAlgorithm.PS256,
                             JWSAlgorithm.PS384,
                             JWSAlgorithm.PS512
-                        };
-                }
+                    };
+                };
+
             case EC:
-                switch(((ECKey) jwk).getCurve().getName()){
-                    case "P-256": //NON-NLS
-                        return new JWSAlgorithm[]{JWSAlgorithm.ES256};
-                    case "secp256k1": //NON-NLS
-                        return new JWSAlgorithm[]{JWSAlgorithm.ES256K}; //NON-NLS
-                    case "P-384": //NON-NLS
-                        return new JWSAlgorithm[]{JWSAlgorithm.ES384}; //NON-NLS
-                    case "P-521": //NON-NLS
-                        return new JWSAlgorithm[]{JWSAlgorithm.ES512};
-                }
+                return switch (((ECKey) jwk).getCurve().getName()) {
+                    case "P-256" -> new JWSAlgorithm[]{JWSAlgorithm.ES256};
+                    case "secp256k1" -> new JWSAlgorithm[]{JWSAlgorithm.ES256K};
+                    case "P-384" -> new JWSAlgorithm[]{JWSAlgorithm.ES384};
+                    case "P-521" -> new JWSAlgorithm[]{JWSAlgorithm.ES512};
+                    default -> new JWSAlgorithm[0];
+                };
+
             case OKP:
-                switch(((OctetKeyPair) jwk).getCurve().getStdName()){
-                    case "Ed25519": //NON-NLS
-                    case "Ed448": //NON-NLS
-                        return new JWSAlgorithm[]{JWSAlgorithm.EdDSA};
-                    default:
-                        return new JWSAlgorithm[0];
-                }
+                return switch (((OctetKeyPair) jwk).getCurve().getStdName()) {
+                    case "Ed25519", "Ed448" -> new JWSAlgorithm[]{JWSAlgorithm.EdDSA};
+                    default -> new JWSAlgorithm[0];
+                };
+
             case OCT:
                 return new JWSAlgorithm[]{
                         JWSAlgorithm.HS256,
                         JWSAlgorithm.HS384,
                         JWSAlgorithm.HS512
                 };
+
             default:
                 return new JWSAlgorithm[0];
         }
