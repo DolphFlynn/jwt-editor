@@ -55,6 +55,22 @@ public class JOSEObjectFinder {
 
         return joseObjects;
     }
+    
+    public static boolean containsJOSEObjects(String text) {
+        Set<String> candidates = findCandidateJoseObjectsWithin(text);
+
+        for (String candidate : candidates) {
+            // Try to parse each as both a JWE and a JWS
+            Optional<JWE> jwe = parseJWE(candidate);
+            Optional<JWS> jws = jwe.isEmpty() ? parseJWS(candidate) : Optional.empty();
+
+            if (jwe.isPresent() || jws.isPresent()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     private static Set<String> findCandidateJoseObjectsWithin(String text) {
         Matcher m = JOSE_OBJECT_PATTERN.matcher(text);

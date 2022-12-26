@@ -41,6 +41,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.blackberry.jwteditor.model.jose.JOSEObjectFinder.containsJOSEObjects;
 import static com.blackberry.jwteditor.model.jose.JOSEObjectFinder.extractJOSEObjects;
 
 /**
@@ -78,7 +79,7 @@ public class EditorPresenter extends Presenter {
      * @return true if the content contains a JWE/JWS that can be edited
      */
     public boolean isEnabled(String content){
-        return extractJOSEObjects(content).size() > 0;
+        return containsJOSEObjects(content);
     }
 
     /**

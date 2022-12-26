@@ -27,6 +27,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static com.blackberry.jwteditor.model.jose.JOSEObjectFinder.containsJOSEObjects;
 import static com.blackberry.jwteditor.model.jose.JOSEObjectFinder.extractJOSEObjects;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -96,11 +97,24 @@ class JOSEParserTests {
     }
 
     @ParameterizedTest
+    @MethodSource("validJws")
+    void testDetectValidJWS(String joseObjectString) {
+        assertThat(containsJOSEObjects(joseObjectString)).isTrue();
+    }
+
+    @ParameterizedTest
     @MethodSource("invalidJws")
     void testInvalidJWS(String joseObjectString) {
         List<JOSEObjectPair> joseObjects = extractJOSEObjects(joseObjectString);
 
         assertThat(joseObjects).isEmpty();
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidJws")
+    void testDetectInvalidJWS(String joseObjectString) {
+        assertThat(containsJOSEObjects(joseObjectString)).isFalse();
+
     }
 
     @ParameterizedTest
@@ -113,10 +127,22 @@ class JOSEParserTests {
     }
 
     @ParameterizedTest
+    @MethodSource("validJwe")
+    void testDetectValidJWE(String joseObjectString) {
+        assertThat(containsJOSEObjects(joseObjectString)).isTrue();
+    }
+
+    @ParameterizedTest
     @MethodSource("invalidJwe")
     void testInvalidJWE(String joseObjectString) {
         List<JOSEObjectPair> joseObjects = extractJOSEObjects(joseObjectString);
 
         assertThat(joseObjects).isEmpty();
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidJwe")
+    void testDetectInvalidJWE(String joseObjectString) {
+        assertThat(containsJOSEObjects(joseObjectString)).isFalse();
     }
 }
