@@ -18,9 +18,9 @@ limitations under the License.
 
 package com.blackberry.jwteditor;
 
-import com.blackberry.jwteditor.model.jose.JOSEObjectPair;
 import com.blackberry.jwteditor.model.jose.JWE;
 import com.blackberry.jwteditor.model.jose.JWS;
+import com.blackberry.jwteditor.model.jose.MutableJOSEObject;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -90,7 +90,7 @@ class JOSEParserTests {
     @ParameterizedTest
     @MethodSource("validJws")
     void testValidJWS(String joseObjectString) {
-        List<JOSEObjectPair> joseObjects = extractJOSEObjects(joseObjectString);
+        List<MutableJOSEObject> joseObjects = extractJOSEObjects(joseObjectString);
 
         assertThat(joseObjects).hasSize(1);
         assertThat(joseObjects.get(0).getModified()).isInstanceOf(JWS.class);
@@ -105,7 +105,7 @@ class JOSEParserTests {
     @ParameterizedTest
     @MethodSource("invalidJws")
     void testInvalidJWS(String joseObjectString) {
-        List<JOSEObjectPair> joseObjects = extractJOSEObjects(joseObjectString);
+        List<MutableJOSEObject> joseObjects = extractJOSEObjects(joseObjectString);
 
         assertThat(joseObjects).isEmpty();
     }
@@ -120,7 +120,7 @@ class JOSEParserTests {
     @ParameterizedTest
     @MethodSource("validJwe")
     void testValidJWE(String joseObjectString) {
-        List<JOSEObjectPair> joseObjects = extractJOSEObjects(joseObjectString);
+        List<MutableJOSEObject> joseObjects = extractJOSEObjects(joseObjectString);
 
         assertThat(joseObjects).hasSize(1);
         assertThat(joseObjects.get(0).getModified()).isInstanceOf(JWE.class);
@@ -135,7 +135,7 @@ class JOSEParserTests {
     @ParameterizedTest
     @MethodSource("invalidJwe")
     void testInvalidJWE(String joseObjectString) {
-        List<JOSEObjectPair> joseObjects = extractJOSEObjects(joseObjectString);
+        List<MutableJOSEObject> joseObjects = extractJOSEObjects(joseObjectString);
 
         assertThat(joseObjects).isEmpty();
     }

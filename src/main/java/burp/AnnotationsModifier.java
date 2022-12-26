@@ -22,8 +22,8 @@ import burp.api.montoya.core.Annotations;
 import burp.api.montoya.core.ByteArray;
 import burp.api.montoya.utilities.ByteUtils;
 import com.blackberry.jwteditor.model.config.ProxyConfig;
-import com.blackberry.jwteditor.model.jose.JOSEObjectPair;
 import com.blackberry.jwteditor.model.jose.JWS;
+import com.blackberry.jwteditor.model.jose.MutableJOSEObject;
 
 import static burp.api.montoya.core.Annotations.annotations;
 import static com.blackberry.jwteditor.model.jose.JOSEObjectFinder.extractJOSEObjects;
@@ -52,8 +52,8 @@ class AnnotationsModifier {
         int jwsCount = 0;
         int jweCount = 0;
 
-        for (JOSEObjectPair joseObjectPair : extractJOSEObjects(messageString)) {
-            if (joseObjectPair.getModified() instanceof JWS) {
+        for (MutableJOSEObject mutableJoseObject : extractJOSEObjects(messageString)) {
+            if (mutableJoseObject.getModified() instanceof JWS) {
                 jwsCount++;
             } else {
                 jweCount++;

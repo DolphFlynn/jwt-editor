@@ -39,8 +39,8 @@ public class JOSEObjectFinder {
      * @param text text block
      * @return list of JOSEObjectPairs
      */
-    public static List<JOSEObjectPair> extractJOSEObjects(String text) {
-        List<JOSEObjectPair> joseObjects = new ArrayList<>();
+    public static List<MutableJOSEObject> extractJOSEObjects(String text) {
+        List<MutableJOSEObject> joseObjects = new ArrayList<>();
 
         Set<String> candidates = findCandidateJoseObjectsWithin(text);
 
@@ -49,8 +49,8 @@ public class JOSEObjectFinder {
             Optional<JWE> jwe = parseJWE(candidate);
             Optional<JWS> jws = jwe.isEmpty() ? parseJWS(candidate) : Optional.empty();
 
-            jwe.ifPresent(value -> joseObjects.add(new JOSEObjectPair(candidate, value)));
-            jws.ifPresent(value -> joseObjects.add(new JOSEObjectPair(candidate, value)));
+            jwe.ifPresent(value -> joseObjects.add(new MutableJOSEObject(candidate, value)));
+            jws.ifPresent(value -> joseObjects.add(new MutableJOSEObject(candidate, value)));
         }
 
         return joseObjects;

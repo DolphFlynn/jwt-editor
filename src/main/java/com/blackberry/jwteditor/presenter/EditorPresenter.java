@@ -19,9 +19,9 @@ limitations under the License.
 package com.blackberry.jwteditor.presenter;
 
 import com.blackberry.jwteditor.model.jose.JOSEObject;
-import com.blackberry.jwteditor.model.jose.JOSEObjectPair;
 import com.blackberry.jwteditor.model.jose.JWE;
 import com.blackberry.jwteditor.model.jose.JWS;
+import com.blackberry.jwteditor.model.jose.MutableJOSEObject;
 import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.operations.Operations;
 import com.blackberry.jwteditor.utils.JSONUtils;
@@ -52,7 +52,7 @@ public class EditorPresenter extends Presenter {
     private final PresenterStore presenters;
     private final EditorView view;
 
-    private final List<JOSEObjectPair> joseObjectPairs;
+    private final List<MutableJOSEObject> mutableJoseObjects;
 
     String message;
 
@@ -69,7 +69,7 @@ public class EditorPresenter extends Presenter {
         this.presenters = presenters;
         presenters.register(this);
 
-        joseObjectPairs = new ArrayList<>();
+        mutableJoseObjects = new ArrayList<>();
     }
 
     /**
@@ -91,13 +91,13 @@ public class EditorPresenter extends Presenter {
 
         // Save the input text and clear existing JOSE objects
         message = content;
-        joseObjectPairs.clear();
+        mutableJoseObjects.clear();
 
         // Extract JOSE Objects from the text, build a change set and add them to the dropdown
-        List<JOSEObjectPair> joseObjects = extractJOSEObjects(content);
+        List<MutableJOSEObject> joseObjects = extractJOSEObjects(content);
         String[] joseObjectStrings = new String[joseObjects.size()];
         for(int i = 0; i < joseObjects.size(); i++){
-            joseObjectPairs.add(joseObjects.get(i));
+            mutableJoseObjects.add(joseObjects.get(i));
 
             // Truncate the JOSE object for display
             String serializedJWT = joseObjects.get(i).getOriginal();
@@ -458,10 +458,10 @@ public class EditorPresenter extends Presenter {
         List<String> replacementList = new ArrayList<>();
 
         //Add a replacement pair to the lists if the JOSEObjectPair has changed
-        for(JOSEObjectPair joseObjectPair: joseObjectPairs){
-            if(joseObjectPair.changed()) {
-                searchList.add(joseObjectPair.getOriginal());
-                replacementList.add(joseObjectPair.getModified().serialize());
+        for(MutableJOSEObject mutableJoseObject : mutableJoseObjects){
+            if(mutableJoseObject.changed()) {
+                searchList.add(mutableJoseObject.getOriginal());
+                replacementList.add(mutableJoseObject.getModified().serialize());
             }
         }
 
@@ -481,8 +481,8 @@ public class EditorPresenter extends Presenter {
      * @return true if changes have been made in the editor
      */
     public boolean isModified() {
-        for(JOSEObjectPair joseObjectPair: joseObjectPairs){
-            if(joseObjectPair.changed()){
+        for(MutableJOSEObject mutableJoseObject : mutableJoseObjects){
+            if(mutableJoseObject.changed()){
                 return true;
             }
         }
@@ -497,8 +497,8 @@ public class EditorPresenter extends Presenter {
         selectionChanging = true;
 
         // Get the JOSEObject pair corresponding to the selected dropdown entry index
-        JOSEObjectPair joseObjectPair = joseObjectPairs.get(view.getSelected());
-        JOSEObject joseObject = joseObjectPair.getModified();
+        MutableJOSEObject mutableJoseObject = mutableJoseObjects.get(view.getSelected());
+        JOSEObject joseObject = mutableJoseObject.getModified();
 
         // Change to JWE/JWS mode based on the newly selected JOSEObject
         if(joseObject instanceof JWS){
@@ -519,14 +519,14 @@ public class EditorPresenter extends Presenter {
      */
     public void componentChanged() {
         // Get the currently selected object
-        JOSEObjectPair joseObjectPair = joseObjectPairs.get(view.getSelected());
+        MutableJOSEObject mutableJoseObject = mutableJoseObjects.get(view.getSelected());
 
         //Serialize the text/hex entries to a JWS/JWE in compact form, depending on the editor mode
         JOSEObject joseObject = view.getMode() == EditorView.TAB_JWS ? getJWS() : getJWE();
         //Update the JOSEObjectPair with the change
-        joseObjectPair.setModified(joseObject);
+        mutableJoseObject.setModified(joseObject);
         //Highlight the serialized text as changed if it differs from the original, and the change wasn't triggered by onSelectionChanging
-        view.setSerialized(joseObject.serialize(), joseObjectPair.changed() && !selectionChanging);
+        view.setSerialized(joseObject.serialize(), mutableJoseObject.changed() && !selectionChanging);
     }
 
     /**

@@ -21,7 +21,7 @@ package com.blackberry.jwteditor.model.jose;
 /**
  * Class for a JOSE object change set
  */
-public class JOSEObjectPair {
+public class MutableJOSEObject {
     private final String original;
     private JOSEObject modified;
 
@@ -31,7 +31,7 @@ public class JOSEObjectPair {
      * @param original the original compact serialized JOSE object
      * @param modified the parsed and updated JOSEObject
      */
-    public JOSEObjectPair(String original, JOSEObject modified) {
+    public MutableJOSEObject(String original, JOSEObject modified) {
         this.original = original;
         this.modified = modified;
     }
