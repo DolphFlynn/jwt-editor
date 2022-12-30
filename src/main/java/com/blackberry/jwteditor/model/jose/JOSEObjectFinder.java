@@ -18,13 +18,19 @@ limitations under the License.
 
 package com.blackberry.jwteditor.model.jose;
 
+import com.nimbusds.jose.JOSEObject;
 import com.nimbusds.jose.JWEObject;
-import com.nimbusds.jose.JWSObject;
+import com.nimbusds.jose.util.Base64URL;
+import com.nimbusds.jose.util.JSONObjectUtils;
 
 import java.text.ParseException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static com.nimbusds.jose.Header.MAX_HEADER_STRING_LENGTH;
+import static com.nimbusds.jose.HeaderParameterNames.ALGORITHM;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 public class JOSEObjectFinder {
     public static final String BASE64_REGEX = "[A-Za-z0-9-_]";
@@ -55,7 +61,7 @@ public class JOSEObjectFinder {
 
         return joseObjects;
     }
-    
+
     public static boolean containsJOSEObjects(String text) {
         Set<String> candidates = findCandidateJoseObjectsWithin(text);
 
@@ -95,7 +101,28 @@ public class JOSEObjectFinder {
 
     private static Optional<JWS> parseJWS(String candidate) {
         try {
-            JWSObject.parse(candidate);
+            Base64URL[] parts = JOSEObject.split(candidate);
+
+            if (parts.length != 3) {
+                throw new ParseException("Unexpected number of Base64URL parts, must be three", 0);
+            }
+
+            // Header must be Base64URL encoded UTF-8 encoded JSON object with 'alg' value
+            Base64URL encodedHeader = parts[0];
+            String header = encodedHeader.decodeToString(); // assumes UTF-8
+            Map<String, Object> headerJson = JSONObjectUtils.parse(header, MAX_HEADER_STRING_LENGTH);
+
+            String algValue = JSONObjectUtils.getString(headerJson, ALGORITHM);
+
+            if (isBlank(algValue)) {
+                throw new ParseException("Missing \"alg\" in header JSON object", 0);
+            }
+
+            // Payload must be Base64URL encoded UTF-8 encoded JSON object
+            Base64URL encodedPayload = parts[1];
+            String payload = encodedPayload.decodeToString();
+            JSONObjectUtils.parse(payload); // throws ParseException if not JSON object
+
             return Optional.of(JWS.parse(candidate));
         } catch (ParseException e) {
             return Optional.empty();

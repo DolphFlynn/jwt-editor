@@ -31,22 +31,33 @@ import static com.blackberry.jwteditor.model.jose.JOSEObjectFinder.containsJOSEO
 import static com.blackberry.jwteditor.model.jose.JOSEObjectFinder.extractJOSEObjects;
 import static org.assertj.core.api.Assertions.assertThat;
 
-class JOSEParserTests {
+class JOSEObjectFinderTests {
     private static Stream<String> validJws() {
         return Stream.of(
                 // JWS
                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJUZXN0In0.Nabf3xakZubPnCzHT-fx0vG1iuNPeJKuSzHxUiQKf-8",
+                // JWS with whitespace
+                " eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJUZXN0In0.Nabf3xakZubPnCzHT-fx0vG1iuNPeJKuSzHxUiQKf-8 ",
                 // JWS without signature
                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJUZXN0In0.",
                 // JWS with preceding text
                 "asdasdasdeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJUZXN0In0.Nabf3xakZubPnCzHT-fx0vG1iuNPeJKuSzHxUiQKf-8",
                 // JWS without signature preceding text
-                "asdasdasdasdeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJUZXN0In0.Nabf3xakZubPnCzHT-fx0vG1iuNPeJKuSzHxUiQKf-8"
+                "asdasdasdasdeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJUZXN0In0.Nabf3xakZubPnCzHT-fx0vG1iuNPeJKuSzHxUiQKf-8",
+                // JWS with empty payload
+                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.e30.17DlZn0zeYhz3uTQCRpSx9hYlUj1SJxDMeZLof8dSHw",
+                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyB9.17DlZn0zeYhz3uTQCRpSx9hYlUj1SJxDMeZLof8dSHw",
+                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgfQ.17DlZn0zeYhz3uTQCRpSx9hYlUj1SJxDMeZLof8dSH"
         );
     }
 
     private static Stream<String> invalidJws() {
         return Stream.of(
+                "",
+                ".",
+                "...",
+                "asdadasdasdeyJhbGci$iJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJUZXN0In0.Nabf3xakZubPnCzHT-fx0vG1iuNPeJKuSzHxUiQKf-8",
+                "asdadasdasdeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ^ZXN0In0.Nabf3xakZubPnCzHT-fx0vG1iuNPeJKuSzHxUiQKf-8",
                 // No header
                 ".eyJzdWIiOiJUZXN0In0.Nabf3xakZubPnCzHT-fx0vG1iuNPeJKuSzHxUiQKf-8",
                 // No payload
@@ -54,7 +65,26 @@ class JOSEParserTests {
                 // Empty
                 "..",
                 //URL
-                "www.blackberry.com"
+                "www.blackberry.com",
+                // Invalid charset encoding
+                "K0FIc0FJZy10eXArQUNJOitBQ0ktSldUK0FDSSwrQUNJLWFsZytBQ0k6K0FDSS1IUzI1NitBQ0lBZlEt.eyJzdWIiOiJUZXN0In0.17DlZn0zeYhz3uTQCRpSx9hYlUj1SJxDMeZLof8dSHw",
+                "_v8AewAiAHQAeQBwACIAOgAiAEoAVwBUACIALAAiAGEAbABnACIAOgAiAEgAUwAyADUANgAiAH0.eyJzdWIiOiJUZXN0In0.17DlZn0zeYhz3uTQCRpSx9hYlUj1SJxDMeZLof8dSHw",
+                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.K0FIc0FJZy1zdWIrQUNJOitBQ0ktVGVzdCtBQ0lBZlEt.17DlZn0zeYhz3uTQCRpSx9hYlUj1SJxDMeZLof8dSHw",
+                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9._v8AewAiAHMAdQBiACIAOgAiAFQAZQBzAHQAIgB9.17DlZn0zeYhz3uTQCRpSx9hYlUj1SJxDMeZLof8dSHw",
+                // Missing or invalid 'alg'
+                "eyJ0eXAiOiJKV1QifQ.eyJzdWIiOiJUZXN0In0.17DlZn0zeYhz3uTQCRpSx9hYlUj1SJxDMeZLof8dSHw",
+                "eyJ0eXAiOiJKV1QiLCJhbGciOiIifQ.eyJzdWIiOiJUZXN0In0.17DlZn0zeYhz3uTQCRpSx9hYlUj1SJxDMeZLof8dSHw",
+                "eyJ0eXAiOiJKV1QiLCJhbGciOiIgIn0.eyJzdWIiOiJUZXN0In0.17DlZn0zeYhz3uTQCRpSx9hYlUj1SJxDMeZLof8dSHw",
+                "eyJ0eXAiOiJKV1QiLCJhbGciOiIgICAgIn0.eyJzdWIiOiJUZXN0In0.17DlZn0zeYhz3uTQCRpSx9hYlUj1SJxDMeZLof8dSHw",
+                "eyJ0eXAiOiJKV1QiLCJhbGciOm51bGx9.eyJzdWIiOiJUZXN0In0.17DlZn0zeYhz3uTQCRpSx9hYlUj1SJxDMeZLof8dSHw",
+                "eyJ0eXAiOiJKV1QiLCJhbGciOjQ0OH0.eyJzdWIiOiJUZXN0In0.17DlZn0zeYhz3uTQCRpSx9hYlUj1SJxDMeZLof8dSHw",
+                "eyJ0eXAiOiJKV1QiLCJhbGciOltdfQ.eyJzdWIiOiJUZXN0In0.17DlZn0zeYhz3uTQCRpSx9hYlUj1SJxDMeZLof8dSHw",
+                "eyJ0eXAiOiJKV1QiLCJhbGciOnt9fQ.eyJzdWIiOiJUZXN0In0.17DlZn0zeYhz3uTQCRpSx9hYlUj1SJxDMeZLof8dSHw",
+                // Payload not JSON object
+                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.bnVsbA.17DlZn0zeYhz3uTQCRpSx9hYlUj1SJxDMeZLof8dSHw",
+                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.NDQ4.17DlZn0zeYhz3uTQCRpSx9hYlUj1SJxDMeZLof8dSHw",
+                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.InNhdW5hIg.17DlZn0zeYhz3uTQCRpSx9hYlUj1SJxDMeZLof8dSHw",
+                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.W10.17DlZn0zeYhz3uTQCRpSx9hYlUj1SJxDMeZLof8dSH"
         );
     }
 
