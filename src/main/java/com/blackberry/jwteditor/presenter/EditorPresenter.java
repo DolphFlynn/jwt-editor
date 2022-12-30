@@ -54,8 +54,7 @@ public class EditorPresenter extends Presenter {
 
     private final List<MutableJOSEObject> mutableJoseObjects;
 
-    String message;
-
+    private String message;
     private boolean selectionChanging;
 
     /**

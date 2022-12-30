@@ -49,12 +49,12 @@ public class KeysView {
     private JButton buttonNewOKP;
     private JTable tableKeys;
 
-    JMenuItem menuItemDelete;
-    JMenuItem menuItemCopyJWK;
-    JMenuItem menuItemCopyPEM;
-    JMenuItem menuItemCopyPublicJWK;
-    JMenuItem menuItemCopyPublicPEM;
-    JMenuItem menuItemCopyPassword;
+    private JMenuItem menuItemDelete;
+    private JMenuItem menuItemCopyJWK;
+    private JMenuItem menuItemCopyPEM;
+    private JMenuItem menuItemCopyPublicJWK;
+    private JMenuItem menuItemCopyPublicPEM;
+    private JMenuItem menuItemCopyPassword;
 
     public KeysView(
             Window parent,
@@ -106,7 +106,6 @@ public class KeysView {
      * Model for the keys table
      */
     public static class KeysTableModel extends AbstractTableModel {
-
         private final List<Object[]> data = new ArrayList<>();
 
         public void addRow(Object[] row) {
@@ -298,12 +297,7 @@ public class KeysView {
         return parent;
     }
 
-    private static class OneTimeColumnResizeHierarchyListener implements HierarchyListener {
-        private final JTable table;
-
-        private OneTimeColumnResizeHierarchyListener(JTable table) {
-            this.table = table;
-        }
+    private record OneTimeColumnResizeHierarchyListener(JTable table) implements HierarchyListener {
 
         @Override
         public void hierarchyChanged(HierarchyEvent e) {
@@ -326,13 +320,10 @@ public class KeysView {
         }
     }
 
-    private static class AlternateRowBackgroundDecoratingTableCellRenderer implements TableCellRenderer {
-        private final TableCellRenderer tableCellRenderer;
+    private record AlternateRowBackgroundDecoratingTableCellRenderer(
+            TableCellRenderer tableCellRenderer) implements TableCellRenderer {
 
-        AlternateRowBackgroundDecoratingTableCellRenderer(TableCellRenderer tableCellRenderer) {
-            this.tableCellRenderer = tableCellRenderer;
-        }
-
+        @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             Component component = tableCellRenderer.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 
@@ -340,7 +331,7 @@ public class KeysView {
                 Color alternateRowColor = UIManager.getColor("Table.alternateRowColor");
 
                 if (alternateRowColor != null && row % 2 != 0) {
-                     component.setBackground(alternateRowColor);
+                    component.setBackground(alternateRowColor);
                 }
             }
 
@@ -348,15 +339,10 @@ public class KeysView {
         }
     }
 
-    private static class RowHeightDecoratingTableCellRenderer implements TableCellRenderer {
+    private record RowHeightDecoratingTableCellRenderer(TableCellRenderer tableCellRenderer) implements TableCellRenderer {
         private static final int ADDITIONAL_HEIGHT_PIXELS = 5;
 
-        private final TableCellRenderer tableCellRenderer;
-
-        RowHeightDecoratingTableCellRenderer(TableCellRenderer tableCellRenderer) {
-            this.tableCellRenderer = tableCellRenderer;
-        }
-
+        @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             Component component = tableCellRenderer.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             int componentHeight = component.getPreferredSize().height;
