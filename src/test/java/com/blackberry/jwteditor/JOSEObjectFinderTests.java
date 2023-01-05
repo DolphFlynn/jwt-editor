@@ -119,8 +119,18 @@ class JOSEObjectFinderTests {
 
     @ParameterizedTest
     @MethodSource("validJws")
-    void testValidJWS(String joseObjectString) {
+    void testExtractValidJWS(String joseObjectString) {
         List<MutableJOSEObject> joseObjects = extractJOSEObjects(joseObjectString);
+
+        assertThat(joseObjects).hasSize(1);
+        assertThat(joseObjects.get(0).getModified()).isInstanceOf(JWS.class);
+    }
+
+    @ParameterizedTest
+    @MethodSource("validJws")
+    void testExtractValidJWSFromWithinData(String joseObjectString) {
+        String text = "Authorization: Bearer " + joseObjectString + "\r\n";
+        List<MutableJOSEObject> joseObjects = extractJOSEObjects(text);
 
         assertThat(joseObjects).hasSize(1);
         assertThat(joseObjects.get(0).getModified()).isInstanceOf(JWS.class);
@@ -130,6 +140,14 @@ class JOSEObjectFinderTests {
     @MethodSource("validJws")
     void testDetectValidJWS(String joseObjectString) {
         assertThat(containsJOSEObjects(joseObjectString)).isTrue();
+    }
+
+    @ParameterizedTest
+    @MethodSource("validJws")
+    void testDetectValidJWSFromWithinData(String joseObjectString) {
+        String text = "Authorization: Bearer " + joseObjectString + "\r\n";
+
+        assertThat(containsJOSEObjects(text)).isTrue();
     }
 
     @ParameterizedTest
@@ -144,13 +162,23 @@ class JOSEObjectFinderTests {
     @MethodSource("invalidJws")
     void testDetectInvalidJWS(String joseObjectString) {
         assertThat(containsJOSEObjects(joseObjectString)).isFalse();
-
     }
 
     @ParameterizedTest
     @MethodSource("validJwe")
-    void testValidJWE(String joseObjectString) {
+    void testExtractValidJWE(String joseObjectString) {
         List<MutableJOSEObject> joseObjects = extractJOSEObjects(joseObjectString);
+
+        assertThat(joseObjects).hasSize(1);
+        assertThat(joseObjects.get(0).getModified()).isInstanceOf(JWE.class);
+    }
+
+    @ParameterizedTest
+    @MethodSource("validJwe")
+    void testExtractValidJWEFromWithinData(String joseObjectString) {
+        String text = "Authorization: Bearer " + joseObjectString + "\r\n";
+
+        List<MutableJOSEObject> joseObjects = extractJOSEObjects(text);
 
         assertThat(joseObjects).hasSize(1);
         assertThat(joseObjects.get(0).getModified()).isInstanceOf(JWE.class);
@@ -160,6 +188,14 @@ class JOSEObjectFinderTests {
     @MethodSource("validJwe")
     void testDetectValidJWE(String joseObjectString) {
         assertThat(containsJOSEObjects(joseObjectString)).isTrue();
+    }
+
+    @ParameterizedTest
+    @MethodSource("validJwe")
+    void testDetectValidJWEFromWithinData(String joseObjectString) {
+        String text = "Authorization: Bearer " + joseObjectString + "\r\n";
+
+        assertThat(containsJOSEObjects(text)).isTrue();
     }
 
     @ParameterizedTest
