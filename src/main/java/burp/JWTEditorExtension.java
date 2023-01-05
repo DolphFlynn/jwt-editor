@@ -6,6 +6,7 @@ import burp.api.montoya.persistence.Preferences;
 import burp.api.montoya.proxy.Proxy;
 import burp.api.montoya.ui.UserInterface;
 import burp.api.montoya.utilities.ByteUtils;
+import burp.proxy.ProxyHttpMessageHandler;
 import com.blackberry.jwteditor.model.KeysModel;
 import com.blackberry.jwteditor.model.config.ProxyConfig;
 import com.blackberry.jwteditor.model.persistence.BurpKeysModelPersistence;
@@ -23,16 +24,11 @@ import java.awt.*;
 
 import static burp.api.montoya.ui.editor.extension.EditorMode.READ_ONLY;
 
-/**
- * Burp extension main class
- */
 @SuppressWarnings("unused")
 public class JWTEditorExtension implements BurpExtension {
 
     @Override
     public void initialize(MontoyaApi api) {
-        PresenterStore presenters = new PresenterStore();
-
         api.extension().setName(Utils.getResourceString("tool_name"));
 
         Preferences preferences = api.persistence().preferences();
@@ -46,6 +42,7 @@ public class JWTEditorExtension implements BurpExtension {
         Window suiteWindow = userInterface.swingUtils().suiteFrame();
 
         RstaFactory rstaFactory = new BurpThemeAwareRstaFactory(userInterface, api.logging());
+        PresenterStore presenters = new PresenterStore();
 
         BurpView burpView = new BurpView(
                 suiteWindow,

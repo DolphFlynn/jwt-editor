@@ -16,7 +16,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package burp;
+package burp.proxy;
 
 import burp.api.montoya.core.Annotations;
 import burp.api.montoya.http.message.requests.HttpRequest;
@@ -29,10 +29,10 @@ import static burp.api.montoya.proxy.RequestInitialInterceptResult.followUserRul
 import static burp.api.montoya.proxy.ResponseFinalInterceptResult.continueWith;
 import static burp.api.montoya.proxy.ResponseInitialInterceptResult.followUserRules;
 
-class ProxyHttpMessageHandler implements ProxyHttpRequestHandler, ProxyHttpResponseHandler {
+public class ProxyHttpMessageHandler implements ProxyHttpRequestHandler, ProxyHttpResponseHandler {
     private final AnnotationsModifier annotationsModifier;
 
-    ProxyHttpMessageHandler(ProxyConfig proxyConfig, ByteUtils byteUtils) {
+    public ProxyHttpMessageHandler(ProxyConfig proxyConfig, ByteUtils byteUtils) {
         this.annotationsModifier = new AnnotationsModifier(proxyConfig, byteUtils);
     }
 
