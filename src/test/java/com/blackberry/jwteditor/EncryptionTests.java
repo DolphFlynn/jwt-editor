@@ -19,11 +19,13 @@ limitations under the License.
 package com.blackberry.jwteditor;
 
 import com.blackberry.jwteditor.model.jose.JWE;
+import com.blackberry.jwteditor.model.jose.JWEFactory;
 import com.blackberry.jwteditor.model.jose.JWS;
+import com.blackberry.jwteditor.model.jose.exceptions.DecryptionException;
+import com.blackberry.jwteditor.model.jose.exceptions.EncryptionException;
 import com.blackberry.jwteditor.model.keys.JWKKey;
 import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.model.keys.PasswordKey;
-import com.blackberry.jwteditor.utils.CryptoUtils;
 import com.blackberry.jwteditor.utils.PEMUtils;
 import com.nimbusds.jose.EncryptionMethod;
 import com.nimbusds.jose.JOSEException;
@@ -50,7 +52,7 @@ class EncryptionTests {
     }
 
     @Test
-    void rsaEncryption() throws PEMUtils.PemException, Key.UnsupportedKeyException, ParseException, CryptoUtils.EncryptionException, CryptoUtils.DecryptionException {
+    void rsaEncryption() throws PEMUtils.PemException, Key.UnsupportedKeyException, ParseException, EncryptionException, DecryptionException {
         boolean atLeastOne = false;
 
         JWS jwsObject = JWS.parse(TEST_JWS);
@@ -63,10 +65,10 @@ class EncryptionTests {
                 if (key.canEncrypt()) {
                     for (JWEAlgorithm kek : key.getKeyEncryptionKeyAlgorithms()) {
                         for (EncryptionMethod cek : key.getContentEncryptionKeyAlgorithms(kek)) {
-                            JWE jwe = CryptoUtils.encrypt(jwsObject, key, kek, cek);
+                            JWE jwe = JWEFactory.encrypt(jwsObject, key, kek, cek);
 
                             if(key.canDecrypt()){
-                                CryptoUtils.decrypt(jwe, key);
+                                jwe.decrypt(key);
                             }
                             atLeastOne = true;
                         }
@@ -78,7 +80,7 @@ class EncryptionTests {
     }
 
     @Test
-    void ecEncryption() throws PEMUtils.PemException, Key.UnsupportedKeyException, ParseException, CryptoUtils.EncryptionException, CryptoUtils.DecryptionException {
+    void ecEncryption() throws PEMUtils.PemException, Key.UnsupportedKeyException, ParseException, EncryptionException, DecryptionException {
         boolean atLeastOne = false;
         JWS jwsObject = JWS.parse(TEST_JWS);
 
@@ -91,9 +93,9 @@ class EncryptionTests {
                 if (key.canEncrypt()) {
                     for (JWEAlgorithm kek : key.getKeyEncryptionKeyAlgorithms()) {
                         for (EncryptionMethod cek : key.getContentEncryptionKeyAlgorithms(kek)) {
-                            JWE jwe = CryptoUtils.encrypt(jwsObject, key, kek, cek);
+                            JWE jwe = JWEFactory.encrypt(jwsObject, key, kek, cek);
                             if(key.canDecrypt()) {
-                                CryptoUtils.decrypt(jwe, key);
+                                jwe.decrypt(key);
                             }
                             atLeastOne = true;
                         }
@@ -105,7 +107,7 @@ class EncryptionTests {
     }
 
     @Test
-    void okpEncryption() throws PEMUtils.PemException, Key.UnsupportedKeyException, ParseException, CryptoUtils.EncryptionException {
+    void okpEncryption() throws PEMUtils.PemException, Key.UnsupportedKeyException, ParseException, EncryptionException {
         boolean atLeastOne = false;
 
         JWS jwsObject = JWS.parse(TEST_JWS);
@@ -120,7 +122,7 @@ class EncryptionTests {
                     for (JWEAlgorithm kek : key.getKeyEncryptionKeyAlgorithms()) {
                         for (EncryptionMethod cek : key.getContentEncryptionKeyAlgorithms(kek)) {
                             if(key.canDecrypt()){
-                                CryptoUtils.encrypt(jwsObject, key, kek, cek);
+                                JWEFactory.encrypt(jwsObject, key, kek, cek);
                             }
                             atLeastOne = true;
                         }
@@ -132,7 +134,7 @@ class EncryptionTests {
     }
 
     @Test
-    void octEncryption() throws Key.UnsupportedKeyException, ParseException, CryptoUtils.EncryptionException, JOSEException, CryptoUtils.DecryptionException {
+    void octEncryption() throws Key.UnsupportedKeyException, ParseException, EncryptionException, JOSEException, DecryptionException {
         boolean atLeastOne = false;
 
         OctetSequenceKey[] octetSequenceKeys = new OctetSequenceKey[]{
@@ -150,8 +152,8 @@ class EncryptionTests {
             if(key.canEncrypt()) {
                 for (JWEAlgorithm kek : key.getKeyEncryptionKeyAlgorithms()) {
                     for (EncryptionMethod cek : key.getContentEncryptionKeyAlgorithms(kek)) {
-                        JWE jwe = CryptoUtils.encrypt(jwsObject, key, kek, cek);
-                        CryptoUtils.decrypt(jwe, key);
+                        JWE jwe = JWEFactory.encrypt(jwsObject, key, kek, cek);
+                        jwe.decrypt(key);
                         atLeastOne = true;
                     }
                 }
@@ -161,7 +163,7 @@ class EncryptionTests {
     }
 
     @Test
-    void passwordEncryption() throws ParseException, CryptoUtils.EncryptionException, CryptoUtils.DecryptionException {
+    void passwordEncryption() throws ParseException, EncryptionException, DecryptionException {
         boolean atLeastOne = false;
         JWS jwsObject = JWS.parse(TEST_JWS);
 
@@ -169,8 +171,8 @@ class EncryptionTests {
         if(key.canEncrypt()) {
             for (JWEAlgorithm kek : key.getKeyEncryptionKeyAlgorithms()) {
                 for (EncryptionMethod cek : key.getContentEncryptionKeyAlgorithms(kek)) {
-                    JWE jwe = CryptoUtils.encrypt(jwsObject, key, kek, cek);
-                    CryptoUtils.decrypt(jwe, key);
+                    JWE jwe = JWEFactory.encrypt(jwsObject, key, kek, cek);
+                    jwe.decrypt(key);
                     atLeastOne = true;
                 }
             }

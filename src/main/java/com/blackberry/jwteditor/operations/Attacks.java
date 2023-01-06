@@ -19,10 +19,11 @@ limitations under the License.
 package com.blackberry.jwteditor.operations;
 
 import com.blackberry.jwteditor.model.jose.JWS;
+import com.blackberry.jwteditor.model.jose.JWSFactory;
+import com.blackberry.jwteditor.model.jose.exceptions.SigningException;
 import com.blackberry.jwteditor.model.keys.JWKKey;
 import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.utils.ByteArrayUtils;
-import com.blackberry.jwteditor.utils.CryptoUtils;
 import com.blackberry.jwteditor.utils.PEMUtils;
 import com.nimbusds.jose.JOSEObjectType;
 import com.nimbusds.jose.JWSAlgorithm;
@@ -40,8 +41,7 @@ public class Attacks {
 
     /**
      * Perform a HMAC key confusion attack
-     *
-     * Method based on the post at https://www.nccgroup.com/ae/about-us/newsroom-and-events/blogs/2019/january/jwt-attack-walk-through/
+     * Method based on <a href="https://www.nccgroup.com/ae/about-us/newsroom-and-events/blogs/2019/january/jwt-attack-walk-through/">this post</a>.
      *
      * @param jws the JWS to sign
      * @param key the public key to use for the attack
@@ -50,9 +50,9 @@ public class Attacks {
      * @return a JWS signed using HMAC with the RSA public key
      * @throws PEMUtils.PemException if the RSA public key is not a valid PEM
      * @throws Key.UnsupportedKeyException if HMAC key creation fails
-     * @throws CryptoUtils.SigningException if signing fails
+     * @throws SigningException if signing fails
      */
-    public static JWS hmacKeyConfusion(JWS jws, JWKKey key, JWSAlgorithm algorithm, boolean stripTrailingNewlines) throws PEMUtils.PemException, Key.UnsupportedKeyException, CryptoUtils.SigningException {
+    public static JWS hmacKeyConfusion(JWS jws, JWKKey key, JWSAlgorithm algorithm, boolean stripTrailingNewlines) throws PEMUtils.PemException, Key.UnsupportedKeyException, SigningException {
 
         // Convert the key to its public key in PEM format
         byte[] pemBytes = PEMUtils.jwkToPem(key.getJWK().toPublicJWK()).getBytes();
@@ -69,7 +69,10 @@ public class Attacks {
         JWKKey signingKey = new JWKKey(new OctetSequenceKey.Builder((pemBytes)).build());
 
         // Sign and return the new JWS
-        return CryptoUtils.sign(signingInfo.toBase64URL(), jws.getEncodedPayload(), signingKey, signingInfo);
+        Base64URL header = signingInfo.toBase64URL();
+        Base64URL payload = jws.getEncodedPayload();
+
+        return new JWSFactory(signingKey).sign(header, payload, signingInfo);
     }
 
     /**
@@ -92,9 +95,9 @@ public class Attacks {
      * @param key the JWK to embed
      * @param algorithm the algorithm to use for signing
      * @return a JWS with embedded JWK
-     * @throws CryptoUtils.SigningException if signing fails
+     * @throws SigningException if signing fails
      */
-    public static JWS embeddedJWK(JWS jws, JWKKey key, JWSAlgorithm algorithm) throws CryptoUtils.SigningException, NoSuchFieldException, IllegalAccessException {
+    public static JWS embeddedJWK(JWS jws, JWKKey key, JWSAlgorithm algorithm) throws SigningException, NoSuchFieldException, IllegalAccessException {
         JWK embeddedKey = key.isPublic() ? key.getJWK().toPublicJWK() : key.getJWK();
         JWSHeader.Builder jwsHeaderBuilder = new JWSHeader.Builder(algorithm)
                 .type(JOSEObjectType.JWT)
@@ -108,6 +111,9 @@ public class Attacks {
 
         JWSHeader jwsHeader = jwsHeaderBuilder.build();
 
-        return CryptoUtils.sign(jwsHeader.toBase64URL(), jws.getEncodedPayload(), key, jwsHeader);
+        Base64URL header = jwsHeader.toBase64URL();
+        Base64URL payload = jws.getEncodedPayload();
+
+        return new JWSFactory(key).sign(header, payload, jwsHeader);
     }
 }

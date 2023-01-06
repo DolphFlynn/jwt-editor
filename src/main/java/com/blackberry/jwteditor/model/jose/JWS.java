@@ -18,9 +18,17 @@ limitations under the License.
 
 package com.blackberry.jwteditor.model.jose;
 
+import com.blackberry.jwteditor.model.jose.exceptions.VerificationException;
+import com.blackberry.jwteditor.model.keys.Key;
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.JWSHeader;
+import com.nimbusds.jose.JWSVerifier;
 import com.nimbusds.jose.util.Base64URL;
 import org.apache.commons.lang3.StringUtils;
 
+import java.nio.charset.StandardCharsets;
+import java.security.Provider;
+import java.security.Security;
 import java.text.ParseException;
 
 import static java.util.Arrays.stream;
@@ -88,13 +96,6 @@ public class JWS extends JOSEObject {
     }
 
     /**
-     * Get the encoded signature
-     *
-     * @return the base64 encoded signature
-     */
-    public Base64URL getEncodedSignature() { return signature; }
-
-    /**
      * Serialize the JWS to compact form
      *
      * @return the JWS in compact form
@@ -102,5 +103,45 @@ public class JWS extends JOSEObject {
     @Override
     public String serialize() {
         return "%s.%s.%s".formatted(header.toString(), payload.toString(), signature.toString());
+    }
+
+    /**
+     * Verify JWS with a JWK and an algorithm
+     *
+     * @param key              JWK for verification
+     * @param verificationInfo JWSHeader containing verification algorithm
+     * @return result of signature verification
+     * @throws VerificationException if verification process fails
+     */
+    public boolean verify(Key key, JWSHeader verificationInfo) throws VerificationException {
+        // Get the verifier based on the key type
+        JWSVerifier verifier;
+        try {
+            verifier = key.getVerifier();
+        } catch (JOSEException e) {
+            throw new VerificationException(e.getMessage());
+        }
+
+        // Try to use the BouncyCastle provider, but fall-back to default if this fails
+        Provider provider = Security.getProvider("BC");
+        if (provider != null) {
+            verifier.getJCAContext().setProvider(provider);
+        }
+
+        // Build the signing input
+        // JWS signature input is the ASCII bytes of the base64 encoded header and payload concatenated with a '.'
+        byte[] headerBytes = header.toString().getBytes(StandardCharsets.US_ASCII);
+        byte[] payloadBytes = payload.toString().getBytes(StandardCharsets.US_ASCII);
+        byte[] signingInput = new byte[headerBytes.length + 1 + payloadBytes.length];
+        System.arraycopy(headerBytes, 0, signingInput, 0, headerBytes.length);
+        signingInput[headerBytes.length] = '.';
+        System.arraycopy(payloadBytes, 0, signingInput, headerBytes.length + 1, payloadBytes.length);
+
+        // Verify the payload with the key and the algorithm provided
+        try {
+            return verifier.verify(verificationInfo, signingInput, signature);
+        } catch (JOSEException e) {
+            throw new VerificationException(e.getMessage());
+        }
     }
 }

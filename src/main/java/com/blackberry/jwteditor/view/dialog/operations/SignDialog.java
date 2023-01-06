@@ -19,11 +19,11 @@ limitations under the License.
 package com.blackberry.jwteditor.view.dialog.operations;
 
 import com.blackberry.jwteditor.model.jose.JWS;
+import com.blackberry.jwteditor.model.jose.exceptions.SigningException;
 import com.blackberry.jwteditor.model.keys.JWKKey;
 import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.operations.Attacks;
 import com.blackberry.jwteditor.operations.Operations;
-import com.blackberry.jwteditor.utils.CryptoUtils;
 import com.blackberry.jwteditor.utils.Utils;
 import com.nimbusds.jose.JWSAlgorithm;
 
@@ -157,7 +157,7 @@ public class SignDialog extends JDialog {
             else if (mode == Mode.EMBED_JWK) {
                 jws = Attacks.embeddedJWK(jws, selectedKey, selectedAlgorithm);
             }
-        } catch (CryptoUtils.SigningException | NoSuchFieldException | IllegalAccessException e) {
+        } catch (SigningException | NoSuchFieldException | IllegalAccessException e) {
             jws = null;
             JOptionPane.showMessageDialog(this, e.getMessage(), Utils.getResourceString("error_title_unable_to_sign"), JOptionPane.WARNING_MESSAGE);
         }

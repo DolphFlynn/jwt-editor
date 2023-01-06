@@ -18,12 +18,20 @@ limitations under the License.
 
 package com.blackberry.jwteditor.operations;
 
-import com.blackberry.jwteditor.utils.CryptoUtils;
 import com.blackberry.jwteditor.model.jose.JWE;
+import com.blackberry.jwteditor.model.jose.JWEFactory;
 import com.blackberry.jwteditor.model.jose.JWS;
+import com.blackberry.jwteditor.model.jose.JWSFactory;
+import com.blackberry.jwteditor.model.jose.exceptions.DecryptionException;
+import com.blackberry.jwteditor.model.jose.exceptions.EncryptionException;
+import com.blackberry.jwteditor.model.jose.exceptions.SigningException;
+import com.blackberry.jwteditor.model.jose.exceptions.VerificationException;
 import com.blackberry.jwteditor.model.keys.JWKKey;
 import com.blackberry.jwteditor.model.keys.Key;
-import com.nimbusds.jose.*;
+import com.nimbusds.jose.EncryptionMethod;
+import com.nimbusds.jose.JWEAlgorithm;
+import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.util.Base64URL;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -50,9 +58,9 @@ public class Operations {
      * @param algorithm the algorithm to sign with
      * @param signingUpdateMode the header update mode
      * @return the signed JWS
-     * @throws CryptoUtils.SigningException if signing fails
+     * @throws SigningException if signing fails
      */
-    public static JWS sign(JWS jws, JWKKey key, JWSAlgorithm algorithm, SigningUpdateMode signingUpdateMode) throws CryptoUtils.SigningException {
+    public static JWS sign(JWS jws, JWKKey key, JWSAlgorithm algorithm, SigningUpdateMode signingUpdateMode) throws SigningException {
 
         // Build a new JWS header with the algorithm to use for signing
         JWSHeader signingInfo = new JWSHeader.Builder(algorithm).build();
@@ -92,7 +100,9 @@ public class Operations {
                 throw new IllegalStateException("Unexpected value: " + signingUpdateMode);
         }
         // Do the signing operation
-        return CryptoUtils.sign(encodedHeader, jws.getEncodedPayload(), key, signingInfo);
+        Base64URL payload = jws.getEncodedPayload();
+
+        return new JWSFactory(key).sign(encodedHeader, payload, signingInfo);
     }
 
     /**
@@ -107,10 +117,10 @@ public class Operations {
             for(JWSAlgorithm signingAlgorithm: key.getSigningAlgorithms()) {
                 JWSHeader verificationInfo = new JWSHeader.Builder(signingAlgorithm).build();
                 try {
-                    if (CryptoUtils.verify(jws, key, verificationInfo)) {
+                    if (jws.verify(key, verificationInfo)) {
                         return true;
                     }
-                } catch (CryptoUtils.VerificationException e) {
+                } catch (VerificationException e) {
                     // Verification failed for this key & algorithm pair
                 }
             }
@@ -126,10 +136,10 @@ public class Operations {
      * @param selectedKek the key encryption algorithm
      * @param selectedCek the content encryption algorithm
      * @return the encrypted JWS as a JWE
-     * @throws CryptoUtils.EncryptionException if encryption fails
+     * @throws EncryptionException if encryption fails
      */
-    public static JWE encrypt(JWS jws, Key selectedKey, JWEAlgorithm selectedKek, EncryptionMethod selectedCek) throws CryptoUtils.EncryptionException {
-        return CryptoUtils.encrypt(jws, selectedKey, selectedKek, selectedCek);
+    public static JWE encrypt(JWS jws, Key selectedKey, JWEAlgorithm selectedKek, EncryptionMethod selectedCek) throws EncryptionException {
+        return JWEFactory.encrypt(jws, selectedKey, selectedKek, selectedCek);
     }
 
     /**
@@ -143,12 +153,11 @@ public class Operations {
     public static JWS decrypt(JWE jwe, List<Key> keys) throws ParseException {
         for(Key key: keys){
             try {
-                return CryptoUtils.decrypt(jwe, key);
-            } catch (CryptoUtils.DecryptionException e) {
+                return jwe.decrypt(key);
+            } catch (DecryptionException e) {
                 //Decryption failed for this key
             }
         }
         return null;
     }
-
 }

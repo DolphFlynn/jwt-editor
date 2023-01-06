@@ -18,9 +18,15 @@ limitations under the License.
 
 package com.blackberry.jwteditor.model.jose;
 
+import com.blackberry.jwteditor.model.jose.exceptions.DecryptionException;
+import com.blackberry.jwteditor.model.keys.Key;
+import com.nimbusds.jose.JWEDecrypter;
+import com.nimbusds.jose.JWEHeader;
 import com.nimbusds.jose.util.Base64URL;
 import org.apache.commons.lang3.StringUtils;
 
+import java.security.Provider;
+import java.security.Security;
 import java.text.ParseException;
 
 import static java.util.Arrays.stream;
@@ -94,30 +100,12 @@ public class JWE extends JOSEObject {
     }
 
     /**
-     * Get the encrypted key as base64
-     *
-     * @return the encoded encrypted key
-     */
-    public Base64URL getEncodedEncryptedKey() {
-        return encryptedKey;
-    }
-
-    /**
      * Get the ciphertext component as bytes
      *
      * @return the decoded ciphertext
      */
     public byte[] getCiphertext() {
         return ciphertext.decode();
-    }
-
-    /**
-     * Get the ciphertext as base64
-     *
-     * @return the encoded ciphertext
-     */
-    public Base64URL getEncodedCiphertext() {
-        return ciphertext;
     }
 
     /**
@@ -130,15 +118,6 @@ public class JWE extends JOSEObject {
     }
 
     /**
-     * Get the tag as base64
-     *
-     * @return the encoded tag
-     */
-    public Base64URL getEncodedTag() {
-        return tag;
-    }
-
-    /**
      * Get the iv as bytes
      *
      * @return the decoded iv
@@ -148,11 +127,47 @@ public class JWE extends JOSEObject {
     }
 
     /**
-     * Get the iv as base64
-     *
-     * @return the encoded iv
+     * Decrypt to a JWS using a JWK
+     * @param key JWK to decrypt with
+     * @return result of the decryption as a JWS
+     * @throws DecryptionException if decryption fails
+     * @throws ParseException if parsing of plaintext as a JWS fails
      */
-    public Base64URL getEncodedIV() {
-        return iv;
+    public JWS decrypt(Key key) throws DecryptionException, ParseException {
+        // Parse the JWE header to get the decryption algorithms
+        JWEHeader header = JWEHeader.parse(this.header.decodeToString());
+
+        try {
+            // Create a new decrypter with the header algs
+            JWEDecrypter decrypter = key.getDecrypter(header.getAlgorithm());
+
+            // Try to use the BouncyCastle provider, but fall-back to default if this fails
+            Provider provider = Security.getProvider("BC");
+            if (provider != null) {
+                decrypter.getJCAContext().setProvider(provider);
+            }
+
+            // Get the encrypted key component, or null if "dir" encryption
+            Base64URL encryptedKey = this.encryptedKey;
+            if (header.getAlgorithm().getName().equals("dir")) { //NON-NLS
+                encryptedKey = null;
+            }
+
+            // Decrypt the ciphertext component using the parsed algorithms and JWK
+            byte[] plaintext = decrypter.decrypt(
+                    header,
+                    encryptedKey,
+                    iv,
+                    ciphertext,
+                    tag
+            );
+
+            // Try to parse the result as a JWS and return
+            return JWS.parse(new String(plaintext));
+        } catch (ParseException e) {
+            throw new DecryptionException("JWE contents are not a JWS");
+        } catch (Exception e) {
+            throw new DecryptionException("Unable to decrypt JWE");
+        }
     }
 }

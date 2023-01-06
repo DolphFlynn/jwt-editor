@@ -19,9 +19,9 @@ limitations under the License.
 package com.blackberry.jwteditor;
 
 import com.blackberry.jwteditor.model.jose.JWS;
+import com.blackberry.jwteditor.model.jose.JWSFactory;
 import com.blackberry.jwteditor.model.keys.JWKKey;
 import com.blackberry.jwteditor.model.keys.PasswordKey;
-import com.blackberry.jwteditor.utils.CryptoUtils;
 import com.blackberry.jwteditor.utils.PEMUtils;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
@@ -109,9 +109,12 @@ class SigningTests {
     void keysCanSignCorrectly(JWKKey key, JWSAlgorithm algorithm) throws Exception {
         JWSHeader signingInfo = new JWSHeader.Builder(algorithm).build();
 
-        JWS jws = CryptoUtils.sign(signingInfo.toBase64URL(), TEST_JWS.getEncodedPayload(), key, signingInfo);
+        Base64URL header = signingInfo.toBase64URL();
+        Base64URL payload = TEST_JWS.getEncodedPayload();
 
-        assertThat(CryptoUtils.verify(jws, key, signingInfo)).isTrue();
+        JWS jws = new JWSFactory(key).sign(header, payload, signingInfo);
+
+        assertThat(jws.verify(key, signingInfo)).isTrue();
     }
 
     @ParameterizedTest
@@ -122,9 +125,12 @@ class SigningTests {
         JWKKey publicKey = new JWKKey(octetKeyPair.toPublicJWK());
 
         JWSHeader signingInfo = new JWSHeader.Builder(EdDSA).build();
-        JWS jws = CryptoUtils.sign(signingInfo.toBase64URL(), TEST_JWS.getEncodedPayload(), privateKey, signingInfo);
+        Base64URL header = signingInfo.toBase64URL();
+        Base64URL payload = TEST_JWS.getEncodedPayload();
 
-        assertThat(CryptoUtils.verify(jws, publicKey, signingInfo)).isTrue();
+        JWS jws = new JWSFactory(privateKey).sign(header, payload, signingInfo);
+
+        assertThat(jws.verify(publicKey, signingInfo)).isTrue();
     }
 
     @Test
