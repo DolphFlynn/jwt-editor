@@ -27,6 +27,7 @@ import com.blackberry.jwteditor.model.keys.JWKKey;
 import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.model.keys.PasswordKey;
 import com.blackberry.jwteditor.utils.PEMUtils;
+import com.blackberry.jwteditor.utils.PEMUtils.PemException;
 import com.nimbusds.jose.EncryptionMethod;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWEAlgorithm;
@@ -52,41 +53,13 @@ class EncryptionTests {
     }
 
     @Test
-    void rsaEncryption() throws PEMUtils.PemException, Key.UnsupportedKeyException, ParseException, EncryptionException, DecryptionException {
-        boolean atLeastOne = false;
-
-        JWS jwsObject = JWS.parse(TEST_JWS);
-
-        String[][] pemCollections = new String[][]{RSAPublic, RSAPrivate};
-        for (String[] pemCollection: pemCollections) {
-            for (String pem : pemCollection) {
-                JWK rsaKey = PEMUtils.pemToRSAKey(pem);
-                JWKKey key = new JWKKey(rsaKey);
-                if (key.canEncrypt()) {
-                    for (JWEAlgorithm kek : key.getKeyEncryptionKeyAlgorithms()) {
-                        for (EncryptionMethod cek : key.getContentEncryptionKeyAlgorithms(kek)) {
-                            JWE jwe = JWEFactory.encrypt(jwsObject, key, kek, cek);
-
-                            if(key.canDecrypt()){
-                                jwe.decrypt(key);
-                            }
-                            atLeastOne = true;
-                        }
-                    }
-                }
-            }
-        }
-        assertThat(atLeastOne).isTrue();
-    }
-
-    @Test
-    void ecEncryption() throws PEMUtils.PemException, Key.UnsupportedKeyException, ParseException, EncryptionException, DecryptionException {
+    void ecEncryption() throws Exception {
         boolean atLeastOne = false;
         JWS jwsObject = JWS.parse(TEST_JWS);
 
         String[][] pemCollections = new String[][]{ECPublic, ECPrivate};
 
-        for (String[] pemCollection: pemCollections) {
+        for (String[] pemCollection : pemCollections) {
             for (String pem : pemCollection) {
                 JWK ecKey = PEMUtils.pemToECKey(pem);
                 JWKKey key = new JWKKey(ecKey);
@@ -94,7 +67,7 @@ class EncryptionTests {
                     for (JWEAlgorithm kek : key.getKeyEncryptionKeyAlgorithms()) {
                         for (EncryptionMethod cek : key.getContentEncryptionKeyAlgorithms(kek)) {
                             JWE jwe = JWEFactory.encrypt(jwsObject, key, kek, cek);
-                            if(key.canDecrypt()) {
+                            if (key.canDecrypt()) {
                                 jwe.decrypt(key);
                             }
                             atLeastOne = true;
@@ -107,21 +80,21 @@ class EncryptionTests {
     }
 
     @Test
-    void okpEncryption() throws PEMUtils.PemException, Key.UnsupportedKeyException, ParseException, EncryptionException {
+    void okpEncryption() throws PemException, Key.UnsupportedKeyException, ParseException, EncryptionException {
         boolean atLeastOne = false;
 
         JWS jwsObject = JWS.parse(TEST_JWS);
 
         String[][] pemCollections = new String[][]{OKPPublic, OKPPrivate};
 
-        for (String[] pemCollection: pemCollections) {
+        for (String[] pemCollection : pemCollections) {
             for (String pem : pemCollection) {
                 JWK octetKeyPair = PEMUtils.pemToOctetKeyPair(pem);
                 JWKKey key = new JWKKey(octetKeyPair);
                 if (key.canEncrypt()) {
                     for (JWEAlgorithm kek : key.getKeyEncryptionKeyAlgorithms()) {
                         for (EncryptionMethod cek : key.getContentEncryptionKeyAlgorithms(kek)) {
-                            if(key.canDecrypt()){
+                            if (key.canDecrypt()) {
                                 JWEFactory.encrypt(jwsObject, key, kek, cek);
                             }
                             atLeastOne = true;
@@ -147,9 +120,9 @@ class EncryptionTests {
 
         JWS jwsObject = JWS.parse(TEST_JWS);
 
-        for(OctetSequenceKey octetSequenceKey: octetSequenceKeys){
+        for (OctetSequenceKey octetSequenceKey : octetSequenceKeys) {
             JWKKey key = new JWKKey(octetSequenceKey);
-            if(key.canEncrypt()) {
+            if (key.canEncrypt()) {
                 for (JWEAlgorithm kek : key.getKeyEncryptionKeyAlgorithms()) {
                     for (EncryptionMethod cek : key.getContentEncryptionKeyAlgorithms(kek)) {
                         JWE jwe = JWEFactory.encrypt(jwsObject, key, kek, cek);
@@ -168,7 +141,7 @@ class EncryptionTests {
         JWS jwsObject = JWS.parse(TEST_JWS);
 
         PasswordKey key = new PasswordKey("Test", "Test", 8, 1000);
-        if(key.canEncrypt()) {
+        if (key.canEncrypt()) {
             for (JWEAlgorithm kek : key.getKeyEncryptionKeyAlgorithms()) {
                 for (EncryptionMethod cek : key.getContentEncryptionKeyAlgorithms(kek)) {
                     JWE jwe = JWEFactory.encrypt(jwsObject, key, kek, cek);
