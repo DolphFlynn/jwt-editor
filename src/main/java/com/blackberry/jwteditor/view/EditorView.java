@@ -19,7 +19,7 @@ limitations under the License.
 package com.blackberry.jwteditor.view;
 
 import burp.api.montoya.ui.Selection;
-import burp.api.montoya.ui.editor.extension.ExtensionHttpMessageEditor;
+import burp.api.montoya.ui.editor.extension.ExtensionProvidedEditor;
 import com.blackberry.jwteditor.presenter.EditorPresenter;
 import com.blackberry.jwteditor.presenter.PresenterStore;
 import com.blackberry.jwteditor.utils.Utils;
@@ -41,7 +41,7 @@ import static org.exbin.deltahex.EditationAllowed.READ_ONLY;
 /**
  * View class for the Editor tab
  */
-public abstract class EditorView implements ExtensionHttpMessageEditor {
+public abstract class EditorView implements ExtensionProvidedEditor {
     public static final int MAX_JOSE_OBJECT_STRING_LENGTH = 55;
 
     public static final int TAB_JWS = 0;

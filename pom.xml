@@ -11,7 +11,7 @@
         <java.version>17</java.version>
         <bouncycastle.version>1.70</bouncycastle.version>
         <gui.designer.version>223.8214.52</gui.designer.version>
-        <extender.version>0.10.1</extender.version>
+        <extender.version>1.0.0</extender.version>
     </properties>
 
     <repositories>
@@ -173,7 +173,7 @@
         <dependency>
             <groupId>net.portswigger.burp.extensions</groupId>
             <artifactId>montoya-api</artifactId>
-            <version>0.10.1</version>
+            <version>${extender.version}</version>
             <scope>provided</scope>
         </dependency>
         <!--                                        TEST DEPENDENCIES                                                -->

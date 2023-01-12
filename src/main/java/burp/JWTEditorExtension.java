@@ -57,19 +57,19 @@ public class JWTEditorExtension implements BurpExtension {
 
         userInterface.registerSuiteTab(burpView.getTabCaption(), burpView.getUiComponent());
 
-        userInterface.registerHttpRequestEditorProvider((httpRequestResponse, editorMode) ->
+        userInterface.registerHttpRequestEditorProvider(editorCreationContext ->
                 new RequestEditorView(
                         presenters,
                         rstaFactory,
-                        editorMode != READ_ONLY
+                        editorCreationContext.editorMode() != READ_ONLY
                 )
         );
 
-        userInterface.registerHttpResponseEditorProvider((httpRequestResponse, editorMode) ->
+        userInterface.registerHttpResponseEditorProvider(editorCreationContext ->
                 new ResponseEditorView(
                         presenters,
                         rstaFactory,
-                        editorMode != READ_ONLY
+                        editorCreationContext.editorMode() != READ_ONLY
                 )
         );
 

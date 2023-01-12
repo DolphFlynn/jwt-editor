@@ -19,17 +19,11 @@ limitations under the License.
 package burp.proxy;
 
 import burp.api.montoya.core.Annotations;
-import burp.api.montoya.http.message.requests.HttpRequest;
-import burp.api.montoya.proxy.*;
+import burp.api.montoya.proxy.http.*;
 import burp.api.montoya.utilities.ByteUtils;
 import com.blackberry.jwteditor.model.config.ProxyConfig;
 
-import static burp.api.montoya.proxy.RequestFinalInterceptResult.continueWith;
-import static burp.api.montoya.proxy.RequestInitialInterceptResult.followUserRules;
-import static burp.api.montoya.proxy.ResponseFinalInterceptResult.continueWith;
-import static burp.api.montoya.proxy.ResponseInitialInterceptResult.followUserRules;
-
-public class ProxyHttpMessageHandler implements ProxyHttpRequestHandler, ProxyHttpResponseHandler {
+public class ProxyHttpMessageHandler implements ProxyRequestHandler, ProxyResponseHandler {
     private final AnnotationsModifier annotationsModifier;
 
     public ProxyHttpMessageHandler(ProxyConfig proxyConfig, ByteUtils byteUtils) {
@@ -37,26 +31,26 @@ public class ProxyHttpMessageHandler implements ProxyHttpRequestHandler, ProxyHt
     }
 
     @Override
-    public RequestInitialInterceptResult handleReceivedRequest(InterceptedHttpRequest interceptedHttpRequest, Annotations annotations) {
-        Annotations modifiedAnnotations = annotationsModifier.updateAnnotationsIfApplicable(annotations, interceptedHttpRequest.asBytes());
+    public ProxyRequestReceivedAction handleRequestReceived(InterceptedRequest interceptedRequest) {
+        Annotations modifiedAnnotations = annotationsModifier.updateAnnotationsIfApplicable(interceptedRequest.annotations(), interceptedRequest.toByteArray());
 
-        return followUserRules(interceptedHttpRequest, modifiedAnnotations);
+        return ProxyRequestReceivedAction.continueWith(interceptedRequest, modifiedAnnotations);
     }
 
     @Override
-    public RequestFinalInterceptResult handleRequestToIssue(InterceptedHttpRequest interceptedHttpRequest, Annotations annotations) {
-        return continueWith(interceptedHttpRequest, annotations);
+    public ProxyRequestToBeSentAction handleRequestToBeSent(InterceptedRequest interceptedRequest) {
+        return ProxyRequestToBeSentAction.continueWith(interceptedRequest);
     }
 
     @Override
-    public ResponseInitialInterceptResult handleReceivedResponse(InterceptedHttpResponse interceptedHttpResponse, HttpRequest httpRequest, Annotations annotations) {
-        Annotations modifiedAnnotations = annotationsModifier.updateAnnotationsIfApplicable(annotations, interceptedHttpResponse.asBytes());
+    public ProxyResponseReceivedAction handleResponseReceived(InterceptedResponse interceptedResponse) {
+        Annotations modifiedAnnotations = annotationsModifier.updateAnnotationsIfApplicable(interceptedResponse.annotations(), interceptedResponse.toByteArray());
 
-        return followUserRules(interceptedHttpResponse, modifiedAnnotations);
+        return ProxyResponseReceivedAction.continueWith(interceptedResponse, modifiedAnnotations);
     }
 
     @Override
-    public ResponseFinalInterceptResult handleResponseToReturn(InterceptedHttpResponse interceptedHttpResponse, HttpRequest httpRequest, Annotations annotations) {
-        return continueWith(interceptedHttpResponse, annotations);
+    public ProxyResponseToBeSentAction handleResponseToBeSent(InterceptedResponse interceptedResponse) {
+        return ProxyResponseToBeSentAction.continueWith(interceptedResponse);
     }
 }

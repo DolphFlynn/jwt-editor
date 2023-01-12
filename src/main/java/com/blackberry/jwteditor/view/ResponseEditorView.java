@@ -20,31 +20,30 @@ package com.blackberry.jwteditor.view;
 
 import burp.api.montoya.http.message.HttpRequestResponse;
 import burp.api.montoya.http.message.responses.HttpResponse;
-import burp.api.montoya.ui.editor.extension.ExtensionHttpResponseEditor;
+import burp.api.montoya.ui.editor.extension.ExtensionProvidedHttpResponseEditor;
 import com.blackberry.jwteditor.presenter.PresenterStore;
 
 import static burp.api.montoya.internal.ObjectFactoryLocator.FACTORY;
 
-public class ResponseEditorView extends EditorView implements ExtensionHttpResponseEditor {
-
+public class ResponseEditorView extends EditorView implements ExtensionProvidedHttpResponseEditor {
     public ResponseEditorView(PresenterStore presenters, RstaFactory rstaFactory, boolean editable) {
         super(presenters, rstaFactory, editable);
     }
 
     @Override
-    public void setHttpRequestResponse(HttpRequestResponse requestResponse) {
-        HttpResponse httpResponse = requestResponse.httpResponse();
-        presenter.setMessage(httpResponse.asBytes().toString());
+    public void setRequestResponse(HttpRequestResponse requestResponse) {
+        HttpResponse httpResponse = requestResponse.response();
+        presenter.setMessage(httpResponse.toByteArray().toString());
     }
 
     @Override
     public boolean isEnabledFor(HttpRequestResponse requestResponse) {
-        String content = requestResponse.httpResponse().asBytes().toString();
+        String content = requestResponse.response().toByteArray().toString();
         return presenter.isEnabled(content);
     }
 
     @Override
-    public HttpResponse getHttpResponse() {
+    public HttpResponse getResponse() {
         return FACTORY.httpResponse(presenter.getMessage());
     }
 }
