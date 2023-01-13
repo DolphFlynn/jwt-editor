@@ -33,10 +33,10 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.security.Security;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static com.blackberry.jwteditor.ArgumentUtils.cartesianProduct;
 import static com.blackberry.jwteditor.PemData.*;
 import static com.blackberry.jwteditor.utils.PEMUtils.pemToRSAKey;
 import static com.nimbusds.jose.EncryptionMethod.*;
@@ -47,6 +47,19 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 @SuppressWarnings("deprecation")
 class RSAEncryptionTests {
     private static final String TEST_JWS = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJUZXN0In0.WVLalefVZ5Rj991Cjgh0qBjKSIQaqC_CgN3b-30GKpQ";
+    private static final List<JWEAlgorithm> ENCRYPTION_ALGORITHMS = List.of(
+            RSA1_5,
+            RSA_OAEP,
+            RSA_OAEP_256
+    );
+    private static final List<EncryptionMethod> ENCRYPTION_METHODS = List.of(
+            A128CBC_HS256,
+            A128GCM,
+            A192CBC_HS384,
+            A192GCM,
+            A256CBC_HS512,
+            A256GCM
+    );
 
     @BeforeAll
     static void addBouncyCastle() {
@@ -126,38 +139,7 @@ class RSAEncryptionTests {
     }
 
     private static Stream<Arguments> rsaKeysAndAlgorithms() {
-        return Stream.of(
-                arguments(RSA512Public, RSA1_5),
-                arguments(RSA512Public, RSA_OAEP),
-                arguments(RSA512Public, RSA_OAEP_256),
-                arguments(RSA1024Public, RSA1_5),
-                arguments(RSA1024Public, RSA_OAEP),
-                arguments(RSA1024Public, RSA_OAEP_256),
-                arguments(RSA2048Public, RSA1_5),
-                arguments(RSA2048Public, RSA_OAEP),
-                arguments(RSA2048Public, RSA_OAEP_256),
-                arguments(RSA3072Public, RSA1_5),
-                arguments(RSA3072Public, RSA_OAEP),
-                arguments(RSA3072Public, RSA_OAEP_256),
-                arguments(RSA4096Public, RSA1_5),
-                arguments(RSA4096Public, RSA_OAEP),
-                arguments(RSA4096Public, RSA_OAEP_256),
-                arguments(RSA512Private, RSA1_5),
-                arguments(RSA512Private, RSA_OAEP),
-                arguments(RSA512Private, RSA_OAEP_256),
-                arguments(RSA1024Private, RSA1_5),
-                arguments(RSA1024Private, RSA_OAEP),
-                arguments(RSA1024Private, RSA_OAEP_256),
-                arguments(RSA2048Private, RSA1_5),
-                arguments(RSA2048Private, RSA_OAEP),
-                arguments(RSA2048Private, RSA_OAEP_256),
-                arguments(RSA3072Private, RSA1_5),
-                arguments(RSA3072Private, RSA_OAEP),
-                arguments(RSA3072Private, RSA_OAEP_256),
-                arguments(RSA4096Private, RSA1_5),
-                arguments(RSA4096Private, RSA_OAEP),
-                arguments(RSA4096Private, RSA_OAEP_256)
-        );
+        return cartesianProduct(rsaKeys().toList(), ENCRYPTION_ALGORITHMS);
     }
 
     @ParameterizedTest
@@ -185,39 +167,14 @@ class RSAEncryptionTests {
                 Pair.of(pemToRSAKey(RSA4096Public), pemToRSAKey(RSA4096Private))
         );
 
-        List<JWEAlgorithm> encryptionAlgorithms = List.of(
-                RSA1_5,
-                RSA_OAEP,
-                RSA_OAEP_256
-        );
-
-        List<EncryptionMethod> encryptionMethods = List.of(
-                A128CBC_HS256,
-                A128GCM,
-                A192CBC_HS384,
-                A192GCM,
-                A256CBC_HS512,
-                A256GCM
-        );
-
-        List<Arguments> arguments = new LinkedList<>();
-
-        for (Pair<JWK, JWK> keyPair : keyPairs) {
-            for (JWEAlgorithm encryptionAlgorithm : encryptionAlgorithms) {
-                for (EncryptionMethod encryptionMethod : encryptionMethods) {
-                    arguments.add(arguments(keyPair.getLeft(), keyPair.getRight(), encryptionAlgorithm, encryptionMethod));
-                }
-            }
-        }
-
-        return arguments.stream();
+        return cartesianProduct(keyPairs, ENCRYPTION_ALGORITHMS, ENCRYPTION_METHODS);
     }
 
     @ParameterizedTest
     @MethodSource("rsaKeyPairsAndAlgorithms")
-    void rsaEncryption(JWK publicJwk, JWK privateJwk, JWEAlgorithm kek, EncryptionMethod cek) throws Exception {
-        JWKKey publicKey = new JWKKey(publicJwk);
-        JWKKey privateKey = new JWKKey(privateJwk);
+    void rsaEncryptionConsistency(Pair<JWK, JWK> keyPair, JWEAlgorithm kek, EncryptionMethod cek) throws Exception {
+        JWKKey publicKey = new JWKKey(keyPair.getLeft());
+        JWKKey privateKey = new JWKKey(keyPair.getRight());
 
         JWE jwe = JWEFactory.encrypt(JWS.parse(TEST_JWS), publicKey, kek, cek);
         JWS decrypt = jwe.decrypt(privateKey);

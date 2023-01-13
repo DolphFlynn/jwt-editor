@@ -41,7 +41,8 @@ import org.junit.jupiter.api.Test;
 import java.security.Security;
 import java.text.ParseException;
 
-import static com.blackberry.jwteditor.PemData.*;
+import static com.blackberry.jwteditor.PemData.OKPPrivate;
+import static com.blackberry.jwteditor.PemData.OKPPublic;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class EncryptionTests {
@@ -50,33 +51,6 @@ class EncryptionTests {
     @BeforeAll
     static void addBouncyCastle() {
         Security.addProvider(new BouncyCastleProvider());
-    }
-
-    @Test
-    void ecEncryption() throws Exception {
-        boolean atLeastOne = false;
-        JWS jwsObject = JWS.parse(TEST_JWS);
-
-        String[][] pemCollections = new String[][]{ECPublic, ECPrivate};
-
-        for (String[] pemCollection : pemCollections) {
-            for (String pem : pemCollection) {
-                JWK ecKey = PEMUtils.pemToECKey(pem);
-                JWKKey key = new JWKKey(ecKey);
-                if (key.canEncrypt()) {
-                    for (JWEAlgorithm kek : key.getKeyEncryptionKeyAlgorithms()) {
-                        for (EncryptionMethod cek : key.getContentEncryptionKeyAlgorithms(kek)) {
-                            JWE jwe = JWEFactory.encrypt(jwsObject, key, kek, cek);
-                            if (key.canDecrypt()) {
-                                jwe.decrypt(key);
-                            }
-                            atLeastOne = true;
-                        }
-                    }
-                }
-            }
-        }
-        assertThat(atLeastOne).isTrue();
     }
 
     @Test
