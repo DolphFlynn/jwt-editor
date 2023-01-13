@@ -395,7 +395,6 @@ public class JWKKey implements Key {
                         EncryptionMethod.A256GCM,
                         EncryptionMethod.A128CBC_HS256,
                         EncryptionMethod.A192CBC_HS384,
-                        EncryptionMethod.A192CBC_HS384,
                         EncryptionMethod.A256CBC_HS512,
                 };
             case PASSWORD:

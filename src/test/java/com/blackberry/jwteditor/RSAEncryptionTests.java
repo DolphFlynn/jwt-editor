@@ -174,7 +174,6 @@ class RSAEncryptionTests {
                 A256GCM,
                 A128CBC_HS256,
                 A192CBC_HS384,
-                A192CBC_HS384, // FIXME
                 A256CBC_HS512
         );
     }
