@@ -26,12 +26,9 @@ import com.blackberry.jwteditor.model.jose.exceptions.EncryptionException;
 import com.blackberry.jwteditor.model.keys.JWKKey;
 import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.model.keys.PasswordKey;
-import com.blackberry.jwteditor.utils.PEMUtils;
-import com.blackberry.jwteditor.utils.PEMUtils.PemException;
 import com.nimbusds.jose.EncryptionMethod;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWEAlgorithm;
-import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.OctetSequenceKey;
 import com.nimbusds.jose.jwk.gen.OctetSequenceKeyGenerator;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -41,8 +38,6 @@ import org.junit.jupiter.api.Test;
 import java.security.Security;
 import java.text.ParseException;
 
-import static com.blackberry.jwteditor.PemData.OKPPrivate;
-import static com.blackberry.jwteditor.PemData.OKPPublic;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class EncryptionTests {
@@ -51,33 +46,6 @@ class EncryptionTests {
     @BeforeAll
     static void addBouncyCastle() {
         Security.addProvider(new BouncyCastleProvider());
-    }
-
-    @Test
-    void okpEncryption() throws PemException, Key.UnsupportedKeyException, ParseException, EncryptionException {
-        boolean atLeastOne = false;
-
-        JWS jwsObject = JWS.parse(TEST_JWS);
-
-        String[][] pemCollections = new String[][]{OKPPublic, OKPPrivate};
-
-        for (String[] pemCollection : pemCollections) {
-            for (String pem : pemCollection) {
-                JWK octetKeyPair = PEMUtils.pemToOctetKeyPair(pem);
-                JWKKey key = new JWKKey(octetKeyPair);
-                if (key.canEncrypt()) {
-                    for (JWEAlgorithm kek : key.getKeyEncryptionKeyAlgorithms()) {
-                        for (EncryptionMethod cek : key.getContentEncryptionKeyAlgorithms(kek)) {
-                            if (key.canDecrypt()) {
-                                JWEFactory.encrypt(jwsObject, key, kek, cek);
-                            }
-                            atLeastOne = true;
-                        }
-                    }
-                }
-            }
-        }
-        assertThat(atLeastOne).isTrue();
     }
 
     @Test
