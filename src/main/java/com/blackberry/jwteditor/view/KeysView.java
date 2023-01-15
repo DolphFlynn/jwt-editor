@@ -23,16 +23,19 @@ import com.blackberry.jwteditor.model.persistence.KeysModelPersistence;
 import com.blackberry.jwteditor.presenter.KeysPresenter;
 import com.blackberry.jwteditor.presenter.PresenterStore;
 import com.blackberry.jwteditor.utils.Utils;
+import com.blackberry.jwteditor.view.utils.PercentageBasedColumnWidthTable;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableColumnModel;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
+
+import static java.util.Arrays.stream;
 
 /**
  * View class for the Keys tab
@@ -91,14 +94,18 @@ public class KeysView {
         ENCRYPTION("encryption", 10, Boolean.class),
         DECRYPTION("decryption", 10, Boolean.class);
 
-        final String label;
-        final int widthPercentage;
-        final Class<?> type;
+        private final String label;
+        private final int widthPercentage;
+        private final Class<?> type;
 
         KeysTableColumns(String labelResourceId, int widthPercentage, Class<?> type) {
             this.label = Utils.getResourceString(labelResourceId);
             this.widthPercentage = widthPercentage;
             this.type = type;
+        }
+
+        static int[] columnWidthPercentages() {
+            return stream(values()).mapToInt(c -> c.widthPercentage).toArray();
         }
     }
 
@@ -141,8 +148,12 @@ public class KeysView {
     /**
      * Class for the right-click popup menu
      */
-    private class JTablePopup extends JTable {
+    private class JTablePopup extends PercentageBasedColumnWidthTable {
         private Integer popupRow;
+
+        public JTablePopup() {
+            super(KeysTableColumns.columnWidthPercentages());
+        }
 
         @Override
         public JPopupMenu getComponentPopupMenu() {
@@ -182,8 +193,7 @@ public class KeysView {
                 menuItemCopyPassword.setEnabled(copyPasswordEnabled);
 
                 return super.getComponentPopupMenu();
-            }
-            else{
+            } else {
                 popupRow = null;
                 return null;
             }
@@ -220,9 +230,6 @@ public class KeysView {
                 }
             }
         });
-
-        // Resize the table columns on initial paint
-        tableKeys.addHierarchyListener(new OneTimeColumnResizeHierarchyListener(tableKeys));
 
         // Decorate existing BooleanRenderer to perform alternateRow highlighting
         TableCellRenderer booleanCellRender = tableKeys.getDefaultRenderer(Boolean.class);
@@ -295,29 +302,6 @@ public class KeysView {
      */
     public Window getParent() {
         return parent;
-    }
-
-    private record OneTimeColumnResizeHierarchyListener(JTable table) implements HierarchyListener {
-
-        @Override
-        public void hierarchyChanged(HierarchyEvent e) {
-            if (e.getChangeFlags() != HierarchyEvent.SHOWING_CHANGED || !e.getComponent().isShowing()) {
-                return;
-            }
-
-            int width = table.getWidth();
-            TableColumnModel columnModel = table.getColumnModel();
-            KeysTableColumns[] values = KeysTableColumns.values();
-
-            for (int i = 0; i < values.length; i++) {
-                KeysTableColumns tableColumns = values[i];
-                TableColumn column = columnModel.getColumn(i);
-                int preferredWidth = (int) (tableColumns.widthPercentage * 0.01 * width);
-                column.setPreferredWidth(preferredWidth);
-            }
-
-            table.removeHierarchyListener(this);
-        }
     }
 
     private record AlternateRowBackgroundDecoratingTableCellRenderer(
