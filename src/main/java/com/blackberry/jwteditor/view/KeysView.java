@@ -23,7 +23,9 @@ import com.blackberry.jwteditor.model.persistence.KeysModelPersistence;
 import com.blackberry.jwteditor.presenter.KeysPresenter;
 import com.blackberry.jwteditor.presenter.PresenterStore;
 import com.blackberry.jwteditor.utils.Utils;
+import com.blackberry.jwteditor.view.utils.AlternateRowBackgroundDecoratingTableCellRenderer;
 import com.blackberry.jwteditor.view.utils.PercentageBasedColumnWidthTable;
+import com.blackberry.jwteditor.view.utils.RowHeightDecoratingTableCellRenderer;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
@@ -158,45 +160,45 @@ public class KeysView {
         @Override
         public JPopupMenu getComponentPopupMenu() {
             // Get the row that has been right-clicked on
-
             Point p = getMousePosition();
-            if(p != null && rowAtPoint(p) >= 0){
-                popupRow = rowAtPoint(p);
 
-                boolean copyJWKEnabled = false;
-                boolean copyPEMEnabled = false;
-                boolean copyPublicJWKEnabled = false;
-                boolean copyPublicPEMEnabled = false;
-                boolean copyPasswordEnabled = false;
-
-                // No selection, set the selection
-                if (tableKeys.getSelectedRowCount() == 0) {
-                    tableKeys.changeSelection(popupRow, 0, false, false);
-                }
-                // Selection equals right-clicked row - this will trigger on right-click release
-                else if(tableKeys.getSelectedRowCount() == 1 && tableKeys.getSelectedRow() == popupRow){
-                    copyJWKEnabled = presenter.canCopyJWK(popupRow);
-                    copyPEMEnabled = presenter.canCopyPEM(popupRow);
-                    copyPublicJWKEnabled = presenter.canCopyPublicJWK(popupRow);
-                    copyPublicPEMEnabled = presenter.canCopyPublicPEM(popupRow);
-                    copyPasswordEnabled = presenter.canCopyPassword(popupRow);
-                }
-                // Selection doesn't equal right-clicked row, change the selection
-                else if(tableKeys.getSelectedRowCount() == 1 && tableKeys.getSelectedRow() != popupRow) {
-                    tableKeys.changeSelection(popupRow, 0, false, false);
-                }
-
-                menuItemCopyJWK.setEnabled(copyJWKEnabled);
-                menuItemCopyPEM.setEnabled(copyPEMEnabled);
-                menuItemCopyPublicJWK.setEnabled(copyPublicJWKEnabled);
-                menuItemCopyPublicPEM.setEnabled(copyPublicPEMEnabled);
-                menuItemCopyPassword.setEnabled(copyPasswordEnabled);
-
-                return super.getComponentPopupMenu();
-            } else {
+            if (p == null || rowAtPoint(p) < 0) {
                 popupRow = null;
                 return null;
             }
+
+            popupRow = rowAtPoint(p);
+
+            boolean copyJWKEnabled = false;
+            boolean copyPEMEnabled = false;
+            boolean copyPublicJWKEnabled = false;
+            boolean copyPublicPEMEnabled = false;
+            boolean copyPasswordEnabled = false;
+
+            // No selection, set the selection
+            if (tableKeys.getSelectedRowCount() == 0) {
+                tableKeys.changeSelection(popupRow, 0, false, false);
+            }
+            // Selection equals right-clicked row - this will trigger on right-click release
+            else if(tableKeys.getSelectedRowCount() == 1 && tableKeys.getSelectedRow() == popupRow){
+                copyJWKEnabled = presenter.canCopyJWK(popupRow);
+                copyPEMEnabled = presenter.canCopyPEM(popupRow);
+                copyPublicJWKEnabled = presenter.canCopyPublicJWK(popupRow);
+                copyPublicPEMEnabled = presenter.canCopyPublicPEM(popupRow);
+                copyPasswordEnabled = presenter.canCopyPassword(popupRow);
+            }
+            // Selection doesn't equal right-clicked row, change the selection
+            else if(tableKeys.getSelectedRowCount() == 1 && tableKeys.getSelectedRow() != popupRow) {
+                tableKeys.changeSelection(popupRow, 0, false, false);
+            }
+
+            menuItemCopyJWK.setEnabled(copyJWKEnabled);
+            menuItemCopyPEM.setEnabled(copyPEMEnabled);
+            menuItemCopyPublicJWK.setEnabled(copyPublicJWKEnabled);
+            menuItemCopyPublicPEM.setEnabled(copyPublicPEMEnabled);
+            menuItemCopyPassword.setEnabled(copyPasswordEnabled);
+
+            return super.getComponentPopupMenu();
         }
 
         public Integer getPopupRow(){
@@ -302,40 +304,5 @@ public class KeysView {
      */
     public Window getParent() {
         return parent;
-    }
-
-    private record AlternateRowBackgroundDecoratingTableCellRenderer(
-            TableCellRenderer tableCellRenderer) implements TableCellRenderer {
-
-        @Override
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            Component component = tableCellRenderer.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-
-            if (!isSelected && !hasFocus) {
-                Color alternateRowColor = UIManager.getColor("Table.alternateRowColor");
-
-                if (alternateRowColor != null && row % 2 != 0) {
-                    component.setBackground(alternateRowColor);
-                }
-            }
-
-            return component;
-        }
-    }
-
-    private record RowHeightDecoratingTableCellRenderer(TableCellRenderer tableCellRenderer) implements TableCellRenderer {
-        private static final int ADDITIONAL_HEIGHT_PIXELS = 5;
-
-        @Override
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            Component component = tableCellRenderer.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-            int componentHeight = component.getPreferredSize().height;
-
-            if (table.getRowHeight() != componentHeight + ADDITIONAL_HEIGHT_PIXELS) {
-                table.setRowHeight(componentHeight + ADDITIONAL_HEIGHT_PIXELS);
-            }
-
-            return component;
-        }
     }
 }
