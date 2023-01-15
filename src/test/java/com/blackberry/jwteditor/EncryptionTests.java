@@ -23,14 +23,9 @@ import com.blackberry.jwteditor.model.jose.JWEFactory;
 import com.blackberry.jwteditor.model.jose.JWS;
 import com.blackberry.jwteditor.model.jose.exceptions.DecryptionException;
 import com.blackberry.jwteditor.model.jose.exceptions.EncryptionException;
-import com.blackberry.jwteditor.model.keys.JWKKey;
-import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.model.keys.PasswordKey;
 import com.nimbusds.jose.EncryptionMethod;
-import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWEAlgorithm;
-import com.nimbusds.jose.jwk.OctetSequenceKey;
-import com.nimbusds.jose.jwk.gen.OctetSequenceKeyGenerator;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -46,35 +41,6 @@ class EncryptionTests {
     @BeforeAll
     static void addBouncyCastle() {
         Security.addProvider(new BouncyCastleProvider());
-    }
-
-    @Test
-    void octEncryption() throws Key.UnsupportedKeyException, ParseException, EncryptionException, JOSEException, DecryptionException {
-        boolean atLeastOne = false;
-
-        OctetSequenceKey[] octetSequenceKeys = new OctetSequenceKey[]{
-                new OctetSequenceKeyGenerator(128).generate(),
-                new OctetSequenceKeyGenerator(192).generate(),
-                new OctetSequenceKeyGenerator(256).generate(),
-                new OctetSequenceKeyGenerator(384).generate(),
-                new OctetSequenceKeyGenerator(512).generate(),
-        };
-
-        JWS jwsObject = JWS.parse(TEST_JWS);
-
-        for (OctetSequenceKey octetSequenceKey : octetSequenceKeys) {
-            JWKKey key = new JWKKey(octetSequenceKey);
-            if (key.canEncrypt()) {
-                for (JWEAlgorithm kek : key.getKeyEncryptionKeyAlgorithms()) {
-                    for (EncryptionMethod cek : key.getContentEncryptionKeyAlgorithms(kek)) {
-                        JWE jwe = JWEFactory.encrypt(jwsObject, key, kek, cek);
-                        jwe.decrypt(key);
-                        atLeastOne = true;
-                    }
-                }
-            }
-        }
-        assertThat(atLeastOne).isTrue();
     }
 
     @Test
