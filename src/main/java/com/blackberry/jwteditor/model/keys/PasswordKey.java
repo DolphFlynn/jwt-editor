@@ -191,7 +191,6 @@ public class PasswordKey implements Key {
                 EncryptionMethod.A128CBC_HS256,
                 EncryptionMethod.A128CBC_HS256_DEPRECATED,
                 EncryptionMethod.A192CBC_HS384,
-                EncryptionMethod.A192CBC_HS384,
                 EncryptionMethod.A256CBC_HS512,
                 EncryptionMethod.A256CBC_HS512_DEPRECATED,
         };
