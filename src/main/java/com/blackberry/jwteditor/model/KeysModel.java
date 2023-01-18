@@ -28,11 +28,13 @@ import java.util.*;
 /**
  * A container class for Key objects
  */
-public class KeysModel implements Iterable<Key>{
+public class KeysModel implements Iterable<Key> {
+    private final Map<String, Key> keys;
+    private KeysPresenter presenter;
 
-    // Underlying hashmap - use LinkedHashMap to preserve insertion order
-    final LinkedHashMap<String, Key> keys;
-    KeysPresenter presenter = null;
+    public KeysModel() {
+        keys = new LinkedHashMap<>();
+    }
 
     /**
      * Iterator to pass through to the underlying hashmap
@@ -42,10 +44,7 @@ public class KeysModel implements Iterable<Key>{
         return new KeyModelIterator();
     }
 
-
-
-    class KeyModelIterator implements Iterator<Key>{
-
+    private class KeyModelIterator implements Iterator<Key> {
         final Iterator<String> hashMapIterator;
 
         public KeyModelIterator() {
@@ -61,13 +60,6 @@ public class KeysModel implements Iterable<Key>{
         public Key next() {
             return keys.get(hashMapIterator.next());
         }
-    }
-
-    /**
-     * Create an empty KeysModel
-     */
-    public KeysModel(){
-        keys = new LinkedHashMap<>();
     }
 
     /**
@@ -98,10 +90,10 @@ public class KeysModel implements Iterable<Key>{
      *
      * @return JSON string representation of the KeysModel
      */
-    public String serialize(){
+    public String serialize() {
         JSONArray jsonArray = new JSONArray();
 
-        for(Key key: this){
+        for (Key key : this) {
             jsonArray.put(key.toJSONObject());
         }
 
@@ -113,7 +105,7 @@ public class KeysModel implements Iterable<Key>{
      *
      * @param presenter presenter to associate
      */
-    public void setPresenter(KeysPresenter presenter){
+    public void setPresenter(KeysPresenter presenter) {
         this.presenter = presenter;
     }
 
@@ -182,9 +174,9 @@ public class KeysModel implements Iterable<Key>{
      *
      * @param key key to add
      */
-    public void addKey(Key key){
+    public void addKey(Key key) {
         keys.put(key.getID(), key);
-        if(presenter != null){
+        if (presenter != null) {
             presenter.onModelUpdated();
         }
     }
@@ -194,9 +186,9 @@ public class KeysModel implements Iterable<Key>{
      *
      * @param keyId key id to remove
      */
-    public void deleteKey(String keyId){
+    public void deleteKey(String keyId) {
         keys.remove(keyId);
-        if(presenter != null){
+        if (presenter != null) {
             presenter.onModelUpdated();
         }
     }
@@ -208,10 +200,10 @@ public class KeysModel implements Iterable<Key>{
      */
     public void deleteKeys(int[] indicies) {
         List<String> toDelete = new ArrayList<>();
-        for(int index: indicies){
+        for (int index : indicies) {
             toDelete.add(getKey(index).getID());
         }
-        for(String keyId: toDelete){
+        for (String keyId : toDelete) {
             deleteKey(keyId);
         }
     }
@@ -232,7 +224,7 @@ public class KeysModel implements Iterable<Key>{
      * @param index index of key to retrieve
      * @return retrieved key
      */
-    public Key getKey(int index){
+    public Key getKey(int index) {
         String key = (String) keys.keySet().toArray()[index];
         return keys.get(key);
     }
@@ -246,4 +238,4 @@ public class KeysModel implements Iterable<Key>{
     public Key getKey(String keyId) {
         return keys.get(keyId);
     }
- }
+}

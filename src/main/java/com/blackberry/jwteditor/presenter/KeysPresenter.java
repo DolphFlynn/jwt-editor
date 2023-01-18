@@ -66,7 +66,7 @@ public class KeysPresenter extends Presenter {
         this.rstaFactory = rstaFactory;
         this.presenters = presenters;
         this.keysModelPersistence = keysModelPersistence;
-        this.model = keysModel == null ? new KeysModel() : keysModel;
+        this.model = keysModel;
 
         model.setPresenter(this);
         presenters.register(this);
