@@ -125,17 +125,19 @@ public class KeysPresenter extends Presenter {
         KeysView.KeysTableModel keysTableModel = new KeysView.KeysTableModel();
 
         // Add the relevant information about each key in the store
-        for(Key key: model) {
-            keysTableModel.addRow(new Object[]{
-                    key.getID(),
-                    key.getDescription(),
-                    key.isPublic(),
-                    key.isPrivate(),
-                    key.canSign(),
-                    key.canVerify(),
-                    key.canEncrypt(),
-                    key.canDecrypt()
-            });
+        for (Key key : model.keys()) {
+            keysTableModel.addRow(
+                    new Object[]{
+                            key.getID(),
+                            key.getDescription(),
+                            key.isPublic(),
+                            key.isPrivate(),
+                            key.canSign(),
+                            key.canVerify(),
+                            key.canEncrypt(),
+                            key.canDecrypt()
+                    }
+            );
         }
 
         // Change the view table model to the newly created one

@@ -23,42 +23,25 @@ import com.blackberry.jwteditor.presenter.KeysPresenter;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.*;
+import java.text.ParseException;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import static java.util.Collections.unmodifiableCollection;
 
 /**
  * A container class for Key objects
  */
-public class KeysModel implements Iterable<Key> {
-    private final Map<String, Key> keys;
+public class KeysModel {
+    private final Map<String, Key> keys = new LinkedHashMap<>();
+    private final Object lock = new Object();
+
     private KeysPresenter presenter;
 
-    public KeysModel() {
-        keys = new LinkedHashMap<>();
-    }
-
-    /**
-     * Iterator to pass through to the underlying hashmap
-     */
-    @Override
-    public Iterator<Key> iterator() {
-        return new KeyModelIterator();
-    }
-
-    private class KeyModelIterator implements Iterator<Key> {
-        final Iterator<String> hashMapIterator;
-
-        public KeyModelIterator() {
-            hashMapIterator = keys.keySet().iterator();
-        }
-
-        @Override
-        public boolean hasNext() {
-            return hashMapIterator.hasNext();
-        }
-
-        @Override
-        public Key next() {
-            return keys.get(hashMapIterator.next());
+    public Iterable<Key> keys() {
+        synchronized (lock) {
+            return unmodifiableCollection(keys.values());
         }
     }
 
@@ -67,10 +50,11 @@ public class KeysModel implements Iterable<Key> {
      *
      * @param json JSON string containing encoded keys
      * @return the KeysModel parsed from the JSON
-     * @throws java.text.ParseException if parsing fails
+     * @throws ParseException if parsing fails
      */
-    public static KeysModel parse(String json) throws java.text.ParseException {
+    public static KeysModel parse(String json) throws ParseException {
         KeysModel keysModel = new KeysModel();
+
         try {
             JSONArray savedKeys = new JSONArray(json);
 
@@ -79,10 +63,10 @@ public class KeysModel implements Iterable<Key> {
                 keysModel.addKey(key);
             }
 
-        } catch (Key.UnsupportedKeyException | java.text.ParseException e) {
-            throw new java.text.ParseException(e.getMessage(), 0);
+            return keysModel;
+        } catch (Key.UnsupportedKeyException | ParseException e) {
+            throw new ParseException(e.getMessage(), 0);
         }
-        return keysModel;
     }
 
     /**
@@ -93,8 +77,8 @@ public class KeysModel implements Iterable<Key> {
     public String serialize() {
         JSONArray jsonArray = new JSONArray();
 
-        for (Key key : this) {
-            jsonArray.put(key.toJSONObject());
+        synchronized (lock) {
+            keys.values().stream().map(Key::toJSONObject).forEach(jsonArray::put);
         }
 
         return jsonArray.toString();
@@ -109,64 +93,28 @@ public class KeysModel implements Iterable<Key> {
         this.presenter = presenter;
     }
 
-    /**
-     * Get a list of all signing capable keys
-     *
-     * @return key list
-     */
     public List<Key> getSigningKeys() {
-        List<Key> keyList = new ArrayList<>();
-        for(Key k: this){
-            if(k.canSign()){
-                keyList.add(k);
-            }
+        synchronized (lock) {
+            return keys.values().stream().filter(Key::canSign).toList();
         }
-        return keyList;
     }
 
-    /**
-     * Get a list of all verification capable keys
-     *
-     * @return key list
-     */
     public List<Key> getVerificationKeys() {
-        List<Key> keyList = new ArrayList<>();
-        for(Key k: this){
-            if(k.canVerify()){
-                keyList.add(k);
-            }
+        synchronized (lock) {
+            return keys.values().stream().filter(Key::canVerify).toList();
         }
-        return keyList;
     }
 
-    /**
-     * Get a list of all encryption capable keys
-     *
-     * @return key list
-     */
     public List<Key> getEncryptionKeys() {
-        List<Key> keyList = new ArrayList<>();
-        for(Key k: this){
-            if(k.canEncrypt()){
-                keyList.add(k);
-            }
+        synchronized (lock) {
+            return keys.values().stream().filter(Key::canEncrypt).toList();
         }
-        return keyList;
     }
 
-    /**
-     * Get a list of all decryption capable keys
-     *
-     * @return key list
-     */
     public List<Key> getDecryptionKeys() {
-        List<Key> keyList = new ArrayList<>();
-        for(Key k: this){
-            if(k.canDecrypt()){
-                keyList.add(k);
-            }
+        synchronized (lock) {
+            return keys.values().stream().filter(Key::canDecrypt).toList();
         }
-        return keyList;
     }
 
     /**
@@ -175,7 +123,10 @@ public class KeysModel implements Iterable<Key> {
      * @param key key to add
      */
     public void addKey(Key key) {
-        keys.put(key.getID(), key);
+        synchronized (lock) {
+            keys.put(key.getID(), key);
+        }
+
         if (presenter != null) {
             presenter.onModelUpdated();
         }
@@ -187,7 +138,10 @@ public class KeysModel implements Iterable<Key> {
      * @param keyId key id to remove
      */
     public void deleteKey(String keyId) {
-        keys.remove(keyId);
+        synchronized (lock) {
+            keys.remove(keyId);
+        }
+
         if (presenter != null) {
             presenter.onModelUpdated();
         }
@@ -199,23 +153,11 @@ public class KeysModel implements Iterable<Key> {
      * @param indicies indicies of keys to remove
      */
     public void deleteKeys(int[] indicies) {
-        List<String> toDelete = new ArrayList<>();
-        for (int index : indicies) {
-            toDelete.add(getKey(index).getID());
+        synchronized (lock) {
+            for (int index : indicies) {
+                deleteKey(getKey(index).getID());
+            }
         }
-        for (String keyId : toDelete) {
-            deleteKey(keyId);
-        }
-    }
-
-    /**
-     * Remove a key from the model by index
-     *
-     * @param index index of key to remove
-     */
-    @SuppressWarnings("unused")
-    public void deleteKey(int index) {
-        deleteKey(getKey(index).getID());
     }
 
     /**
@@ -225,8 +167,10 @@ public class KeysModel implements Iterable<Key> {
      * @return retrieved key
      */
     public Key getKey(int index) {
-        String key = (String) keys.keySet().toArray()[index];
-        return keys.get(key);
+        synchronized (lock) {
+            String key = (String) keys.keySet().toArray()[index];
+            return keys.get(key);
+        }
     }
 
     /**
@@ -236,6 +180,8 @@ public class KeysModel implements Iterable<Key> {
      * @return retrieved key
      */
     public Key getKey(String keyId) {
-        return keys.get(keyId);
+        synchronized (lock) {
+            return keys.get(keyId);
+        }
     }
 }
