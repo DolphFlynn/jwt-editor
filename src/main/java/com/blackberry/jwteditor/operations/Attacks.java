@@ -72,7 +72,7 @@ public class Attacks {
         Base64URL header = signingInfo.toBase64URL();
         Base64URL payload = jws.getEncodedPayload();
 
-        return new JWSFactory(signingKey).sign(header, payload, signingInfo);
+        return JWSFactory.sign(signingKey, header, payload, signingInfo);
     }
 
     /**
@@ -114,6 +114,6 @@ public class Attacks {
         Base64URL header = jwsHeader.toBase64URL();
         Base64URL payload = jws.getEncodedPayload();
 
-        return new JWSFactory(key).sign(header, payload, jwsHeader);
+        return JWSFactory.sign(key, header, payload, jwsHeader);
     }
 }

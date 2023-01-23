@@ -112,7 +112,7 @@ class SigningTests {
         Base64URL header = signingInfo.toBase64URL();
         Base64URL payload = TEST_JWS.getEncodedPayload();
 
-        JWS jws = new JWSFactory(key).sign(header, payload, signingInfo);
+        JWS jws = JWSFactory.sign(key, header, payload, signingInfo);
 
         assertThat(jws.verify(key, signingInfo)).isTrue();
     }
@@ -128,7 +128,7 @@ class SigningTests {
         Base64URL header = signingInfo.toBase64URL();
         Base64URL payload = TEST_JWS.getEncodedPayload();
 
-        JWS jws = new JWSFactory(privateKey).sign(header, payload, signingInfo);
+        JWS jws = JWSFactory.sign(privateKey, header, payload, signingInfo);
 
         assertThat(jws.verify(publicKey, signingInfo)).isTrue();
     }

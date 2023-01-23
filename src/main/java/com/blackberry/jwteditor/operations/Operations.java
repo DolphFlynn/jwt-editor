@@ -102,7 +102,7 @@ public class Operations {
         // Do the signing operation
         Base64URL payload = jws.getEncodedPayload();
 
-        return new JWSFactory(key).sign(encodedHeader, payload, signingInfo);
+        return JWSFactory.sign(key, encodedHeader, payload, signingInfo);
     }
 
     /**
