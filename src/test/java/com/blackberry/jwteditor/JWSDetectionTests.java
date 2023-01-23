@@ -18,16 +18,17 @@ limitations under the License.
 
 package com.blackberry.jwteditor;
 
+import com.blackberry.jwteditor.model.jose.JOSEObject;
 import com.blackberry.jwteditor.model.jose.JWS;
 import com.blackberry.jwteditor.model.jose.MutableJOSEObject;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
-import static com.blackberry.jwteditor.model.jose.JOSEObjectFinder.containsJOSEObjects;
-import static com.blackberry.jwteditor.model.jose.JOSEObjectFinder.extractJOSEObjects;
+import static com.blackberry.jwteditor.model.jose.JOSEObjectFinder.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class JWSDetectionTests {
@@ -35,14 +36,8 @@ class JWSDetectionTests {
         return Stream.of(
                 // JWS
                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJUZXN0In0.Nabf3xakZubPnCzHT-fx0vG1iuNPeJKuSzHxUiQKf-8",
-                // JWS with whitespace
-                " eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJUZXN0In0.Nabf3xakZubPnCzHT-fx0vG1iuNPeJKuSzHxUiQKf-8 ",
                 // JWS without signature
                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJUZXN0In0.",
-                // JWS with preceding text
-                "asdasdasdeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJUZXN0In0.Nabf3xakZubPnCzHT-fx0vG1iuNPeJKuSzHxUiQKf-8",
-                // JWS without signature preceding text
-                "asdasdasdasdeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJUZXN0In0.Nabf3xakZubPnCzHT-fx0vG1iuNPeJKuSzHxUiQKf-8",
                 // JWS with empty payload
                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.e30.17DlZn0zeYhz3uTQCRpSx9hYlUj1SJxDMeZLof8dSHw",
                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyB9.17DlZn0zeYhz3uTQCRpSx9hYlUj1SJxDMeZLof8dSHw",
@@ -98,6 +93,16 @@ class JWSDetectionTests {
 
     @ParameterizedTest
     @MethodSource("validJws")
+    void testExtractValidJWSWithWhitespace(String joseObjectString) {
+        String text = " " + joseObjectString + " ";
+        List<MutableJOSEObject> joseObjects = extractJOSEObjects(text);
+
+        assertThat(joseObjects).hasSize(1);
+        assertThat(joseObjects.get(0).getModified()).isInstanceOf(JWS.class);
+    }
+
+    @ParameterizedTest
+    @MethodSource("validJws")
     void testExtractValidJWSFromWithinData(String joseObjectString) {
         String text = "Authorization: Bearer " + joseObjectString + "\r\n";
         List<MutableJOSEObject> joseObjects = extractJOSEObjects(text);
@@ -122,6 +127,13 @@ class JWSDetectionTests {
 
     @ParameterizedTest
     @MethodSource("validJws")
+    void testDetectValidJWSWithWhitespace(String joseObjectString) {
+        String text = " " + joseObjectString + " ";
+        assertThat(containsJOSEObjects(text)).isTrue();
+    }
+
+    @ParameterizedTest
+    @MethodSource("validJws")
     void testDetectValidJWSFromWithinData(String joseObjectString) {
         String text = "Authorization: Bearer " + joseObjectString + "\r\n";
 
@@ -132,5 +144,32 @@ class JWSDetectionTests {
     @MethodSource("invalidJws")
     void testDetectInvalidJWS(String joseObjectString) {
         assertThat(containsJOSEObjects(joseObjectString)).isFalse();
+    }
+
+    @ParameterizedTest
+    @MethodSource("validJws")
+    void testParseValidJWS(String joseObjectString) {
+        Optional<JOSEObject> joseObject = parseJOSEObject(joseObjectString);
+
+        assertThat(joseObject).isPresent();
+        assertThat(joseObject.get()).isInstanceOf(JWS.class);
+    }
+
+    @ParameterizedTest
+    @MethodSource("validJws")
+    void testParseValidJWSFromWithinData(String joseObjectString) {
+        String text = "Authorization: Bearer " + joseObjectString + "\r\n";
+
+        Optional<JOSEObject> joseObject = parseJOSEObject(text);
+
+        assertThat(joseObject).isEmpty();
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidJws")
+    void testParseInvalidJWS(String joseObjectString) {
+        Optional<JOSEObject> joseObject = parseJOSEObject(joseObjectString);
+
+        assertThat(joseObject).isEmpty();
     }
 }

@@ -18,16 +18,17 @@ limitations under the License.
 
 package com.blackberry.jwteditor;
 
+import com.blackberry.jwteditor.model.jose.JOSEObject;
 import com.blackberry.jwteditor.model.jose.JWE;
 import com.blackberry.jwteditor.model.jose.MutableJOSEObject;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
-import static com.blackberry.jwteditor.model.jose.JOSEObjectFinder.containsJOSEObjects;
-import static com.blackberry.jwteditor.model.jose.JOSEObjectFinder.extractJOSEObjects;
+import static com.blackberry.jwteditor.model.jose.JOSEObjectFinder.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class JWEDetectionTests {
@@ -36,11 +37,7 @@ class JWEDetectionTests {
                 //JWE with encrypted key
                 "eyJlbmMiOiJBMTI4R0NNIiwiYWxnIjoiQTEyOEtXIn0.H3X6mT5HLgcFfzLoe4ku6Knhh9Ofv1eL.qF5-N_7K8VQ4yMSz.WXUNY6eg5fR4tc8Hqf5XDRM9ALGwcQyYG4IYwwg8Ctkx1UuxoV7t6UnemjzCj2sOYUqi3KYpDzrKVJpzokz0vcIem4lFe5N_ds8FAMpW0GSF9ePA8qvV99WaP0N2ECVPmgihvL6qwNhdptlLKtxcOpE41U5LnU22voPK55VF4_1j0WmTgWgZ7DwLDysp6EIDjrrt-DY.febBmP71KADmKRVfeSnv_g",
                 //JWE with dir encryption
-                "eyJlbmMiOiJBMTI4R0NNIiwiYWxnIjoiZGlyIn0..FofRkmAUlKShyhYp.1AjXmQsKwV36LSxZ5YJq7xPPTTUS_e9FyLbd-CWdX72ESWMttHm2xGDWUl-Sp9grmcINWLNwsKezYnJVncfir2o9Uq9vcXENIypU2Qwmymn5q5gJwkR4Wx_RLae9Zm8xP76LJFQe8FssUVHx65Zzvd1I6GbV6FjfbkLF1Z_Ka-olubtWCilFDjIVN7WRUAxmV8syJaM.P0XjuL8_8nK50paY09mB6g",
-                //JWE with encrypted key with preceding text
-                "asdasdasdaseyJlbmMiOiJBMTI4R0NNIiwiYWxnIjoiQTEyOEtXIn0.H3X6mT5HLgcFfzLoe4ku6Knhh9Ofv1eL.qF5-N_7K8VQ4yMSz.WXUNY6eg5fR4tc8Hqf5XDRM9ALGwcQyYG4IYwwg8Ctkx1UuxoV7t6UnemjzCj2sOYUqi3KYpDzrKVJpzokz0vcIem4lFe5N_ds8FAMpW0GSF9ePA8qvV99WaP0N2ECVPmgihvL6qwNhdptlLKtxcOpE41U5LnU22voPK55VF4_1j0WmTgWgZ7DwLDysp6EIDjrrt-DY.febBmP71KADmKRVfeSnv_g",
-                //JWE with dir encryption with preceding text
-                "asdasdasdeyJlbmMiOiJBMTI4R0NNIiwiYWxnIjoiZGlyIn0..FofRkmAUlKShyhYp.1AjXmQsKwV36LSxZ5YJq7xPPTTUS_e9FyLbd-CWdX72ESWMttHm2xGDWUl-Sp9grmcINWLNwsKezYnJVncfir2o9Uq9vcXENIypU2Qwmymn5q5gJwkR4Wx_RLae9Zm8xP76LJFQe8FssUVHx65Zzvd1I6GbV6FjfbkLF1Z_Ka-olubtWCilFDjIVN7WRUAxmV8syJaM.P0XjuL8_8nK50paY09mB6g"
+                "eyJlbmMiOiJBMTI4R0NNIiwiYWxnIjoiZGlyIn0..FofRkmAUlKShyhYp.1AjXmQsKwV36LSxZ5YJq7xPPTTUS_e9FyLbd-CWdX72ESWMttHm2xGDWUl-Sp9grmcINWLNwsKezYnJVncfir2o9Uq9vcXENIypU2Qwmymn5q5gJwkR4Wx_RLae9Zm8xP76LJFQe8FssUVHx65Zzvd1I6GbV6FjfbkLF1Z_Ka-olubtWCilFDjIVN7WRUAxmV8syJaM.P0XjuL8_8nK50paY09mB6g"
         );
     }
 
@@ -106,5 +103,32 @@ class JWEDetectionTests {
     @MethodSource("invalidJwe")
     void testDetectInvalidJWE(String joseObjectString) {
         assertThat(containsJOSEObjects(joseObjectString)).isFalse();
+    }
+
+    @ParameterizedTest
+    @MethodSource("validJwe")
+    void testParseValidJWE(String joseObjectString) {
+        Optional<JOSEObject> joseObject = parseJOSEObject(joseObjectString);
+
+        assertThat(joseObject).isPresent();
+        assertThat(joseObject.get()).isInstanceOf(JWE.class);
+    }
+
+    @ParameterizedTest
+    @MethodSource("validJwe")
+    void testParseValidJWEFromWithinData(String joseObjectString) {
+        String text = "Authorization: Bearer " + joseObjectString + "\r\n";
+
+        Optional<JOSEObject> joseObject = parseJOSEObject(text);
+
+        assertThat(joseObject).isEmpty();
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidJwe")
+    void testParseInvalidJWE(String joseObjectString) {
+        Optional<JOSEObject> joseObject = parseJOSEObject(joseObjectString);
+
+        assertThat(joseObject).isEmpty();
     }
 }

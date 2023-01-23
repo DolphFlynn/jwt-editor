@@ -18,7 +18,6 @@ limitations under the License.
 
 package com.blackberry.jwteditor.model.jose;
 
-import com.nimbusds.jose.JOSEObject;
 import com.nimbusds.jose.JWEObject;
 import com.nimbusds.jose.util.Base64URL;
 import com.nimbusds.jose.util.JSONObjectUtils;
@@ -51,12 +50,7 @@ public class JOSEObjectFinder {
         Set<String> candidates = findCandidateJoseObjectsWithin(text);
 
         for (String candidate : candidates) {
-            // Try to parse each as both a JWE and a JWS
-            Optional<JWE> jwe = parseJWE(candidate);
-            Optional<JWS> jws = jwe.isEmpty() ? parseJWS(candidate) : Optional.empty();
-
-            jwe.ifPresent(value -> joseObjects.add(new MutableJOSEObject(candidate, value)));
-            jws.ifPresent(value -> joseObjects.add(new MutableJOSEObject(candidate, value)));
+            parseJWT(candidate).ifPresent(value -> joseObjects.add(new MutableJOSEObject(candidate, value)));
         }
 
         return joseObjects;
@@ -67,8 +61,8 @@ public class JOSEObjectFinder {
 
         for (String candidate : candidates) {
             // Try to parse each as both a JWE and a JWS
-            Optional<JWE> jwe = parseJWE(candidate);
-            Optional<JWS> jws = jwe.isEmpty() ? parseJWS(candidate) : Optional.empty();
+            Optional<JOSEObject> jwe = parseJWE(candidate);
+            Optional<JOSEObject> jws = jwe.isEmpty() ? parseJWS(candidate) : Optional.empty();
 
             if (jwe.isPresent() || jws.isPresent()) {
                 return true;
@@ -76,6 +70,10 @@ public class JOSEObjectFinder {
         }
 
         return false;
+    }
+
+    public static Optional<JOSEObject> parseJOSEObject(String text) {
+        return parseJWT(text);
     }
 
     private static Set<String> findCandidateJoseObjectsWithin(String text) {
@@ -90,7 +88,19 @@ public class JOSEObjectFinder {
         return strings;
     }
 
-    private static Optional<JWE> parseJWE(String candidate) {
+    private static Optional<JOSEObject> parseJWT(String candidate) {
+        Matcher m = JOSE_OBJECT_PATTERN.matcher(candidate);
+
+        if (!m.matches()) {
+            return Optional.empty();
+        }
+
+        // Try to parse each as both a JWE and a JWS
+        Optional<JOSEObject> jwe = parseJWE(candidate);
+        return jwe.isPresent() ? jwe : parseJWS(candidate);
+    }
+
+    private static Optional<JOSEObject> parseJWE(String candidate) {
         try {
             JWEObject.parse(candidate);
             return Optional.of(JWE.parse(candidate));
@@ -99,9 +109,9 @@ public class JOSEObjectFinder {
         }
     }
 
-    private static Optional<JWS> parseJWS(String candidate) {
+    private static Optional<JOSEObject> parseJWS(String candidate) {
         try {
-            Base64URL[] parts = JOSEObject.split(candidate);
+            Base64URL[] parts = com.nimbusds.jose.JOSEObject.split(candidate);
 
             if (parts.length != 3) {
                 throw new ParseException("Unexpected number of Base64URL parts, must be three", 0);
