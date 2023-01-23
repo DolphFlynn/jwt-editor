@@ -23,13 +23,10 @@ import com.blackberry.jwteditor.model.keys.Key;
 import com.nimbusds.jose.JWEDecrypter;
 import com.nimbusds.jose.JWEHeader;
 import com.nimbusds.jose.util.Base64URL;
-import org.apache.commons.lang3.StringUtils;
 
 import java.security.Provider;
 import java.security.Security;
 import java.text.ParseException;
-
-import static java.util.Arrays.stream;
 
 /**
  * Class representing a JWE
@@ -55,29 +52,6 @@ public class JWE extends JOSEObject {
         this.iv = iv;
         this.ciphertext = ciphertext;
         this.tag = tag;
-    }
-
-    /**
-     * Parse a JWE from compact serialization
-     *
-     * @param compactJWE JWE in compact serialization form
-     * @return a parsed JWE object
-     * @throws ParseException if the value is not a valid JWE
-     */
-    public static JWE parse(String compactJWE) throws ParseException {
-        if (StringUtils.countMatches(compactJWE, ".") != 4) {
-            throw new ParseException("Invalid number of encoded fields", 0);
-        }
-
-        Base64URL[] parts = com.nimbusds.jose.JOSEObject.split(compactJWE);
-
-        boolean allEmpty = stream(parts).allMatch(part -> part.decodeToString().isEmpty());
-
-        if (allEmpty) {
-            throw new ParseException("All sections empty", 0);
-        }
-
-        return new JWE(parts[0], parts[1], parts[2], parts[3], parts[4]);
     }
 
     /**

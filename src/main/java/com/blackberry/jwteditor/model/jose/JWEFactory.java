@@ -3,10 +3,15 @@ package com.blackberry.jwteditor.model.jose;
 import com.blackberry.jwteditor.model.jose.exceptions.EncryptionException;
 import com.blackberry.jwteditor.model.keys.Key;
 import com.nimbusds.jose.*;
+import com.nimbusds.jose.util.Base64URL;
+import org.apache.commons.lang3.StringUtils;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Provider;
 import java.security.Security;
+import java.text.ParseException;
+
+import static java.util.Arrays.stream;
 
 public class JWEFactory {
     public static JWE encrypt(JWS jws, Key key, JWEAlgorithm kek, EncryptionMethod cek) throws EncryptionException {
@@ -42,5 +47,28 @@ public class JWEFactory {
                 jweCryptoParts.getCipherText(),
                 jweCryptoParts.getAuthenticationTag()
         );
+    }
+
+    /**
+     * Parse a JWE from compact serialization
+     *
+     * @param compactJWE JWE in compact serialization form
+     * @return a parsed JWE object
+     * @throws ParseException if the value is not a valid JWE
+     */
+    public static JWE parse(String compactJWE) throws ParseException {
+        if (StringUtils.countMatches(compactJWE, ".") != 4) {
+            throw new ParseException("Invalid number of encoded fields", 0);
+        }
+
+        Base64URL[] parts = com.nimbusds.jose.JOSEObject.split(compactJWE);
+
+        boolean allEmpty = stream(parts).allMatch(part -> part.decodeToString().isEmpty());
+
+        if (allEmpty) {
+            throw new ParseException("All sections empty", 0);
+        }
+
+        return new JWE(parts[0], parts[1], parts[2], parts[3], parts[4]);
     }
 }

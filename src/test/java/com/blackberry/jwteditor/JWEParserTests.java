@@ -25,6 +25,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.text.ParseException;
 import java.util.stream.Stream;
 
+import static com.blackberry.jwteditor.model.jose.JWEFactory.parse;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -65,7 +66,7 @@ class JWEParserTests {
     @ParameterizedTest
     @MethodSource("validJwe")
     void testValidJWE(String joseObjectString) throws ParseException {
-        JWE jwe = JWE.parse(joseObjectString);
+        JWE jwe = parse(joseObjectString);
 
         assertThat(jwe.serialize()).isEqualTo(joseObjectString);
     }
@@ -73,6 +74,6 @@ class JWEParserTests {
     @ParameterizedTest
     @MethodSource("invalidJwe")
     void testInvalidJWE(String joseObjectString) {
-        assertThrows(ParseException.class, () -> JWE.parse(joseObjectString));
+        assertThrows(ParseException.class, () -> parse(joseObjectString));
     }
 }

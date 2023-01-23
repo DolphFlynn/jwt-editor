@@ -103,7 +103,7 @@ public class JOSEObjectFinder {
     private static Optional<JOSEObject> parseJWE(String candidate) {
         try {
             JWEObject.parse(candidate);
-            return Optional.of(JWE.parse(candidate));
+            return Optional.of(JWEFactory.parse(candidate));
         } catch (ParseException e) {
             return Optional.empty();
         }
