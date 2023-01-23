@@ -24,14 +24,10 @@ import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.JWSVerifier;
 import com.nimbusds.jose.util.Base64URL;
-import org.apache.commons.lang3.StringUtils;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Provider;
 import java.security.Security;
-import java.text.ParseException;
-
-import static java.util.Arrays.stream;
 
 /**
  * Class representing a JWS
@@ -50,29 +46,6 @@ public class JWS extends JOSEObject {
         super(header);
         this.payload = payload;
         this.signature = signature;
-    }
-
-    /**
-     * Parse a JWS from compact serialization
-     *
-     * @param compactJWS the JWS in compact serialization
-     * @return the parsed JWS
-     * @throws ParseException if parsing fails
-     */
-    public static JWS parse(String compactJWS) throws ParseException {
-        if (StringUtils.countMatches(compactJWS, ".") != 2) {
-            throw new ParseException("Invalid number of encoded sections", 0);
-        }
-
-        Base64URL[] parts = com.nimbusds.jose.JOSEObject.split(compactJWS);
-
-        boolean allEmpty = stream(parts).allMatch(part -> part.decodeToString().isEmpty());
-
-        if (allEmpty) {
-            throw new ParseException("All sections empty", 0);
-        }
-
-        return new JWS(parts[0], parts[1], parts[2]);
     }
 
     /**

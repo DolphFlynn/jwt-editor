@@ -133,7 +133,7 @@ public class JOSEObjectFinder {
             String payload = encodedPayload.decodeToString();
             JSONObjectUtils.parse(payload); // throws ParseException if not JSON object
 
-            return Optional.of(JWS.parse(candidate));
+            return Optional.of(JWSFactory.parse(candidate));
         } catch (ParseException e) {
             return Optional.empty();
         }

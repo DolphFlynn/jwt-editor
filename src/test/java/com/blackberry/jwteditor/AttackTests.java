@@ -19,6 +19,7 @@ limitations under the License.
 package com.blackberry.jwteditor;
 
 import com.blackberry.jwteditor.model.jose.JWS;
+import com.blackberry.jwteditor.model.jose.JWSFactory;
 import com.blackberry.jwteditor.model.keys.JWKKey;
 import com.blackberry.jwteditor.operations.Attacks;
 import com.blackberry.jwteditor.utils.PEMUtils;
@@ -62,7 +63,7 @@ class AttackTests {
     @ParameterizedTest
     @ValueSource(strings = {"none", "None", "NONE", "nOnE"})
     void testSigningKeyNone(String algorithm) throws ParseException {
-        JWS jws = JWS.parse(HMAC_KEY_CONFUSION_JWS);
+        JWS jws = JWSFactory.parse(HMAC_KEY_CONFUSION_JWS);
         JWS modifiedJWS = Attacks.noneSigning(jws, algorithm);
 
         assertThat(modifiedJWS.getHeader()).isEqualTo(String.format("{\"typ\":\"JWT\",\"alg\":\"%s\"}", algorithm));
@@ -72,8 +73,8 @@ class AttackTests {
 
     @Test
     void testHMACKeyConfusion() throws Exception {
-        JWS jws = JWS.parse(HMAC_KEY_CONFUSION_JWS);
-        JWS expectedJWS = JWS.parse(HMAC_KEY_CONFUSION_EXPECTED_JWS);
+        JWS jws = JWSFactory.parse(HMAC_KEY_CONFUSION_JWS);
+        JWS expectedJWS = JWSFactory.parse(HMAC_KEY_CONFUSION_EXPECTED_JWS);
         JWKKey key = new JWKKey(PEMUtils.pemToRSAKey(HMAC_KEY_CONFUSION_PEM));
 
         JWS modifiedJWS  = Attacks.hmacKeyConfusion(jws, key, JWSAlgorithm.HS256, false);
@@ -84,7 +85,7 @@ class AttackTests {
     @Test
     // Test the Embedded JWK attack produces a known-good value
     void testEmbeddedJWKKnown() throws Exception {
-        JWS jws = JWS.parse(HMAC_KEY_CONFUSION_JWS);
+        JWS jws = JWSFactory.parse(HMAC_KEY_CONFUSION_JWS);
         JWKKey jwk = new JWKKey(JWK.parse(EMBEDDED_JWK_KEY));
 
         JWS modifiedJWS = Attacks.embeddedJWK(jws, jwk, JWSAlgorithm.RS256);
@@ -96,7 +97,7 @@ class AttackTests {
     @ParameterizedTest
     @MethodSource("com.blackberry.jwteditor.KeyUtils#keySigningAlgorithmPairs")
     void testEmbeddedJWKAll(JWKKey jwk, JWSAlgorithm alg) throws Exception {
-        JWS jws = JWS.parse(HMAC_KEY_CONFUSION_JWS);
+        JWS jws = JWSFactory.parse(HMAC_KEY_CONFUSION_JWS);
 
         Attacks.embeddedJWK(jws, jwk, alg);
     }

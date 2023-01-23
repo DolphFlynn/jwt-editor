@@ -163,7 +163,7 @@ public class JWE extends JOSEObject {
             );
 
             // Try to parse the result as a JWS and return
-            return JWS.parse(new String(plaintext));
+            return JWSFactory.parse(new String(plaintext));
         } catch (ParseException e) {
             throw new DecryptionException("JWE contents are not a JWS");
         } catch (Exception e) {

@@ -21,6 +21,7 @@ package com.blackberry.jwteditor;
 import com.blackberry.jwteditor.model.jose.JWE;
 import com.blackberry.jwteditor.model.jose.JWEFactory;
 import com.blackberry.jwteditor.model.jose.JWS;
+import com.blackberry.jwteditor.model.jose.JWSFactory;
 import com.blackberry.jwteditor.model.keys.JWKKey;
 import com.nimbusds.jose.EncryptionMethod;
 import com.nimbusds.jose.JWEAlgorithm;
@@ -180,7 +181,7 @@ class ECEncryptionTests {
         JWKKey publicKey = new JWKKey(keyPair.getLeft());
         JWKKey privateKey = new JWKKey(keyPair.getRight());
 
-        JWE jwe = JWEFactory.encrypt(JWS.parse(TEST_JWS), publicKey, kek, cek);
+        JWE jwe = JWEFactory.encrypt(JWSFactory.parse(TEST_JWS), publicKey, kek, cek);
         JWS decrypt = jwe.decrypt(privateKey);
 
         assertThat(decrypt.serialize()).isEqualTo(TEST_JWS);

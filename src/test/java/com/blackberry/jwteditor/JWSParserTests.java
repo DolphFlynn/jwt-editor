@@ -19,6 +19,7 @@ limitations under the License.
 package com.blackberry.jwteditor;
 
 import com.blackberry.jwteditor.model.jose.JWS;
+import com.blackberry.jwteditor.model.jose.JWSFactory;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -59,7 +60,7 @@ class JWSParserTests {
     @ParameterizedTest
     @MethodSource("validJws")
     void testValidJWS(String joseObjectString) throws ParseException {
-        JWS jws = JWS.parse(joseObjectString);
+        JWS jws = JWSFactory.parse(joseObjectString);
 
         assertThat(jws.serialize()).isEqualTo(joseObjectString);
     }
@@ -67,6 +68,6 @@ class JWSParserTests {
     @ParameterizedTest
     @MethodSource("invalidJws")
     void testInvalidJWS(String joseObjectString) {
-        assertThrows(ParseException.class, () -> JWS.parse(joseObjectString));
+        assertThrows(ParseException.class, () -> JWSFactory.parse(joseObjectString));
     }
 }

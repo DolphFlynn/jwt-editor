@@ -21,6 +21,7 @@ package com.blackberry.jwteditor;
 import com.blackberry.jwteditor.model.jose.JWE;
 import com.blackberry.jwteditor.model.jose.JWEFactory;
 import com.blackberry.jwteditor.model.jose.JWS;
+import com.blackberry.jwteditor.model.jose.JWSFactory;
 import com.blackberry.jwteditor.model.keys.PasswordKey;
 import com.nimbusds.jose.EncryptionMethod;
 import com.nimbusds.jose.JWEAlgorithm;
@@ -90,7 +91,7 @@ class PasswordEncryptionTests {
     @ParameterizedTest
     @MethodSource("algorithmsAndMethods")
     void passwordEncryptionConsistency(JWEAlgorithm kek, EncryptionMethod cek) throws Exception {
-        JWE jwe = JWEFactory.encrypt(JWS.parse(TEST_JWS), KEY, kek, cek);
+        JWE jwe = JWEFactory.encrypt(JWSFactory.parse(TEST_JWS), KEY, kek, cek);
         JWS decrypt = jwe.decrypt(KEY);
 
         assertThat(decrypt.serialize()).isEqualTo(TEST_JWS);

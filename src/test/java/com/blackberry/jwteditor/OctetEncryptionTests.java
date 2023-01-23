@@ -21,6 +21,7 @@ package com.blackberry.jwteditor;
 import com.blackberry.jwteditor.model.jose.JWE;
 import com.blackberry.jwteditor.model.jose.JWEFactory;
 import com.blackberry.jwteditor.model.jose.JWS;
+import com.blackberry.jwteditor.model.jose.JWSFactory;
 import com.blackberry.jwteditor.model.keys.JWKKey;
 import com.nimbusds.jose.EncryptionMethod;
 import com.nimbusds.jose.JOSEException;
@@ -184,7 +185,7 @@ class OctetEncryptionTests {
     void octEncryptionConsistency(OctetSequenceKey octKey, JWEAlgorithm kek, EncryptionMethod cek) throws Exception {
         JWKKey key = new JWKKey(octKey);
 
-        JWE jwe = JWEFactory.encrypt(JWS.parse(TEST_JWS), key, kek, cek);
+        JWE jwe = JWEFactory.encrypt(JWSFactory.parse(TEST_JWS), key, kek, cek);
         JWS decrypt = jwe.decrypt(key);
 
         assertThat(decrypt.serialize()).isEqualTo(TEST_JWS);
