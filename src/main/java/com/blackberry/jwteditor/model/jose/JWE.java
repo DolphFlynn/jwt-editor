@@ -46,7 +46,7 @@ public class JWE extends JOSEObject {
      * @param ciphertext   base64 encoded ciphertext
      * @param tag          base64 encoded tag
      */
-    public JWE(Base64URL header, Base64URL encryptedKey, Base64URL iv, Base64URL ciphertext, Base64URL tag) {
+    JWE(Base64URL header, Base64URL encryptedKey, Base64URL iv, Base64URL ciphertext, Base64URL tag) {
         super(header);
         this.encryptedKey = encryptedKey;
         this.iv = iv;

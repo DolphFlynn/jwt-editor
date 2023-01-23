@@ -43,6 +43,7 @@ import java.util.List;
 
 import static com.blackberry.jwteditor.model.jose.JOSEObjectFinder.containsJOSEObjects;
 import static com.blackberry.jwteditor.model.jose.JOSEObjectFinder.extractJOSEObjects;
+import static com.blackberry.jwteditor.model.jose.JWEFactory.jweFromParts;
 import static com.blackberry.jwteditor.model.jose.JWSFactory.jwsFromParts;
 
 /**
@@ -254,13 +255,7 @@ public class EditorPresenter extends Presenter {
             header = Base64URL.encode(view.getJWEHeader().getBytes(StandardCharsets.UTF_8));
         }
 
-        return new JWE(
-                header,
-                encryptedKey,
-                iv,
-                ciphertext,
-                tag
-        );
+        return jweFromParts(header, encryptedKey, iv, ciphertext, tag);
     }
 
     /**
