@@ -34,6 +34,8 @@ import com.nimbusds.jose.util.Base64URL;
 
 import java.lang.reflect.Field;
 
+import static com.blackberry.jwteditor.model.jose.JWSFactory.jwsFromParts;
+
 /**
  * Implementations of common JWS attacks
  */
@@ -85,7 +87,7 @@ public class Attacks {
     public static JWS noneSigning(JWS jws, String algorithm){
         String decodedHeader = String.format("{\"typ\":\"JWT\",\"alg\":\"%s\"}", algorithm); //NON-NLS
         Base64URL header = Base64URL.encode(decodedHeader);
-        return new JWS(header, jws.getEncodedPayload(), Base64URL.encode(new byte[0]));
+        return jwsFromParts(header, jws.getEncodedPayload(), Base64URL.encode(new byte[0]));
     }
 
     /**

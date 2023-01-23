@@ -43,6 +43,7 @@ import java.util.List;
 
 import static com.blackberry.jwteditor.model.jose.JOSEObjectFinder.containsJOSEObjects;
 import static com.blackberry.jwteditor.model.jose.JOSEObjectFinder.extractJOSEObjects;
+import static com.blackberry.jwteditor.model.jose.JWSFactory.jwsFromParts;
 
 /**
  * Presenter class for the Editor tab
@@ -193,11 +194,7 @@ public class EditorPresenter extends Presenter {
             payload = Base64URL.encode(view.getPayload());
         }
 
-        return new JWS(
-            header,
-            payload,
-            Base64URL.encode(view.getSignature())
-        );
+        return jwsFromParts(header, payload, Base64URL.encode(view.getSignature()));
     }
 
     /**

@@ -43,13 +43,14 @@ import java.util.stream.Stream;
 
 import static com.blackberry.jwteditor.KeyUtils.*;
 import static com.blackberry.jwteditor.PemData.*;
+import static com.blackberry.jwteditor.model.jose.JWSFactory.jwsFromParts;
 import static com.nimbusds.jose.JWSAlgorithm.*;
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 class SigningTests {
-    private static final JWS TEST_JWS = new JWS(
+    private static final JWS TEST_JWS = jwsFromParts(
             Base64URL.encode("{\"typ\":\"JWT\",\"alg\":\"HS256\"}"),
             Base64URL.encode("{\"sub\":\"Test\"}"),
             Base64URL.encode(new byte[0])

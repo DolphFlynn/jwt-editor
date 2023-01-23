@@ -38,4 +38,14 @@ public class JWSFactory {
 
         return new JWS(parts[0], parts[1], parts[2]);
     }
+
+    /**
+     * Construct a JWS from encoded components
+     * @param header the encoded header
+     * @param payload the encoded payload
+     * @param signature the encoded signature
+     */
+    public static JWS jwsFromParts(Base64URL header, Base64URL payload, Base64URL signature) {
+        return new JWS(header, payload, signature);
+    }
 }

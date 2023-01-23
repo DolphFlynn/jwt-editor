@@ -42,7 +42,7 @@ public class JWS extends JOSEObject {
      * @param payload the encoded payload
      * @param signature the encoded signature
      */
-    public JWS(Base64URL header, Base64URL payload, Base64URL signature) {
+    JWS(Base64URL header, Base64URL payload, Base64URL signature) {
         super(header);
         this.payload = payload;
         this.signature = signature;
