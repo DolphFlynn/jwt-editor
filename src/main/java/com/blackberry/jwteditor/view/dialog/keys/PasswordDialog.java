@@ -44,7 +44,7 @@ public class PasswordDialog extends KeyDialog {
     private JSpinner spinnerIterations;
     private JTextField textFieldKeyId;
 
-    PasswordKey key = null;
+    private PasswordKey key;
 
     public PasswordDialog(Window parent, PresenterStore presenters){
         this(parent, presenters, UUID.randomUUID().toString(), "", 8, 1000);

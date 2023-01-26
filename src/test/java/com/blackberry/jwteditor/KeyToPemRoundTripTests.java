@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class KeyRoundTripTests {
+class KeyToPemRoundTripTests {
     private static final String KID_REGEX = "\"kid\":\"[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\",";
 
     @BeforeAll
