@@ -22,14 +22,12 @@ import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.model.keys.PasswordKey;
 import com.blackberry.jwteditor.presenter.PresenterStore;
 import com.blackberry.jwteditor.utils.Utils;
+import com.blackberry.jwteditor.view.utils.DocumentAdapter;
 
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.UUID;
 
 /**
@@ -61,20 +59,10 @@ public class PasswordDialog extends KeyDialog {
         originalId = keyId;
 
         setContentPane(contentPane);
-        setModal(true);
         getRootPane().setDefaultButton(buttonOK);
 
         buttonOK.addActionListener(e -> onOK());
-
         buttonCancel.addActionListener(e -> onCancel());
-
-        // call onCancel() when cross is clicked
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                onCancel();
-            }
-        });
 
         // call onCancel() on ESCAPE
         contentPane.registerKeyboardAction(e -> onCancel(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
@@ -92,20 +80,7 @@ public class PasswordDialog extends KeyDialog {
         spinnerModeSalt.setMinimum(1);
         spinnerSaltLength.setModel(spinnerModeSalt);
 
-
-        DocumentListener documentListener = new DocumentListener() {
-            public void insertUpdate(DocumentEvent e) {
-                checkInput();
-            }
-
-            public void removeUpdate(DocumentEvent e) {
-                checkInput();
-            }
-
-            public void changedUpdate(DocumentEvent e) {
-                checkInput();
-            }
-        };
+        DocumentListener documentListener = new DocumentAdapter(e -> checkInput());
 
         // Attach event handlers for the inputs changing
         textFieldPassword.getDocument().addDocumentListener(documentListener);
@@ -140,7 +115,8 @@ public class PasswordDialog extends KeyDialog {
     /**
      * Called when the Cancel or X button is pressed. Set the changed key to null and destroy the window
      */
-    private void onCancel() {
+    @Override
+    void onCancel() {
         key = null;
         dispose();
     }

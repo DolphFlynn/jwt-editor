@@ -24,16 +24,14 @@ import com.blackberry.jwteditor.presenter.PresenterStore;
 import com.blackberry.jwteditor.utils.JSONUtils;
 import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.view.RstaFactory;
+import com.blackberry.jwteditor.view.utils.DocumentAdapter;
 import com.nimbusds.jose.jwk.OctetSequenceKey;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.security.SecureRandom;
 import java.text.ParseException;
 import java.util.UUID;
@@ -45,6 +43,7 @@ public class SymmetricKeyDialog extends KeyDialog {
     private final RstaFactory rstaFactory;
     private final Color textAreaKeyInitialBackgroundColor;
     private final Color textAreaKeyInitialCurrentLineHighlightColor;
+
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
@@ -60,20 +59,11 @@ public class SymmetricKeyDialog extends KeyDialog {
         this.rstaFactory = rstaFactory;
         this.presenters = presenters;
         setContentPane(contentPane);
-        setModal(true);
         getRootPane().setDefaultButton(buttonOK);
 
         buttonOK.addActionListener(e -> onOK());
 
         buttonCancel.addActionListener(e -> onCancel());
-
-        // call onCancel() when cross is clicked
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                onCancel();
-            }
-        });
 
         // call onCancel() on ESCAPE
         contentPane.registerKeyboardAction(e -> onCancel(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
@@ -102,19 +92,7 @@ public class SymmetricKeyDialog extends KeyDialog {
         // Attach event listeners for Generate button and text entry changing
         buttonGenerate.addActionListener(e -> generate());
 
-        DocumentListener documentListener = new DocumentListener() {
-            public void insertUpdate(DocumentEvent e) {
-                checkInput();
-            }
-
-            public void removeUpdate(DocumentEvent e) {
-                checkInput();
-            }
-
-            public void changedUpdate(DocumentEvent e) {
-                checkInput();
-            }
-        };
+        DocumentListener documentListener = new DocumentAdapter(e -> checkInput());
         textAreaKey.getDocument().addDocumentListener(documentListener);
 
         textAreaKeyInitialBackgroundColor = textAreaKey.getBackground();
@@ -207,7 +185,8 @@ public class SymmetricKeyDialog extends KeyDialog {
     /**
      * Called when the Cancel or X button is pressed. Set the changed key to null and destroy the window
      */
-    private void onCancel() {
+    @Override
+    void onCancel() {
         jwk = null;
         dispose();
     }

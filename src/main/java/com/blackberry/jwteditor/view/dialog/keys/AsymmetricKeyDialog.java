@@ -26,6 +26,7 @@ import com.blackberry.jwteditor.utils.JSONUtils;
 import com.blackberry.jwteditor.utils.PEMUtils;
 import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.view.RstaFactory;
+import com.blackberry.jwteditor.view.utils.DocumentAdapter;
 import com.nimbusds.jose.jwk.*;
 import com.nimbusds.jose.jwk.gen.ECKeyGenerator;
 import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
@@ -33,7 +34,6 @@ import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -108,20 +108,10 @@ public class AsymmetricKeyDialog extends KeyDialog {
         }
 
         setContentPane(contentPane);
-        setModal(true);
         getRootPane().setDefaultButton(buttonOK);
 
         buttonOK.addActionListener(e -> onOK());
-
         buttonCancel.addActionListener(e -> onCancel());
-
-        // call onCancel() when cross is clicked
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                onCancel();
-            }
-        });
 
         // call onCancel() on ESCAPE
         contentPane.registerKeyboardAction(e -> onCancel(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
@@ -178,19 +168,7 @@ public class AsymmetricKeyDialog extends KeyDialog {
         radioButtonJWK.addChangeListener(e -> onKeyFormatChanged());
         buttonGenerate.addActionListener(e -> generate());
 
-        DocumentListener documentListener = new DocumentListener() {
-            public void insertUpdate(DocumentEvent e) {
-                checkInput();
-            }
-
-            public void removeUpdate(DocumentEvent e) {
-                checkInput();
-            }
-
-            public void changedUpdate(DocumentEvent e) {
-                checkInput();
-            }
-        };
+        DocumentListener documentListener = new DocumentAdapter(e -> checkInput());
 
         textAreaKey.getDocument().addDocumentListener(documentListener);
         textFieldKeyId.getDocument().addDocumentListener(documentListener);
@@ -466,7 +444,8 @@ public class AsymmetricKeyDialog extends KeyDialog {
     /**
      * Called when the Cancel or X button is pressed. Set the changed key to null and destroy the window
      */
-    private void onCancel() {
+    @Override
+    void onCancel() {
         jwk = null;
         dispose();
     }
