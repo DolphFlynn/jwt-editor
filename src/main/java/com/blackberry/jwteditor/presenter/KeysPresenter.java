@@ -28,7 +28,7 @@ import com.blackberry.jwteditor.utils.PEMUtils;
 import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.view.KeysView;
 import com.blackberry.jwteditor.view.RstaFactory;
-import com.blackberry.jwteditor.view.dialog.keys.AsymmetricKeyDialog;
+import com.blackberry.jwteditor.view.dialog.keys.AsymmetricKeyDialogFactory;
 import com.blackberry.jwteditor.view.dialog.keys.KeyDialog;
 import com.blackberry.jwteditor.view.dialog.keys.PasswordDialog;
 import com.blackberry.jwteditor.view.dialog.keys.SymmetricKeyDialog;
@@ -47,6 +47,7 @@ public class KeysPresenter extends Presenter {
     private final RstaFactory rstaFactory;
     private final PresenterStore presenters;
     private final KeysModelPersistence keysModelPersistence;
+    private final AsymmetricKeyDialogFactory asymmetricKeyDialogFactory;
 
     /**
      * Create a new KeysPresenter
@@ -67,6 +68,7 @@ public class KeysPresenter extends Presenter {
         this.presenters = presenters;
         this.keysModelPersistence = keysModelPersistence;
         this.model = keysModel;
+        this.asymmetricKeyDialogFactory = new AsymmetricKeyDialogFactory(view.getParent(), presenters, rstaFactory);
 
         model.setPresenter(this);
         presenters.register(this);
@@ -84,14 +86,14 @@ public class KeysPresenter extends Presenter {
         // Get the dialog type based on the key type
         if(key instanceof JWKKey) {
             JWK jwk = ((JWKKey) key).getJWK();
-            if (jwk instanceof RSAKey) {
-                d = new AsymmetricKeyDialog(view.getParent(), presenters, rstaFactory, (RSAKey) jwk);
-            } else if (jwk instanceof ECKey) {
-                d = new AsymmetricKeyDialog(view.getParent(), presenters, rstaFactory, (ECKey) jwk);
-            } else if (jwk instanceof OctetKeyPair) {
-                d = new AsymmetricKeyDialog(view.getParent(), presenters, rstaFactory, (OctetKeyPair) jwk);
-            } else if (jwk instanceof OctetSequenceKey) {
-                d = new SymmetricKeyDialog(view.getParent(), presenters, rstaFactory, (OctetSequenceKey) jwk);
+            if (jwk instanceof RSAKey rsaKey) {
+                d = asymmetricKeyDialogFactory.rsaKeyDialog(rsaKey);
+            } else if (jwk instanceof ECKey ecKey) {
+                d = asymmetricKeyDialogFactory.ecKeyDialog(ecKey);
+            } else if (jwk instanceof OctetKeyPair octetKeyPair) {
+                d = asymmetricKeyDialogFactory.okpDialog(octetKeyPair);
+            } else if (jwk instanceof OctetSequenceKey octetSequenceKey) {
+                d = new SymmetricKeyDialog(view.getParent(), presenters, rstaFactory, octetSequenceKey);
             } else {
                 return;
             }
@@ -182,21 +184,21 @@ public class KeysPresenter extends Presenter {
      * Handler for button clicks for new RSA keys
      */
     public void onButtonNewRSAClick() {
-        onButtonNewClicked(new AsymmetricKeyDialog(view.getParent(), presenters, rstaFactory, AsymmetricKeyDialog.Mode.RSA));
+        onButtonNewClicked(asymmetricKeyDialogFactory.rsaKeyDialog());
     }
 
     /**
      * Handler for button clicks for new EC keys
      */
     public void onButtonNewECClick() {
-        onButtonNewClicked(new AsymmetricKeyDialog(view.getParent(), presenters, rstaFactory, AsymmetricKeyDialog.Mode.EC));
+        onButtonNewClicked(asymmetricKeyDialogFactory.ecKeyDialog());
     }
 
     /**
      * Handler for button clicks for new OKPs
      */
     public void onButtonNewOKPClick() {
-        onButtonNewClicked(new AsymmetricKeyDialog(view.getParent(), presenters, rstaFactory, AsymmetricKeyDialog.Mode.OKP));
+        onButtonNewClicked(asymmetricKeyDialogFactory.okpDialog());
     }
 
     /**

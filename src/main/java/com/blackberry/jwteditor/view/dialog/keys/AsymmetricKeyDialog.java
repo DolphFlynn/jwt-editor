@@ -18,7 +18,6 @@ limitations under the License.
 
 package com.blackberry.jwteditor.view.dialog.keys;
 
-import com.blackberry.jwteditor.cryptography.okp.OKPGenerator;
 import com.blackberry.jwteditor.model.keys.JWKKey;
 import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.presenter.PresenterStore;
@@ -27,9 +26,8 @@ import com.blackberry.jwteditor.utils.PEMUtils;
 import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.view.RstaFactory;
 import com.blackberry.jwteditor.view.utils.DocumentAdapter;
-import com.nimbusds.jose.jwk.*;
-import com.nimbusds.jose.jwk.gen.ECKeyGenerator;
-import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
+import com.nimbusds.jose.jwk.JWK;
+import com.nimbusds.jose.jwk.RSAKey;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 
@@ -39,17 +37,16 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.security.KeyStore;
-import java.security.Provider;
-import java.security.Security;
 import java.text.ParseException;
-import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 /**
  * "New RSA Key /EC Key /OKP " dialog for Keys tab
  */
 public class AsymmetricKeyDialog extends KeyDialog {
+    private final AsymmetricKeyDialogMode mode;
+    private final RstaFactory rstaFactory;
+
     private Color textAreaKeyInitialBackgroundColor;
     private Color textAreaKeyInitialCurrentLineHighlightColor;
     private JPanel contentPane;
@@ -64,46 +61,21 @@ public class AsymmetricKeyDialog extends KeyDialog {
     private JTextField textFieldKeyId;
     private JPanel panelKeyId;
 
-    public enum Mode {
-        EC(KeyType.EC),
-        RSA(KeyType.RSA),
-        OKP(KeyType.OKP);
-
-        private final KeyType keyType;
-
-        Mode(KeyType keyType){
-            this.keyType = keyType;
-        }
-    }
-
-    private final Mode mode;
-    private final RstaFactory rstaFactory;
     private JWK jwk;
 
-    public AsymmetricKeyDialog(Window parent, PresenterStore presenters, RstaFactory rstaFactory, RSAKey rsaKey){
-        this(parent, presenters, Mode.RSA, rstaFactory, rsaKey);
-    }
-
-    public AsymmetricKeyDialog(Window parent, PresenterStore presenters, RstaFactory rstaFactory, ECKey ecKey){
-        this(parent, presenters, Mode.EC, rstaFactory, ecKey);
-    }
-
-    public AsymmetricKeyDialog(Window parent, PresenterStore presenters, RstaFactory rstaFactory, OctetKeyPair octetKeyPair){
-        this(parent, presenters, Mode.OKP, rstaFactory, octetKeyPair);
-    }
-
-    public AsymmetricKeyDialog(Window parent, PresenterStore presenters, RstaFactory rstaFactory, Mode mode){
-        this(parent, presenters, mode, rstaFactory, null);
-    }
-
-    private AsymmetricKeyDialog(Window parent, PresenterStore presenters, Mode mode, RstaFactory rstaFactory, JWK jwk) {
-        super(parent);
+    AsymmetricKeyDialog(
+            Window parent,
+            PresenterStore presenters,
+            RstaFactory rstaFactory,
+            AsymmetricKeyDialogMode mode,
+            JWK jwk) {
+        super(parent, mode.resourceTitleId());
         this.mode = mode;
         this.rstaFactory = rstaFactory;
         this.jwk = jwk;
         this.presenters = presenters;
 
-        if(jwk != null) {
+        if (jwk != null) {
             originalId = jwk.getKeyID();
         }
 
@@ -116,52 +88,8 @@ public class AsymmetricKeyDialog extends KeyDialog {
         // call onCancel() on ESCAPE
         contentPane.registerKeyboardAction(e -> onCancel(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
-        // Set the window title and key combobox options based on the key type
-        switch (mode){
-            case EC: {
-                setTitle(Utils.getResourceString("keys_new_title_ec"));
-                comboBoxKeySize.setModel(new DefaultComboBoxModel<>(new Curve[]{
-                        Curve.P_256,
-                        Curve.SECP256K1,
-                        Curve.P_384,
-                        Curve.P_521
-                }));
-
-                Curve selectedCurve = jwk == null ? Curve.P_256 : ((ECKey) jwk).getCurve();
-                comboBoxKeySize.setSelectedItem(selectedCurve);
-
-                break;
-            }
-
-            case RSA: {
-                setTitle(Utils.getResourceString("keys_new_title_rsa"));
-                comboBoxKeySize.setModel(new DefaultComboBoxModel<>(new Integer[]{
-                        512,
-                        1024,
-                        2048,
-                        3072,
-                        4096
-                }));
-
-                int selectedKeySize = jwk == null ? 2048 : jwk.size();
-                comboBoxKeySize.setSelectedItem(selectedKeySize);
-
-                break;
-            }
-
-            case OKP: {
-                setTitle(Utils.getResourceString("keys_new_title_okp"));
-                comboBoxKeySize.setModel(new DefaultComboBoxModel<>(new Curve[]{
-                        Curve.X25519,
-                        Curve.Ed25519,
-                        Curve.X448,
-                        Curve.Ed448,
-                }));
-
-                Curve selectedCurve = jwk == null ? Curve.X25519 : ((OctetKeyPair) jwk).getCurve();
-                comboBoxKeySize.setSelectedItem(selectedCurve);
-            }
-        }
+        comboBoxKeySize.setModel(new DefaultComboBoxModel<>(mode.keyOptions()));
+        comboBoxKeySize.setSelectedItem(mode.selectedKeyOption(jwk));
 
         // Add event listeners for the generate button being pressed, the key format radio button changing, or the text
         // content being updated
@@ -185,17 +113,18 @@ public class AsymmetricKeyDialog extends KeyDialog {
 
     /**
      * Enable/disable the OK button
+     *
      * @param enabled whether the OK button should be enabled
      */
-    private void setFormEnabled(boolean enabled){
+    private void setFormEnabled(boolean enabled) {
         buttonOK.setEnabled(enabled);
     }
 
     /**
      * Check the contents of the text input
      */
-    private void checkInput(){
-        if(textAreaKeyInitialBackgroundColor == null) {
+    private void checkInput() {
+        if (textAreaKeyInitialBackgroundColor == null) {
             textAreaKeyInitialBackgroundColor = textAreaKey.getBackground();
             textAreaKeyInitialCurrentLineHighlightColor = textAreaKey.getCurrentLineHighlightColor();
         }
@@ -214,50 +143,39 @@ public class AsymmetricKeyDialog extends KeyDialog {
 
         boolean keyError = false;
         boolean keyIDError = false;
-        if(key.length() == 0) {
+        if (key.length() == 0) {
             // Disable OK if the text entry is empty
             setFormEnabled(false);
-        }
-        else{
+        } else {
             try {
                 // If JWK is selected, try to parse as a JWK
-                if(radioButtonJWK.isSelected()){
+                if (radioButtonJWK.isSelected()) {
                     tempJWK = JWK.parse(key);
 
-                    if(tempJWK.getKeyID() == null){
+                    if (tempJWK.getKeyID() == null) {
                         keyError = true;
                         labelError.setText(Utils.getResourceString("error_missing_kid"));
                     }
 
                     // Restricting RSA private keys to their full form at the moment as there is an issue with PEM parsing these keys
-                    if(tempJWK instanceof RSAKey && tempJWK.isPrivate() && ((RSAKey)tempJWK).getFirstPrimeFactor() == null){
+                    if (tempJWK instanceof RSAKey && tempJWK.isPrivate() && ((RSAKey) tempJWK).getFirstPrimeFactor() == null) {
                         keyError = true;
                         labelError.setText(Utils.getResourceString("error_invalid_key"));
                     }
                 }
                 // If not, try to parse the PEM and convert to a JWK
                 else {
-                    switch (mode){
-                        case EC:
-                            tempJWK = PEMUtils.pemToECKey(key, textFieldKeyId.getText());
-                            break;
-                        case RSA:
-                            tempJWK = PEMUtils.pemToRSAKey(key, textFieldKeyId.getText());
-                            break;
-                        case OKP:
-                            tempJWK = PEMUtils.pemToOctetKeyPair(key, textFieldKeyId.getText());
-                            break;
-                    }
+                    tempJWK = mode.pemToECKey(key, textFieldKeyId.getText());
 
                     // Check the key id entry is set in PEM mode
-                    if(textFieldKeyId.getText().length() == 0) {
+                    if (textFieldKeyId.getText().length() == 0) {
                         keyIDError = true;
                         labelError.setText(Utils.getResourceString("error_missing_kid"));
                     }
                 }
 
                 // Check the parsed JWK is the correct type for the window mode
-                if(!(tempJWK.getKeyType() == mode.keyType)){
+                if (tempJWK.getKeyType() != mode.keyType()) {
                     keyError = true;
                     labelError.setText(Utils.getResourceString("error_invalid_key_type"));
                 }
@@ -265,7 +183,7 @@ public class AsymmetricKeyDialog extends KeyDialog {
             } catch (ParseException | IllegalArgumentException | PEMUtils.PemException e) {
                 // Set the error state if any parse errors are encountered
                 keyError = true;
-                if(textFieldKeyId.getText().length() == 0) {
+                if (textFieldKeyId.getText().length() == 0) {
                     keyIDError = true;
                 }
                 labelError.setText(Utils.getResourceString("error_invalid_key"));
@@ -274,41 +192,32 @@ public class AsymmetricKeyDialog extends KeyDialog {
         }
 
         // If the key ID is invalid, disable OK and highlight the key id text entry
-        if(keyIDError){
+        if (keyIDError) {
             setFormEnabled(false);
             textFieldKeyId.setBackground(Color.PINK);
         }
 
         // If the key text is invalid, disable OK and highlight the key text entry
-        if(keyError){
+        if (keyError) {
             setFormEnabled(false);
             textAreaKey.setBackground(Color.PINK);
             textAreaKey.setCurrentLineHighlightColor(Color.PINK);
         }
 
         // Set the parsed JWK if there are no errors, set to null otherwise
-        if(keyError || keyIDError){
-            jwk = null;
-        }
-        else{
-            jwk = tempJWK;
-        }
+        jwk = keyError || keyIDError ? null : tempJWK;
     }
 
     /**
      * Handler for the key format radio button changing
      */
-    private void onKeyFormatChanged(){
+    private void onKeyFormatChanged() {
         // Change from PEM to JWK
-        if(radioButtonJWK.isSelected()){
-            if(jwk == null) {
-                // If the PEM has not been parsed to a JWK, clear the JWK entry
-                textAreaKey.setText("");
-            }
-            else{
-                // Otherwise, serialized the JWK to JSON and set the contents of the text box
-                textAreaKey.setText(JSONUtils.prettyPrintJSON(jwk.toJSONString()));
-            }
+        if (radioButtonJWK.isSelected()) {
+            // If the PEM has not been parsed to a JWK, clear the JWK entry
+            // Otherwise, serialized the JWK to JSON and set the contents of the text box
+            String text = jwk == null ? "" : JSONUtils.prettyPrintJSON(jwk.toJSONString());
+            textAreaKey.setText(text);
 
             // Ordering is important here, these must come after the conversion above, otherwise they will trigger the
             // event handlers and clear the stored jwk
@@ -317,20 +226,18 @@ public class AsymmetricKeyDialog extends KeyDialog {
         }
         // Change from JWK to PEM
         else {
-            if(jwk == null) {
+            if (jwk == null) {
                 // If the JWK has not been parsed, clear the PEM entry and key id text box
                 textFieldKeyId.setText("");
                 textAreaKey.setText("");
-            }
-            else {
+            } else {
                 // Otherwise, serialized the JWK to PEM and set the contents of the text box
                 try {
                     // Store a temporary copy of the JWK as setting the first field will overwrite the stored JWK
                     JWK tempJWK = jwk;
                     textFieldKeyId.setText(tempJWK.getKeyID());
                     textAreaKey.setText(PEMUtils.jwkToPem(tempJWK));
-                }
-                catch (PEMUtils.PemException e){
+                } catch (PEMUtils.PemException e) {
                     textFieldKeyId.setText("");
                     textAreaKey.setText("");
                 }
@@ -346,46 +253,17 @@ public class AsymmetricKeyDialog extends KeyDialog {
     /**
      * Handle clicks to the Generate button
      */
-    private void generate(){
+    private void generate() {
         // Get the selected key size
         Object parameters = comboBoxKeySize.getSelectedItem();
 
-        // Disable the form controls during keygen
-        comboBoxKeySize.setEnabled(false);
-        buttonGenerate.setEnabled(false);
-        textAreaKey.setEnabled(false);
-        textFieldKeyId.setEnabled(false);
-        buttonOK.setEnabled(false);
-        radioButtonJWK.setEnabled(false);
-        radioButtonPEM.setEnabled(false);
+        enableOrDisableControls(false);
 
         // Generate the new key on a background thread as this may be long running
-        SwingWorker<JWK, Void> generateTask = new SwingWorker<>() {
+        new SwingWorker<JWK, Void>() {
             @Override
             protected JWK doInBackground() throws Exception {
-                // Generate a random key id
-                String kid = UUID.randomUUID().toString();
-
-                // Force using the BC provider, but fall-back to default if this fails
-                KeyStore keyStore = null;
-                Provider provider = Security.getProvider("BC");
-                if (provider != null) {
-                    keyStore = KeyStore.getInstance(KeyStore.getDefaultType(), provider);
-                }
-
-                // Select the key generator and generate based on the dialog mode
-                switch (mode) {
-                    case EC:
-                        //noinspection ConstantConditions
-                        return new ECKeyGenerator((Curve) parameters).keyStore(keyStore).keyID(kid).generate();
-                    case RSA:
-                        //noinspection ConstantConditions
-                        return new RSAKeyGenerator((Integer) parameters, true).keyStore(keyStore).keyID(kid).generate();
-                    case OKP:
-                        return new OKPGenerator((Curve) parameters).keyStore(keyStore).keyID(kid).generate();
-                    default:
-                        throw new IllegalStateException("Can't happen - invalid mode");
-                }
+                return mode.generateNewKey(parameters);
             }
 
             /**
@@ -409,35 +287,36 @@ public class AsymmetricKeyDialog extends KeyDialog {
                 }
 
                 // Re-enable the form
-                comboBoxKeySize.setEnabled(true);
-                buttonGenerate.setEnabled(true);
-                textAreaKey.setEnabled(true);
-                textFieldKeyId.setEnabled(true);
-                buttonOK.setEnabled(true);
-                radioButtonJWK.setEnabled(true);
-                radioButtonPEM.setEnabled(true);
+                enableOrDisableControls(true);
             }
-        };
+        }.execute();
+    }
 
-        generateTask.execute();
+    private void enableOrDisableControls(boolean enabled) {
+        // Disable the form controls during keygen
+        comboBoxKeySize.setEnabled(enabled);
+        buttonGenerate.setEnabled(enabled);
+        textAreaKey.setEnabled(enabled);
+        textFieldKeyId.setEnabled(enabled);
+        buttonOK.setEnabled(enabled);
+        radioButtonJWK.setEnabled(enabled);
+        radioButtonPEM.setEnabled(enabled);
     }
 
     /**
      * Get the new/modified key resulting from the operations of this dialog
+     *
      * @return the new/modified JWK
      */
-    public Key getKey(){
-        if(jwk == null){
+    public Key getKey() {
+        if (jwk == null) {
             return null;
         }
-        else {
-            try{
-                return new JWKKey(jwk);
-            }
-            catch (Key.UnsupportedKeyException e){
-                return null;
-            }
 
+        try {
+            return new JWKKey(jwk);
+        } catch (Key.UnsupportedKeyException e) {
+            return null;
         }
     }
 

@@ -21,7 +21,6 @@ package com.blackberry.jwteditor.view.dialog.keys;
 import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.model.keys.PasswordKey;
 import com.blackberry.jwteditor.presenter.PresenterStore;
-import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.view.utils.DocumentAdapter;
 
 import javax.swing.*;
@@ -34,6 +33,8 @@ import java.util.UUID;
  * "New Password" dialog for Keys tab
  */
 public class PasswordDialog extends KeyDialog {
+    private static final String TITLE_RESOURCE_ID = "password";
+
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
@@ -54,7 +55,7 @@ public class PasswordDialog extends KeyDialog {
     }
 
     private PasswordDialog(Window parent, PresenterStore presenters, String keyId, String password, int saltLength, int iterations) {
-        super(parent);
+        super(parent, TITLE_RESOURCE_ID);
         this.presenters = presenters;
         originalId = keyId;
 
@@ -66,8 +67,6 @@ public class PasswordDialog extends KeyDialog {
 
         // call onCancel() on ESCAPE
         contentPane.registerKeyboardAction(e -> onCancel(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-
-        setTitle(Utils.getResourceString("password"));
 
         // Initialise the iterations spinner
         SpinnerNumberModel spinnerModelIterations = new SpinnerNumberModel();

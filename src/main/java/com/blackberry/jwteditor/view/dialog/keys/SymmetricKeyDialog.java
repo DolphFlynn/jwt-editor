@@ -40,6 +40,8 @@ import java.util.UUID;
  * "New Symmetric Key" dialog for Keys tab
  */
 public class SymmetricKeyDialog extends KeyDialog {
+    private static final String TITLE_RESOURCE_ID = "keys_new_title_symmetric";
+
     private final RstaFactory rstaFactory;
     private final Color textAreaKeyInitialBackgroundColor;
     private final Color textAreaKeyInitialCurrentLineHighlightColor;
@@ -55,7 +57,8 @@ public class SymmetricKeyDialog extends KeyDialog {
     private OctetSequenceKey jwk;
 
     public SymmetricKeyDialog(Window parent, PresenterStore presenters, RstaFactory rstaFactory, OctetSequenceKey jwk) {
-        super(parent);
+        super(parent, TITLE_RESOURCE_ID);
+
         this.rstaFactory = rstaFactory;
         this.presenters = presenters;
         setContentPane(contentPane);
@@ -67,8 +70,6 @@ public class SymmetricKeyDialog extends KeyDialog {
 
         // call onCancel() on ESCAPE
         contentPane.registerKeyboardAction(e -> onCancel(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-
-        setTitle(Utils.getResourceString("keys_new_title_symmetric"));
 
         spinnerKeySize.setModel(new SpinnerNumberModel(128, 0, null, 8));
 

@@ -38,10 +38,11 @@ public abstract class KeyDialog extends JDialog {
     protected PresenterStore presenters;
     protected String originalId;
 
-    public KeyDialog(Window parent) {
+    public KeyDialog(Window parent, String titleResourceId) {
         super(parent);
 
         setModal(true);
+        setTitle(Utils.getResourceString(titleResourceId));
 
         // call onCancel() when cross is clicked
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
