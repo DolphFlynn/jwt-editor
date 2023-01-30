@@ -21,13 +21,13 @@ package burp.proxy;
 import burp.api.montoya.core.Annotations;
 import burp.api.montoya.proxy.http.*;
 import burp.api.montoya.utilities.ByteUtils;
-import com.blackberry.jwteditor.model.config.ProxyConfig;
+import com.blackberry.jwteditor.model.config.BurpConfig;
 
 public class ProxyHttpMessageHandler implements ProxyRequestHandler, ProxyResponseHandler {
     private final AnnotationsModifier annotationsModifier;
 
-    public ProxyHttpMessageHandler(ProxyConfig proxyConfig, ByteUtils byteUtils) {
-        this.annotationsModifier = new AnnotationsModifier(proxyConfig, byteUtils);
+    public ProxyHttpMessageHandler(BurpConfig burpConfig, ByteUtils byteUtils) {
+        this.annotationsModifier = new AnnotationsModifier(burpConfig, byteUtils);
     }
 
     @Override

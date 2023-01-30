@@ -8,7 +8,7 @@ import burp.api.montoya.ui.UserInterface;
 import burp.api.montoya.utilities.ByteUtils;
 import burp.proxy.ProxyHttpMessageHandler;
 import com.blackberry.jwteditor.model.KeysModel;
-import com.blackberry.jwteditor.model.config.ProxyConfig;
+import com.blackberry.jwteditor.model.config.BurpConfig;
 import com.blackberry.jwteditor.model.persistence.BurpKeysModelPersistence;
 import com.blackberry.jwteditor.model.persistence.KeysModelPersistence;
 import com.blackberry.jwteditor.model.persistence.ProxyConfigPersistence;
@@ -36,7 +36,7 @@ public class JWTEditorExtension implements BurpExtension {
         KeysModel keysModel = keysModelPersistence.loadOrCreateNew();
 
         ProxyConfigPersistence proxyConfigPersistence = new ProxyConfigPersistence(preferences);
-        ProxyConfig proxyConfig = proxyConfigPersistence.loadOrCreateNew();
+        BurpConfig burpConfig = proxyConfigPersistence.loadOrCreateNew();
 
         UserInterface userInterface = api.userInterface();
         Window suiteWindow = userInterface.swingUtils().suiteFrame();
@@ -51,7 +51,7 @@ public class JWTEditorExtension implements BurpExtension {
                 keysModel,
                 rstaFactory,
                 proxyConfigPersistence,
-                proxyConfig,
+                burpConfig,
                 userInterface
         );
 
@@ -76,7 +76,7 @@ public class JWTEditorExtension implements BurpExtension {
         Proxy proxy = api.proxy();
         ByteUtils byteUtils = api.utilities().byteUtils();
 
-        ProxyHttpMessageHandler proxyHttpMessageHandler = new ProxyHttpMessageHandler(proxyConfig, byteUtils);
+        ProxyHttpMessageHandler proxyHttpMessageHandler = new ProxyHttpMessageHandler(burpConfig, byteUtils);
         proxy.registerRequestHandler(proxyHttpMessageHandler);
         proxy.registerResponseHandler(proxyHttpMessageHandler);
     }

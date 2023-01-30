@@ -18,19 +18,21 @@ limitations under the License.
 
 package com.blackberry.jwteditor.view.dialog.config;
 
+import com.blackberry.jwteditor.model.config.BurpConfig;
 import com.blackberry.jwteditor.model.config.HighlightColor;
-import com.blackberry.jwteditor.model.config.ProxyConfig;
 import com.blackberry.jwteditor.utils.Utils;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 /**
  *  Dialog for Burp proxy config
  */
-public class ProxyConfigDialog extends JDialog {
-    private final ProxyConfig proxyConfig;
+public class BurpConfigDialog extends JDialog {
+    private final BurpConfig burpConfig;
 
     private JPanel contentPane;
     private JButton buttonOK;
@@ -44,11 +46,11 @@ public class ProxyConfigDialog extends JDialog {
      * Creates new ProxyConfigDialog
      *
      * @param parent parent window
-     * @param proxyConfig proxy config instance
+     * @param burpConfig burp config instance
      */
-    public ProxyConfigDialog(Window parent, ProxyConfig proxyConfig) {
+    public BurpConfigDialog(Window parent, BurpConfig burpConfig) {
         super(parent);
-        this.proxyConfig = proxyConfig;
+        this.burpConfig = burpConfig;
 
         setContentPane(contentPane);
         setModal(true);
@@ -73,21 +75,21 @@ public class ProxyConfigDialog extends JDialog {
         // Populate the highlight color dropdown, set custom renderer and current item
         comboBoxHighlightColor.setModel(new DefaultComboBoxModel<>(HighlightColor.values()));
         comboBoxHighlightColor.setRenderer(new HighlightComboRenderer());
-        comboBoxHighlightColor.setSelectedItem(proxyConfig.highlightColor());
+        comboBoxHighlightColor.setSelectedItem(burpConfig.highlightColor());
 
         // Set an event handler to enable/disable highlight color
         checkBoxHighlightJWT.addActionListener(e -> comboBoxHighlightColor.setEnabled(checkBoxHighlightJWT.isSelected()));
 
-        checkBoxHighlightJWT.setSelected(proxyConfig.highlightJWT());
-        comboBoxHighlightColor.setEnabled(proxyConfig.highlightJWT());
+        checkBoxHighlightJWT.setSelected(burpConfig.highlightJWT());
+        comboBoxHighlightColor.setEnabled(burpConfig.highlightJWT());
     }
 
     /**
-     * OK clicked, update ProxyConfig instance
+     * OK clicked, update BurpConfig instance
      */
     private void onOK() {
-        proxyConfig.setHighlightJWT(checkBoxHighlightJWT.isSelected());
-        proxyConfig.setHighlightColor((HighlightColor) comboBoxHighlightColor.getSelectedItem());
+        burpConfig.setHighlightJWT(checkBoxHighlightJWT.isSelected());
+        burpConfig.setHighlightColor((HighlightColor) comboBoxHighlightColor.getSelectedItem());
         dispose();
     }
 

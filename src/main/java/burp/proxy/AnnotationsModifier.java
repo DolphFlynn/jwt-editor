@@ -21,7 +21,7 @@ package burp.proxy;
 import burp.api.montoya.core.Annotations;
 import burp.api.montoya.core.ByteArray;
 import burp.api.montoya.utilities.ByteUtils;
-import com.blackberry.jwteditor.model.config.ProxyConfig;
+import com.blackberry.jwteditor.model.config.BurpConfig;
 import com.blackberry.jwteditor.model.jose.JWS;
 import com.blackberry.jwteditor.model.jose.MutableJOSEObject;
 
@@ -29,11 +29,11 @@ import static burp.api.montoya.core.Annotations.annotations;
 import static com.blackberry.jwteditor.model.jose.JOSEObjectFinder.extractJOSEObjects;
 
 class AnnotationsModifier {
-    private final ProxyConfig proxyConfig;
+    private final BurpConfig burpConfig;
     private final ByteUtils byteUtils;
 
-    AnnotationsModifier(ProxyConfig proxyConfig, ByteUtils byteUtils) {
-        this.proxyConfig = proxyConfig;
+    AnnotationsModifier(BurpConfig burpConfig, ByteUtils byteUtils) {
+        this.burpConfig = burpConfig;
         this.byteUtils = byteUtils;
     }
 
@@ -42,7 +42,7 @@ class AnnotationsModifier {
 
         return counts.isZero()
                 ? annotations
-                : annotations(counts.comment(), proxyConfig.highlightColor().burpColor);
+                : annotations(counts.comment(), burpConfig.highlightColor().burpColor);
     }
 
     private Counts countJOSEObjects(ByteArray message) {
@@ -60,16 +60,16 @@ class AnnotationsModifier {
             }
         }
 
-        return new Counts(proxyConfig, jweCount, jwsCount);
+        return new Counts(burpConfig, jweCount, jwsCount);
     }
 
-    private record Counts(ProxyConfig proxyConfig, int jweCount, int jwsCount) {
+    private record Counts(BurpConfig burpConfig, int jweCount, int jwsCount) {
         boolean isZero() {
             return jweCount == 0 && jwsCount == 0;
         }
 
         String comment() {
-            return proxyConfig.comment(jwsCount, jweCount);
+            return burpConfig.comment(jwsCount, jweCount);
         }
     }
 }

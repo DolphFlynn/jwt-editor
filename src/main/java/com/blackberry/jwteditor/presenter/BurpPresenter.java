@@ -18,10 +18,10 @@ limitations under the License.
 
 package com.blackberry.jwteditor.presenter;
 
-import com.blackberry.jwteditor.model.config.ProxyConfig;
+import com.blackberry.jwteditor.model.config.BurpConfig;
 import com.blackberry.jwteditor.model.persistence.ProxyConfigPersistence;
 import com.blackberry.jwteditor.view.BurpView;
-import com.blackberry.jwteditor.view.dialog.config.ProxyConfigDialog;
+import com.blackberry.jwteditor.view.dialog.config.BurpConfigDialog;
 
 import javax.swing.*;
 import java.awt.*;
@@ -32,23 +32,23 @@ import java.awt.*;
 public class BurpPresenter extends Presenter {
     private final Window window;
     private final ProxyConfigPersistence proxyConfigPersistence;
-    private final ProxyConfig proxyConfig;
+    private final BurpConfig burpConfig;
 
     /**
      * Create a new BurpPresenter
      *
      * @param burpView               the BurpView to associate with the presenter
      * @param presenters             the shared store of all presenters
-     * @param proxyConfig            Configuration for proxy listener
+     * @param burpConfig            Configuration for proxy listener
      * @param proxyConfigPersistence Used to persist proxy configuration
      */
     public BurpPresenter(BurpView burpView,
                          PresenterStore presenters,
                          ProxyConfigPersistence proxyConfigPersistence,
-                         ProxyConfig proxyConfig) {
+                         BurpConfig burpConfig) {
         this.window = SwingUtilities.getWindowAncestor(burpView.getUiComponent());
         this.proxyConfigPersistence = proxyConfigPersistence;
-        this.proxyConfig = proxyConfig;
+        this.burpConfig = burpConfig;
 
         presenters.register(this);
     }
@@ -57,7 +57,7 @@ public class BurpPresenter extends Presenter {
      * Handler for button clicks for configuration
      */
     public void onButtonConfigurationClick() {
-        ProxyConfigDialog dialog = new ProxyConfigDialog(window, proxyConfig);
+        BurpConfigDialog dialog = new BurpConfigDialog(window, burpConfig);
 
         // Display the dialog
         dialog.pack();
@@ -65,6 +65,6 @@ public class BurpPresenter extends Presenter {
         dialog.setVisible(true);
         // Block here until the dialog returns
 
-        proxyConfigPersistence.save(proxyConfig);
+        proxyConfigPersistence.save(burpConfig);
     }
 }

@@ -19,8 +19,8 @@ limitations under the License.
 package com.blackberry.jwteditor.model.persistence;
 
 import burp.api.montoya.persistence.Preferences;
+import com.blackberry.jwteditor.model.config.BurpConfig;
 import com.blackberry.jwteditor.model.config.HighlightColor;
-import com.blackberry.jwteditor.model.config.ProxyConfig;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -44,7 +44,7 @@ public class ProxyConfigPersistence {
      *
      * @return instance of proxy config
      */
-    public ProxyConfig loadOrCreateNew() {
+    public BurpConfig loadOrCreateNew() {
         String json = preferences.getString(PROXY_LISTENER_SETTINGS_NAME);
 
         // If parse fails, create a new proxy config
@@ -58,13 +58,13 @@ public class ProxyConfigPersistence {
                     String highlightColorName = (String) parsedObject.get(PROXY_HISTORY_HIGHLIGHT_COLOR_KEY);
                     HighlightColor highlightColor = HighlightColor.from(highlightColorName);
 
-                    return new ProxyConfig(highlightJWT, highlightColor);
+                    return new BurpConfig(highlightJWT, highlightColor);
                 }
             } catch (ClassCastException | JSONException ignored) {
             }
         }
 
-        return new ProxyConfig();
+        return new BurpConfig();
     }
 
     /**
@@ -72,7 +72,7 @@ public class ProxyConfigPersistence {
      *
      * @param model proxy config to be saved
      */
-    public void save(ProxyConfig model) {
+    public void save(BurpConfig model) {
         // Serialise the proxy config and save
         JSONObject proxyConfigJson = new JSONObject();
         proxyConfigJson.put(PROXY_LISTENER_ENABLED_KEY, model.highlightJWT());

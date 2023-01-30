@@ -25,7 +25,7 @@ import static com.blackberry.jwteditor.model.config.HighlightColor.GREEN;
 /**
  * Class containing configuration for Burp's proxy listener
  */
-public class ProxyConfig {
+public class BurpConfig {
     public static final HighlightColor DEFAULT_HIGHLIGHT_COLOR = GREEN;
 
     private static final String BURP_PROXY_COMMENT_TEMPLATE = Utils.getResourceString("burp_proxy_comment");
@@ -36,7 +36,7 @@ public class ProxyConfig {
     /**
      * Construct proxy config with default options
      */
-    public ProxyConfig() {
+    public BurpConfig() {
         this(true, null);
     }
 
@@ -46,7 +46,7 @@ public class ProxyConfig {
      * @param highlightJWT   flag determining whether messages with JWTs passing through Burp are to be highlighted
      * @param highlightColor color to highlight any messages with JWTs
      */
-    public ProxyConfig(boolean highlightJWT, HighlightColor highlightColor) {
+    public BurpConfig(boolean highlightJWT, HighlightColor highlightColor) {
         this.highlightJWT = highlightJWT;
         this.highlightColor = highlightColor == null ? DEFAULT_HIGHLIGHT_COLOR : highlightColor;
     }

@@ -19,8 +19,8 @@ limitations under the License.
 package com.blackberry.jwteditor;
 
 import burp.api.montoya.persistence.Preferences;
+import com.blackberry.jwteditor.model.config.BurpConfig;
 import com.blackberry.jwteditor.model.config.HighlightColor;
-import com.blackberry.jwteditor.model.config.ProxyConfig;
 import com.blackberry.jwteditor.model.persistence.ProxyConfigPersistence;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -29,26 +29,26 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.stream.Stream;
 
-import static com.blackberry.jwteditor.model.config.ProxyConfig.DEFAULT_HIGHLIGHT_COLOR;
+import static com.blackberry.jwteditor.model.config.BurpConfig.DEFAULT_HIGHLIGHT_COLOR;
 import static com.blackberry.jwteditor.model.persistence.ProxyConfigPersistence.PROXY_LISTENER_SETTINGS_NAME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class ProxyConfigPersistenceTest {
+class BurpConfigPersistenceTest {
     private final Preferences callbacks = mock(Preferences.class);
 
     @Test
     void givenNoSavedConfig_whenLoadOrCreateCalled_thenDefaultInstanceReturned() {
         ProxyConfigPersistence configPersistence = new ProxyConfigPersistence(callbacks);
 
-        ProxyConfig proxyConfig = configPersistence.loadOrCreateNew();
+        BurpConfig burpConfig = configPersistence.loadOrCreateNew();
 
-        assertThat(proxyConfig).isNotNull();
-        assertThat(proxyConfig.highlightJWT()).isTrue();
-        assertThat(proxyConfig.highlightColor()).isEqualTo(DEFAULT_HIGHLIGHT_COLOR);
-        configPersistence.save(proxyConfig);
+        assertThat(burpConfig).isNotNull();
+        assertThat(burpConfig.highlightJWT()).isTrue();
+        assertThat(burpConfig.highlightColor()).isEqualTo(DEFAULT_HIGHLIGHT_COLOR);
+        configPersistence.save(burpConfig);
     }
 
     private static Stream<String> invalidProxyConfigJson() {
@@ -73,11 +73,11 @@ class ProxyConfigPersistenceTest {
         ProxyConfigPersistence configPersistence = new ProxyConfigPersistence(callbacks);
         when(callbacks.getString(PROXY_LISTENER_SETTINGS_NAME)).thenReturn(invalidJson);
 
-        ProxyConfig proxyConfig = configPersistence.loadOrCreateNew();
+        BurpConfig burpConfig = configPersistence.loadOrCreateNew();
 
-        assertThat(proxyConfig).isNotNull();
-        assertThat(proxyConfig.highlightJWT()).isTrue();
-        assertThat(proxyConfig.highlightColor()).isEqualTo(DEFAULT_HIGHLIGHT_COLOR);
+        assertThat(burpConfig).isNotNull();
+        assertThat(burpConfig.highlightJWT()).isTrue();
+        assertThat(burpConfig.highlightColor()).isEqualTo(DEFAULT_HIGHLIGHT_COLOR);
     }
 
     private static Stream<Arguments> validProxyConfigJson() {
@@ -101,10 +101,10 @@ class ProxyConfigPersistenceTest {
         ProxyConfigPersistence configPersistence = new ProxyConfigPersistence(callbacks);
         when(callbacks.getString(PROXY_LISTENER_SETTINGS_NAME)).thenReturn(json);
 
-        ProxyConfig proxyConfig = configPersistence.loadOrCreateNew();
+        BurpConfig burpConfig = configPersistence.loadOrCreateNew();
 
-        assertThat(proxyConfig).isNotNull();
-        assertThat(proxyConfig.highlightJWT()).isEqualTo(listenerEnabled);
-        assertThat(proxyConfig.highlightColor()).isEqualTo(highlightColor);
+        assertThat(burpConfig).isNotNull();
+        assertThat(burpConfig.highlightJWT()).isEqualTo(listenerEnabled);
+        assertThat(burpConfig.highlightColor()).isEqualTo(highlightColor);
     }
 }
