@@ -76,7 +76,7 @@ public class JWTEditorExtension implements BurpExtension {
         Proxy proxy = api.proxy();
         ByteUtils byteUtils = api.utilities().byteUtils();
 
-        ProxyHttpMessageHandler proxyHttpMessageHandler = new ProxyHttpMessageHandler(burpConfig, byteUtils);
+        ProxyHttpMessageHandler proxyHttpMessageHandler = new ProxyHttpMessageHandler(burpConfig.proxyConfig(), byteUtils);
         proxy.registerRequestHandler(proxyHttpMessageHandler);
         proxy.registerResponseHandler(proxyHttpMessageHandler);
     }

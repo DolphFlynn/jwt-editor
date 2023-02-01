@@ -75,8 +75,8 @@ public class ProxyConfigPersistence {
     public void save(BurpConfig model) {
         // Serialise the proxy config and save
         JSONObject proxyConfigJson = new JSONObject();
-        proxyConfigJson.put(PROXY_LISTENER_ENABLED_KEY, model.highlightJWT());
-        proxyConfigJson.put(PROXY_HISTORY_HIGHLIGHT_COLOR_KEY, model.highlightColor().burpColor);
+        proxyConfigJson.put(PROXY_LISTENER_ENABLED_KEY, model.proxyConfig().highlightJWT());
+        proxyConfigJson.put(PROXY_HISTORY_HIGHLIGHT_COLOR_KEY, model.proxyConfig().highlightColor().burpColor);
 
         preferences.setString(PROXY_LISTENER_SETTINGS_NAME, proxyConfigJson.toString());
     }

@@ -29,7 +29,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.stream.Stream;
 
-import static com.blackberry.jwteditor.model.config.BurpConfig.DEFAULT_HIGHLIGHT_COLOR;
+import static com.blackberry.jwteditor.model.config.ProxyConfig.DEFAULT_HIGHLIGHT_COLOR;
 import static com.blackberry.jwteditor.model.persistence.ProxyConfigPersistence.PROXY_LISTENER_SETTINGS_NAME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
@@ -46,8 +46,8 @@ class BurpConfigPersistenceTest {
         BurpConfig burpConfig = configPersistence.loadOrCreateNew();
 
         assertThat(burpConfig).isNotNull();
-        assertThat(burpConfig.highlightJWT()).isTrue();
-        assertThat(burpConfig.highlightColor()).isEqualTo(DEFAULT_HIGHLIGHT_COLOR);
+        assertThat(burpConfig.proxyConfig().highlightJWT()).isTrue();
+        assertThat(burpConfig.proxyConfig().highlightColor()).isEqualTo(DEFAULT_HIGHLIGHT_COLOR);
         configPersistence.save(burpConfig);
     }
 
@@ -76,8 +76,8 @@ class BurpConfigPersistenceTest {
         BurpConfig burpConfig = configPersistence.loadOrCreateNew();
 
         assertThat(burpConfig).isNotNull();
-        assertThat(burpConfig.highlightJWT()).isTrue();
-        assertThat(burpConfig.highlightColor()).isEqualTo(DEFAULT_HIGHLIGHT_COLOR);
+        assertThat(burpConfig.proxyConfig().highlightJWT()).isTrue();
+        assertThat(burpConfig.proxyConfig().highlightColor()).isEqualTo(DEFAULT_HIGHLIGHT_COLOR);
     }
 
     private static Stream<Arguments> validProxyConfigJson() {
@@ -104,7 +104,7 @@ class BurpConfigPersistenceTest {
         BurpConfig burpConfig = configPersistence.loadOrCreateNew();
 
         assertThat(burpConfig).isNotNull();
-        assertThat(burpConfig.highlightJWT()).isEqualTo(listenerEnabled);
-        assertThat(burpConfig.highlightColor()).isEqualTo(highlightColor);
+        assertThat(burpConfig.proxyConfig().highlightJWT()).isEqualTo(listenerEnabled);
+        assertThat(burpConfig.proxyConfig().highlightColor()).isEqualTo(highlightColor);
     }
 }

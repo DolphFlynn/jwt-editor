@@ -75,21 +75,23 @@ public class BurpConfigDialog extends JDialog {
         // Populate the highlight color dropdown, set custom renderer and current item
         comboBoxHighlightColor.setModel(new DefaultComboBoxModel<>(HighlightColor.values()));
         comboBoxHighlightColor.setRenderer(new HighlightComboRenderer());
-        comboBoxHighlightColor.setSelectedItem(burpConfig.highlightColor());
+        comboBoxHighlightColor.setSelectedItem(burpConfig.proxyConfig().highlightColor());
 
         // Set an event handler to enable/disable highlight color
         checkBoxHighlightJWT.addActionListener(e -> comboBoxHighlightColor.setEnabled(checkBoxHighlightJWT.isSelected()));
 
-        checkBoxHighlightJWT.setSelected(burpConfig.highlightJWT());
-        comboBoxHighlightColor.setEnabled(burpConfig.highlightJWT());
+        checkBoxHighlightJWT.setSelected(burpConfig.proxyConfig().highlightJWT());
+        comboBoxHighlightColor.setEnabled(burpConfig.proxyConfig().highlightJWT());
     }
 
     /**
      * OK clicked, update BurpConfig instance
      */
     private void onOK() {
-        burpConfig.setHighlightJWT(checkBoxHighlightJWT.isSelected());
-        burpConfig.setHighlightColor((HighlightColor) comboBoxHighlightColor.getSelectedItem());
+        boolean highlightJWT = checkBoxHighlightJWT.isSelected();
+        burpConfig.proxyConfig().setHighlightJWT(highlightJWT);
+        HighlightColor highlightColor = (HighlightColor) comboBoxHighlightColor.getSelectedItem();
+        burpConfig.proxyConfig().setHighlightColor(highlightColor);
         dispose();
     }
 

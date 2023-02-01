@@ -18,83 +18,28 @@ limitations under the License.
 
 package com.blackberry.jwteditor.model.config;
 
-import com.blackberry.jwteditor.utils.Utils;
-
-import static com.blackberry.jwteditor.model.config.HighlightColor.GREEN;
-
-/**
- * Class containing configuration for Burp's proxy listener
- */
 public class BurpConfig {
-    public static final HighlightColor DEFAULT_HIGHLIGHT_COLOR = GREEN;
-
-    private static final String BURP_PROXY_COMMENT_TEMPLATE = Utils.getResourceString("burp_proxy_comment");
-
-    private volatile boolean highlightJWT;
-    private volatile HighlightColor highlightColor;
+    private final ProxyConfig proxyConfig = new ProxyConfig();
 
     /**
-     * Construct proxy config with default options
+     * Construct Burp config with default options
      */
     public BurpConfig() {
         this(true, null);
     }
 
     /**
-     * Construct proxy config with specified options
+     * Construct Burp config with specified options
      *
      * @param highlightJWT   flag determining whether messages with JWTs passing through Burp are to be highlighted
      * @param highlightColor color to highlight any messages with JWTs
      */
     public BurpConfig(boolean highlightJWT, HighlightColor highlightColor) {
-        this.highlightJWT = highlightJWT;
-        this.highlightColor = highlightColor == null ? DEFAULT_HIGHLIGHT_COLOR : highlightColor;
+        proxyConfig.setHighlightJWT(highlightJWT);
+        proxyConfig.setHighlightColor(highlightColor);
     }
 
-    /**
-     * Get whether messages with JWTs passing through Burp are to be highlighted
-     *
-     * @return true if messages with JWTs are to be highlighted
-     */
-    public boolean highlightJWT() {
-        return highlightJWT;
-    }
-
-    /**
-     * Set whether messages with JWTs passing through Burp are to be highlighted
-     *
-     * @param highlightJWT flag determining whether messages with JWTs passing through Burp are highlighted
-     */
-    public void setHighlightJWT(boolean highlightJWT) {
-        this.highlightJWT = highlightJWT;
-    }
-
-    /**
-     * Highlight color used to highlight any messages with JWTs
-     *
-     * @return color to use to highlight any appropriate messages
-     */
-    public HighlightColor highlightColor() {
-        return highlightColor;
-    }
-
-    /**
-     * Sets the highlight color used to highlight any messages with JWTs
-     *
-     * @param highlightColor color to use to highlight any appropriate messages
-     */
-    public void setHighlightColor(HighlightColor highlightColor) {
-        this.highlightColor = highlightColor;
-    }
-
-    /**
-     * Generates comment for proxy history items to be highlighted
-     *
-     * @param jwsCount the number of JWS within the message
-     * @param jweCount the number of JWE within the message
-     * @return the comment string
-     */
-    public String comment(int jwsCount, int jweCount) {
-        return String.format(BURP_PROXY_COMMENT_TEMPLATE, jwsCount, jweCount);
+    public ProxyConfig proxyConfig() {
+        return proxyConfig;
     }
 }
