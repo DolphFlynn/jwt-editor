@@ -68,6 +68,8 @@ public class JWS extends JOSEObject {
         return signature.decode();
     }
 
+    public Base64URL getEncodedSignature() { return signature; }
+
     /**
      * Serialize the JWS to compact form
      *
