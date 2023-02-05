@@ -21,7 +21,6 @@ package burp.proxy;
 import burp.api.montoya.core.Annotations;
 import burp.api.montoya.core.ByteArray;
 import burp.api.montoya.utilities.ByteUtils;
-import com.blackberry.jwteditor.model.config.ProxyConfig;
 import com.blackberry.jwteditor.model.jose.JWS;
 import com.blackberry.jwteditor.model.jose.MutableJOSEObject;
 

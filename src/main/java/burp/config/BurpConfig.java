@@ -16,7 +16,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.blackberry.jwteditor.model.config;
+package burp.config;
+
+import burp.proxy.HighlightColor;
+import burp.proxy.ProxyConfig;
 
 public class BurpConfig {
     private final ProxyConfig proxyConfig = new ProxyConfig();

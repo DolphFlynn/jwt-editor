@@ -21,7 +21,6 @@ package burp.proxy;
 import burp.api.montoya.core.Annotations;
 import burp.api.montoya.proxy.http.*;
 import burp.api.montoya.utilities.ByteUtils;
-import com.blackberry.jwteditor.model.config.ProxyConfig;
 
 public class ProxyHttpMessageHandler implements ProxyRequestHandler, ProxyResponseHandler {
     private final AnnotationsModifier annotationsModifier;

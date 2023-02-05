@@ -18,7 +18,7 @@ limitations under the License.
 
 package com.blackberry.jwteditor.presenter;
 
-import com.blackberry.jwteditor.model.config.BurpConfig;
+import burp.config.BurpConfig;
 import com.blackberry.jwteditor.model.persistence.ProxyConfigPersistence;
 import com.blackberry.jwteditor.view.BurpView;
 import com.blackberry.jwteditor.view.dialog.config.BurpConfigDialog;

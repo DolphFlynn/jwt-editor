@@ -19,8 +19,8 @@ limitations under the License.
 package com.blackberry.jwteditor;
 
 import burp.api.montoya.persistence.Preferences;
-import com.blackberry.jwteditor.model.config.BurpConfig;
-import com.blackberry.jwteditor.model.config.HighlightColor;
+import burp.config.BurpConfig;
+import burp.proxy.HighlightColor;
 import com.blackberry.jwteditor.model.persistence.ProxyConfigPersistence;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -29,7 +29,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.stream.Stream;
 
-import static com.blackberry.jwteditor.model.config.ProxyConfig.DEFAULT_HIGHLIGHT_COLOR;
+import static burp.proxy.ProxyConfig.DEFAULT_HIGHLIGHT_COLOR;
 import static com.blackberry.jwteditor.model.persistence.ProxyConfigPersistence.PROXY_LISTENER_SETTINGS_NAME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.params.provider.Arguments.arguments;

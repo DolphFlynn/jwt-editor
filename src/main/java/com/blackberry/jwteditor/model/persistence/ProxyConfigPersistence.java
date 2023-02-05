@@ -19,8 +19,8 @@ limitations under the License.
 package com.blackberry.jwteditor.model.persistence;
 
 import burp.api.montoya.persistence.Preferences;
-import com.blackberry.jwteditor.model.config.BurpConfig;
-import com.blackberry.jwteditor.model.config.HighlightColor;
+import burp.config.BurpConfig;
+import burp.proxy.HighlightColor;
 import org.json.JSONException;
 import org.json.JSONObject;
 

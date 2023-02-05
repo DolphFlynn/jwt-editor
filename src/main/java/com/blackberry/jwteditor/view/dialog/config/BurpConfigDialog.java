@@ -18,8 +18,8 @@ limitations under the License.
 
 package com.blackberry.jwteditor.view.dialog.config;
 
-import com.blackberry.jwteditor.model.config.BurpConfig;
-import com.blackberry.jwteditor.model.config.HighlightColor;
+import burp.config.BurpConfig;
+import burp.proxy.HighlightColor;
 import com.blackberry.jwteditor.utils.Utils;
 
 import javax.swing.*;

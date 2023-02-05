@@ -20,8 +20,8 @@ package com.blackberry.jwteditor.view;
 
 import burp.api.montoya.ui.Theme;
 import burp.api.montoya.ui.UserInterface;
+import burp.config.BurpConfig;
 import com.blackberry.jwteditor.model.KeysModel;
-import com.blackberry.jwteditor.model.config.BurpConfig;
 import com.blackberry.jwteditor.model.persistence.KeysModelPersistence;
 import com.blackberry.jwteditor.model.persistence.ProxyConfigPersistence;
 import com.blackberry.jwteditor.presenter.BurpPresenter;

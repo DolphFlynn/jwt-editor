@@ -16,11 +16,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.blackberry.jwteditor.model.config;
+package burp.proxy;
 
 import com.blackberry.jwteditor.utils.Utils;
 
-import static com.blackberry.jwteditor.model.config.HighlightColor.GREEN;
+import static burp.proxy.HighlightColor.GREEN;
 
 /**
  * Class containing configuration for Burp's proxy listener
@@ -36,7 +36,7 @@ public class ProxyConfig {
     /**
      * Construct proxy config with default options
      */
-    ProxyConfig() {
+    public ProxyConfig() {
         this.highlightJWT = true;
         this.highlightColor = DEFAULT_HIGHLIGHT_COLOR;
     }
