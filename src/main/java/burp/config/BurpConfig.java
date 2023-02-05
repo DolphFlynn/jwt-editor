@@ -18,11 +18,13 @@ limitations under the License.
 
 package burp.config;
 
+import burp.intruder.IntruderConfig;
 import burp.proxy.HighlightColor;
 import burp.proxy.ProxyConfig;
 
 public class BurpConfig {
     private final ProxyConfig proxyConfig = new ProxyConfig();
+    private final IntruderConfig intruderConfig = new IntruderConfig();
 
     /**
      * Construct Burp config with default options
@@ -44,5 +46,9 @@ public class BurpConfig {
 
     public ProxyConfig proxyConfig() {
         return proxyConfig;
+    }
+
+    public IntruderConfig intruderConfig() {
+        return intruderConfig;
     }
 }

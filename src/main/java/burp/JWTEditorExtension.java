@@ -2,11 +2,13 @@ package burp;
 
 import burp.api.montoya.BurpExtension;
 import burp.api.montoya.MontoyaApi;
+import burp.api.montoya.intruder.Intruder;
 import burp.api.montoya.persistence.Preferences;
 import burp.api.montoya.proxy.Proxy;
 import burp.api.montoya.ui.UserInterface;
 import burp.api.montoya.utilities.ByteUtils;
 import burp.config.BurpConfig;
+import burp.intruder.JWSPayloadProcessor;
 import burp.proxy.ProxyHttpMessageHandler;
 import com.blackberry.jwteditor.model.KeysModel;
 import com.blackberry.jwteditor.model.persistence.BurpKeysModelPersistence;
@@ -79,5 +81,8 @@ public class JWTEditorExtension implements BurpExtension {
         ProxyHttpMessageHandler proxyHttpMessageHandler = new ProxyHttpMessageHandler(burpConfig.proxyConfig(), byteUtils);
         proxy.registerRequestHandler(proxyHttpMessageHandler);
         proxy.registerResponseHandler(proxyHttpMessageHandler);
+
+        Intruder intruder = api.intruder();
+        intruder.registerPayloadProcessor(new JWSPayloadProcessor(burpConfig.intruderConfig()));
     }
 }

@@ -19,7 +19,10 @@ limitations under the License.
 package com.blackberry.jwteditor.view.dialog.config;
 
 import burp.config.BurpConfig;
+import burp.intruder.FuzzLocation;
+import burp.intruder.IntruderConfig;
 import burp.proxy.HighlightColor;
+import burp.proxy.ProxyConfig;
 import com.blackberry.jwteditor.utils.Utils;
 
 import javax.swing.*;
@@ -41,6 +44,8 @@ public class BurpConfigDialog extends JDialog {
     private JLabel labelHighlightColor;
     private JComboBox comboBoxHighlightColor;
     private JLabel labelHighlightJWT;
+    private JTextField intruderParameterName;
+    private JComboBox comboBoxPayloadPosition;
 
     /**
      * Creates new ProxyConfigDialog
@@ -70,28 +75,40 @@ public class BurpConfigDialog extends JDialog {
         // call onCancel() on ESCAPE
         contentPane.registerKeyboardAction(e -> onCancel(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
-        setTitle(Utils.getResourceString("proxy_config"));
+        setTitle(Utils.getResourceString("burp_config"));
+
+        ProxyConfig proxyConfig = burpConfig.proxyConfig();
 
         // Populate the highlight color dropdown, set custom renderer and current item
         comboBoxHighlightColor.setModel(new DefaultComboBoxModel<>(HighlightColor.values()));
         comboBoxHighlightColor.setRenderer(new HighlightComboRenderer());
-        comboBoxHighlightColor.setSelectedItem(burpConfig.proxyConfig().highlightColor());
+        comboBoxHighlightColor.setSelectedItem(proxyConfig.highlightColor());
 
         // Set an event handler to enable/disable highlight color
         checkBoxHighlightJWT.addActionListener(e -> comboBoxHighlightColor.setEnabled(checkBoxHighlightJWT.isSelected()));
 
-        checkBoxHighlightJWT.setSelected(burpConfig.proxyConfig().highlightJWT());
-        comboBoxHighlightColor.setEnabled(burpConfig.proxyConfig().highlightJWT());
+        checkBoxHighlightJWT.setSelected(proxyConfig.highlightJWT());
+        comboBoxHighlightColor.setEnabled(proxyConfig.highlightJWT());
+
+        IntruderConfig intruderConfig = burpConfig.intruderConfig();
+
+        comboBoxPayloadPosition.setModel(new DefaultComboBoxModel<>(FuzzLocation.values()));
+        comboBoxPayloadPosition.setSelectedItem(intruderConfig.fuzzLocation());
+        intruderParameterName.setText(intruderConfig.fuzzParameter());
     }
 
     /**
      * OK clicked, update BurpConfig instance
      */
     private void onOK() {
-        boolean highlightJWT = checkBoxHighlightJWT.isSelected();
-        burpConfig.proxyConfig().setHighlightJWT(highlightJWT);
-        HighlightColor highlightColor = (HighlightColor) comboBoxHighlightColor.getSelectedItem();
-        burpConfig.proxyConfig().setHighlightColor(highlightColor);
+        ProxyConfig proxyConfig = burpConfig.proxyConfig();
+        proxyConfig.setHighlightJWT(checkBoxHighlightJWT.isSelected());
+        proxyConfig.setHighlightColor((HighlightColor) comboBoxHighlightColor.getSelectedItem());
+
+        IntruderConfig intruderConfig = burpConfig.intruderConfig();
+        intruderConfig.setFuzzParameter(intruderParameterName.getText());
+        intruderConfig.setFuzzLocation((FuzzLocation) comboBoxPayloadPosition.getSelectedItem());
+
         dispose();
     }
 
