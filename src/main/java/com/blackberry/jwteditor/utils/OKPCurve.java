@@ -53,23 +53,13 @@ public enum OKPCurve {
         return keyLength;
     }
 
-    private byte[] extractPublicKeyFromPrivateKey(byte[] octets) throws PEMUtils.PemException {
-        switch (this) {
-            case X25519:
-                return new X25519PrivateKeyParameters(octets).generatePublicKey().getEncoded();
-
-            case X448:
-                return new X448PrivateKeyParameters(octets).generatePublicKey().getEncoded();
-
-            case ED25519:
-                return new Ed25519PrivateKeyParameters(octets).generatePublicKey().getEncoded();
-
-            case ED448:
-                return new Ed448PrivateKeyParameters(octets).generatePublicKey().getEncoded();
-
-            default:
-                throw new PEMUtils.PemException("Unsupported curve " + this);
-        }
+    private byte[] extractPublicKeyFromPrivateKey(byte[] octets) {
+        return switch (this) {
+            case X25519 -> new X25519PrivateKeyParameters(octets).generatePublicKey().getEncoded();
+            case X448 -> new X448PrivateKeyParameters(octets).generatePublicKey().getEncoded();
+            case ED25519 -> new Ed25519PrivateKeyParameters(octets).generatePublicKey().getEncoded();
+            case ED448 -> new Ed448PrivateKeyParameters(octets).generatePublicKey().getEncoded();
+        };
     }
 
     public static OKPCurve fromStandardName(String name) throws PEMUtils.PemException {
