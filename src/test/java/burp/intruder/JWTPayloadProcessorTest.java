@@ -15,6 +15,8 @@ import org.mockito.stubbing.Answer;
 
 import static burp.api.montoya.intruder.FakePayloadData.payloadData;
 import static burp.api.montoya.intruder.PayloadProcessingAction.USE_PAYLOAD;
+import static burp.intruder.FuzzLocation.HEADER;
+import static burp.intruder.FuzzLocation.PAYLOAD;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -37,7 +39,7 @@ class JWTPayloadProcessorTest {
     void givenBaseValueNotJWS_whenPayloadProcessed_thenPayloadLeftUnchanged() {
         String baseValue = "isogeny";
         PayloadData payloadData = payloadData().withBaseValue(baseValue).build();
-        JWSPayloadProcessor processor = new JWSPayloadProcessor(new IntruderConfig("role", true));
+        JWSPayloadProcessor processor = new JWSPayloadProcessor(new IntruderConfig("role", PAYLOAD));
 
         PayloadProcessingResult result = processor.processPayload(payloadData);
 
@@ -49,7 +51,7 @@ class JWTPayloadProcessorTest {
     void givenBaseValueJWSAndFuzzParameterNotPresent_whenPayloadProcessed_thenPayloadLeftUnchanged() {
         String baseValue = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
         PayloadData payloadData = payloadData().withBaseValue(baseValue).build();
-        JWSPayloadProcessor processor = new JWSPayloadProcessor(new IntruderConfig("role", true));
+        JWSPayloadProcessor processor = new JWSPayloadProcessor(new IntruderConfig("role", PAYLOAD));
 
         PayloadProcessingResult result = processor.processPayload(payloadData);
 
@@ -61,7 +63,7 @@ class JWTPayloadProcessorTest {
     void givenBaseValueJWSAndFuzzParameterPresentInWrongContext_whenPayloadProcessed_thenPayloadLeftUnchanged() {
         String baseValue = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
         PayloadData payloadData = payloadData().withBaseValue(baseValue).build();
-        JWSPayloadProcessor processor = new JWSPayloadProcessor(new IntruderConfig("alg", true));
+        JWSPayloadProcessor processor = new JWSPayloadProcessor(new IntruderConfig("alg", PAYLOAD));
 
         PayloadProcessingResult result = processor.processPayload(payloadData);
 
@@ -73,7 +75,7 @@ class JWTPayloadProcessorTest {
     void givenBaseValueJWSAndFuzzParameterPresentInHeader_whenPayloadProcessed_thenPayloadModified() {
         String baseValue = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
         PayloadData payloadData = payloadData().withBaseValue(baseValue).withCurrentPayload("RS256").build();
-        JWSPayloadProcessor processor = new JWSPayloadProcessor(new IntruderConfig("alg", false));
+        JWSPayloadProcessor processor = new JWSPayloadProcessor(new IntruderConfig("alg", HEADER));
 
         PayloadProcessingResult result = processor.processPayload(payloadData);
 
@@ -85,7 +87,7 @@ class JWTPayloadProcessorTest {
     void givenBaseValueJWSAndFuzzParameterPresentInPayload_whenPayloadProcessed_thenPayloadModified() {
         String baseValue = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
         PayloadData payloadData = payloadData().withBaseValue(baseValue).withCurrentPayload("emanon").build();
-        JWSPayloadProcessor processor = new JWSPayloadProcessor(new IntruderConfig("name", true));
+        JWSPayloadProcessor processor = new JWSPayloadProcessor(new IntruderConfig("name", PAYLOAD));
 
         PayloadProcessingResult result = processor.processPayload(payloadData);
 

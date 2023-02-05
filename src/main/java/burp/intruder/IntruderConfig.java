@@ -1,4 +1,4 @@
 package burp.intruder;
 
-public record IntruderConfig(String fuzzParameter, boolean fuzzParameterInPayload) {
+public record IntruderConfig(String fuzzParameter, FuzzLocation fuzzLocation) {
 }

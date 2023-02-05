@@ -12,6 +12,7 @@ import org.json.JSONObject;
 
 import java.util.Optional;
 
+import static burp.intruder.FuzzLocation.PAYLOAD;
 import static com.blackberry.jwteditor.model.jose.JOSEObjectFinder.parseJOSEObject;
 
 public class JWSPayloadProcessor implements PayloadProcessor {
@@ -27,17 +28,18 @@ public class JWSPayloadProcessor implements PayloadProcessor {
         Optional<JOSEObject> joseObject = parseJOSEObject(baseValue.toString());
 
         if (joseObject.isPresent() && (joseObject.get() instanceof JWS jws)) {
-            String targetData = intruderConfig.fuzzParameterInPayload() ? jws.getPayload() : jws.getHeader();
+            boolean fuzzPayload = intruderConfig.fuzzLocation() == PAYLOAD;
+            String targetData = fuzzPayload ? jws.getPayload() : jws.getHeader();
             JSONObject targetJson = new JSONObject(targetData);
 
             if (targetJson.has(intruderConfig.fuzzParameter())) {
                 targetJson.put(intruderConfig.fuzzParameter(), payloadData.currentPayload().toString());
 
-                Base64URL updatedHeader = intruderConfig.fuzzParameterInPayload()
+                Base64URL updatedHeader = fuzzPayload
                         ? jws.getEncodedHeader()
                         : Base64URL.encode(targetJson.toString());
 
-                Base64URL updatedPayload = intruderConfig.fuzzParameterInPayload()
+                Base64URL updatedPayload = fuzzPayload
                         ? Base64URL.encode(targetJson.toString())
                         : jws.getEncodedPayload();
 
