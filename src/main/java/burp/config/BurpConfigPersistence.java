@@ -19,7 +19,10 @@ limitations under the License.
 package burp.config;
 
 import burp.api.montoya.persistence.Preferences;
+import burp.intruder.FuzzLocation;
+import burp.intruder.IntruderConfig;
 import burp.proxy.HighlightColor;
+import burp.proxy.ProxyConfig;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -27,10 +30,12 @@ import org.json.JSONObject;
  * Interface for loading and saving ProxyConfig
  */
 public class BurpConfigPersistence {
-    public static final String PROXY_LISTENER_SETTINGS_NAME = "com.blackberry.jwteditor.proxy"; //NON-NLS
+    static final String BURP_SETTINGS_NAME = "com.blackberry.jwteditor.settings";
 
-    private static final String PROXY_LISTENER_ENABLED_KEY = "proxy_listener_enabled";  //NON-NLS
-    private static final String PROXY_HISTORY_HIGHLIGHT_COLOR_KEY = "proxy_history_highlight_color";  //NON-NLS
+    private static final String PROXY_LISTENER_ENABLED_KEY = "proxy_listener_enabled";
+    private static final String PROXY_HISTORY_HIGHLIGHT_COLOR_KEY = "proxy_history_highlight_color";
+    private static final String INTRUDER_FUZZ_PARAMETER_TYPE = "intruder_payload_processor_fuzz_location";
+    private static final String INTRUDER_FUZZ_PARAMETER_NAME = "intruder_payload_processor_parameter_name";
 
     private final Preferences preferences;
 
@@ -44,21 +49,33 @@ public class BurpConfigPersistence {
      * @return instance of proxy config
      */
     public BurpConfig loadOrCreateNew() {
-        String json = preferences.getString(PROXY_LISTENER_SETTINGS_NAME);
+        String json = preferences.getString(BURP_SETTINGS_NAME);
 
-        // If parse fails, create a new proxy config
+        // If parse fails, create a new Burp config
         if (json != null) {
             try {
                 JSONObject parsedObject = new JSONObject(json);
+                BurpConfig burpConfig = new BurpConfig();
 
                 if (parsedObject.has(PROXY_LISTENER_ENABLED_KEY) && parsedObject.has(PROXY_HISTORY_HIGHLIGHT_COLOR_KEY)) {
-                    boolean highlightJWT = (Boolean) parsedObject.get(PROXY_LISTENER_ENABLED_KEY);
+                    ProxyConfig proxyConfig = burpConfig.proxyConfig();
+
+                    proxyConfig.setHighlightJWT((Boolean) parsedObject.get(PROXY_LISTENER_ENABLED_KEY));
 
                     String highlightColorName = (String) parsedObject.get(PROXY_HISTORY_HIGHLIGHT_COLOR_KEY);
-                    HighlightColor highlightColor = HighlightColor.from(highlightColorName);
-
-                    return new BurpConfig(highlightJWT, highlightColor);
+                    proxyConfig.setHighlightColor(HighlightColor.from(highlightColorName));
                 }
+
+                if (parsedObject.has(INTRUDER_FUZZ_PARAMETER_TYPE) && parsedObject.has(INTRUDER_FUZZ_PARAMETER_NAME)) {
+                    IntruderConfig intruderConfig = burpConfig.intruderConfig();
+
+                    intruderConfig.setFuzzParameter((String) parsedObject.get(INTRUDER_FUZZ_PARAMETER_NAME));
+
+                    String fuzzLocationName = (String) parsedObject.get(INTRUDER_FUZZ_PARAMETER_TYPE);
+                    intruderConfig.setFuzzLocation(FuzzLocation.from(fuzzLocationName));
+                }
+
+                return burpConfig;
             } catch (ClassCastException | JSONException ignored) {
             }
         }
@@ -67,16 +84,19 @@ public class BurpConfigPersistence {
     }
 
     /**
-     * Saves proxy configuration
+     * Saves Burp configuration
      *
-     * @param model proxy config to be saved
+     * @param model Burp config to be saved
      */
     public void save(BurpConfig model) {
-        // Serialise the proxy config and save
-        JSONObject proxyConfigJson = new JSONObject();
-        proxyConfigJson.put(PROXY_LISTENER_ENABLED_KEY, model.proxyConfig().highlightJWT());
-        proxyConfigJson.put(PROXY_HISTORY_HIGHLIGHT_COLOR_KEY, model.proxyConfig().highlightColor().burpColor);
+        // Serialise the Burp config and save
+        JSONObject burpConfigJson = new JSONObject();
 
-        preferences.setString(PROXY_LISTENER_SETTINGS_NAME, proxyConfigJson.toString());
+        burpConfigJson.put(PROXY_LISTENER_ENABLED_KEY, model.proxyConfig().highlightJWT());
+        burpConfigJson.put(PROXY_HISTORY_HIGHLIGHT_COLOR_KEY, model.proxyConfig().highlightColor().burpColor);
+        burpConfigJson.put(INTRUDER_FUZZ_PARAMETER_NAME, model.intruderConfig().fuzzParameter());
+        burpConfigJson.put(INTRUDER_FUZZ_PARAMETER_TYPE, model.intruderConfig().fuzzLocation());
+
+        preferences.setString(BURP_SETTINGS_NAME, burpConfigJson.toString());
     }
 }

@@ -19,30 +19,11 @@ limitations under the License.
 package burp.config;
 
 import burp.intruder.IntruderConfig;
-import burp.proxy.HighlightColor;
 import burp.proxy.ProxyConfig;
 
 public class BurpConfig {
     private final ProxyConfig proxyConfig = new ProxyConfig();
     private final IntruderConfig intruderConfig = new IntruderConfig();
-
-    /**
-     * Construct Burp config with default options
-     */
-    BurpConfig() {
-        this(true, null);
-    }
-
-    /**
-     * Construct Burp config with specified options
-     *
-     * @param highlightJWT   flag determining whether messages with JWTs passing through Burp are to be highlighted
-     * @param highlightColor color to highlight any messages with JWTs
-     */
-    public BurpConfig(boolean highlightJWT, HighlightColor highlightColor) {
-        proxyConfig.setHighlightJWT(highlightJWT);
-        proxyConfig.setHighlightColor(highlightColor);
-    }
 
     public ProxyConfig proxyConfig() {
         return proxyConfig;
