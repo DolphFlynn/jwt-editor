@@ -8,12 +8,12 @@ import burp.api.montoya.proxy.Proxy;
 import burp.api.montoya.ui.UserInterface;
 import burp.api.montoya.utilities.ByteUtils;
 import burp.config.BurpConfig;
+import burp.config.BurpConfigPersistence;
 import burp.intruder.JWSPayloadProcessor;
 import burp.proxy.ProxyHttpMessageHandler;
 import com.blackberry.jwteditor.model.KeysModel;
 import com.blackberry.jwteditor.model.persistence.BurpKeysModelPersistence;
 import com.blackberry.jwteditor.model.persistence.KeysModelPersistence;
-import com.blackberry.jwteditor.model.persistence.ProxyConfigPersistence;
 import com.blackberry.jwteditor.presenter.PresenterStore;
 import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.view.BurpView;
@@ -37,8 +37,8 @@ public class JWTEditorExtension implements BurpExtension {
         KeysModelPersistence keysModelPersistence = new BurpKeysModelPersistence(preferences);
         KeysModel keysModel = keysModelPersistence.loadOrCreateNew();
 
-        ProxyConfigPersistence proxyConfigPersistence = new ProxyConfigPersistence(preferences);
-        BurpConfig burpConfig = proxyConfigPersistence.loadOrCreateNew();
+        BurpConfigPersistence burpConfigPersistence = new BurpConfigPersistence(preferences);
+        BurpConfig burpConfig = burpConfigPersistence.loadOrCreateNew();
 
         UserInterface userInterface = api.userInterface();
         Window suiteWindow = userInterface.swingUtils().suiteFrame();
@@ -52,7 +52,7 @@ public class JWTEditorExtension implements BurpExtension {
                 keysModelPersistence,
                 keysModel,
                 rstaFactory,
-                proxyConfigPersistence,
+                burpConfigPersistence,
                 burpConfig,
                 userInterface
         );

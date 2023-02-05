@@ -16,10 +16,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.blackberry.jwteditor.model.persistence;
+package burp.config;
 
 import burp.api.montoya.persistence.Preferences;
-import burp.config.BurpConfig;
 import burp.proxy.HighlightColor;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -27,7 +26,7 @@ import org.json.JSONObject;
 /**
  * Interface for loading and saving ProxyConfig
  */
-public class ProxyConfigPersistence {
+public class BurpConfigPersistence {
     public static final String PROXY_LISTENER_SETTINGS_NAME = "com.blackberry.jwteditor.proxy"; //NON-NLS
 
     private static final String PROXY_LISTENER_ENABLED_KEY = "proxy_listener_enabled";  //NON-NLS
@@ -35,7 +34,7 @@ public class ProxyConfigPersistence {
 
     private final Preferences preferences;
 
-    public ProxyConfigPersistence(Preferences preferences) {
+    public BurpConfigPersistence(Preferences preferences) {
         this.preferences = preferences;
     }
 

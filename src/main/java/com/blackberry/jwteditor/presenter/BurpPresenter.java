@@ -19,7 +19,7 @@ limitations under the License.
 package com.blackberry.jwteditor.presenter;
 
 import burp.config.BurpConfig;
-import com.blackberry.jwteditor.model.persistence.ProxyConfigPersistence;
+import burp.config.BurpConfigPersistence;
 import com.blackberry.jwteditor.view.BurpView;
 import com.blackberry.jwteditor.view.dialog.config.BurpConfigDialog;
 
@@ -31,7 +31,7 @@ import java.awt.*;
  */
 public class BurpPresenter extends Presenter {
     private final Window window;
-    private final ProxyConfigPersistence proxyConfigPersistence;
+    private final BurpConfigPersistence burpConfigPersistence;
     private final BurpConfig burpConfig;
 
     /**
@@ -39,15 +39,15 @@ public class BurpPresenter extends Presenter {
      *
      * @param burpView               the BurpView to associate with the presenter
      * @param presenters             the shared store of all presenters
-     * @param burpConfig            Configuration for proxy listener
-     * @param proxyConfigPersistence Used to persist proxy configuration
+     * @param burpConfig             Configuration for proxy listener
+     * @param burpConfigPersistence  Used to persist Burp configuration
      */
     public BurpPresenter(BurpView burpView,
                          PresenterStore presenters,
-                         ProxyConfigPersistence proxyConfigPersistence,
+                         BurpConfigPersistence burpConfigPersistence,
                          BurpConfig burpConfig) {
         this.window = SwingUtilities.getWindowAncestor(burpView.getUiComponent());
-        this.proxyConfigPersistence = proxyConfigPersistence;
+        this.burpConfigPersistence = burpConfigPersistence;
         this.burpConfig = burpConfig;
 
         presenters.register(this);
@@ -65,6 +65,6 @@ public class BurpPresenter extends Presenter {
         dialog.setVisible(true);
         // Block here until the dialog returns
 
-        proxyConfigPersistence.save(burpConfig);
+        burpConfigPersistence.save(burpConfig);
     }
 }

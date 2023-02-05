@@ -21,9 +21,9 @@ package com.blackberry.jwteditor.view;
 import burp.api.montoya.ui.Theme;
 import burp.api.montoya.ui.UserInterface;
 import burp.config.BurpConfig;
+import burp.config.BurpConfigPersistence;
 import com.blackberry.jwteditor.model.KeysModel;
 import com.blackberry.jwteditor.model.persistence.KeysModelPersistence;
-import com.blackberry.jwteditor.model.persistence.ProxyConfigPersistence;
 import com.blackberry.jwteditor.presenter.BurpPresenter;
 import com.blackberry.jwteditor.presenter.PresenterStore;
 import com.blackberry.jwteditor.utils.Utils;
@@ -62,7 +62,7 @@ public class BurpView {
             KeysModelPersistence keysModelPersistence,
             KeysModel keysModel,
             RstaFactory rstaFactory,
-            ProxyConfigPersistence proxyConfigPersistence,
+            BurpConfigPersistence burpConfigPersistence,
             BurpConfig burpConfig,
             UserInterface userInterface) {
         this.parent = parent;
@@ -76,7 +76,7 @@ public class BurpView {
         presenter = new BurpPresenter(
                 this,
                 presenters,
-                proxyConfigPersistence,
+                burpConfigPersistence,
                 burpConfig
         );
 

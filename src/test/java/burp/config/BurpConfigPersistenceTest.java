@@ -16,12 +16,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.blackberry.jwteditor;
+package burp.config;
 
 import burp.api.montoya.persistence.Preferences;
-import burp.config.BurpConfig;
 import burp.proxy.HighlightColor;
-import com.blackberry.jwteditor.model.persistence.ProxyConfigPersistence;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -29,8 +27,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.stream.Stream;
 
+import static burp.config.BurpConfigPersistence.PROXY_LISTENER_SETTINGS_NAME;
 import static burp.proxy.ProxyConfig.DEFAULT_HIGHLIGHT_COLOR;
-import static com.blackberry.jwteditor.model.persistence.ProxyConfigPersistence.PROXY_LISTENER_SETTINGS_NAME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.Mockito.mock;
@@ -41,7 +39,7 @@ class BurpConfigPersistenceTest {
 
     @Test
     void givenNoSavedConfig_whenLoadOrCreateCalled_thenDefaultInstanceReturned() {
-        ProxyConfigPersistence configPersistence = new ProxyConfigPersistence(callbacks);
+        BurpConfigPersistence configPersistence = new BurpConfigPersistence(callbacks);
 
         BurpConfig burpConfig = configPersistence.loadOrCreateNew();
 
@@ -70,7 +68,7 @@ class BurpConfigPersistenceTest {
     @ParameterizedTest
     @MethodSource("invalidProxyConfigJson")
     void givenInvalidSavedConfig_whenLoadOrCreateCalled_thenDefaultInstanceReturned(String invalidJson) {
-        ProxyConfigPersistence configPersistence = new ProxyConfigPersistence(callbacks);
+        BurpConfigPersistence configPersistence = new BurpConfigPersistence(callbacks);
         when(callbacks.getString(PROXY_LISTENER_SETTINGS_NAME)).thenReturn(invalidJson);
 
         BurpConfig burpConfig = configPersistence.loadOrCreateNew();
@@ -98,7 +96,7 @@ class BurpConfigPersistenceTest {
     @ParameterizedTest
     @MethodSource("validProxyConfigJson")
     void givenValidSavedConfig_whenLoadOrCreateCalled_thenAppropriateInstanceReturned(String json, boolean listenerEnabled, HighlightColor highlightColor) {
-        ProxyConfigPersistence configPersistence = new ProxyConfigPersistence(callbacks);
+        BurpConfigPersistence configPersistence = new BurpConfigPersistence(callbacks);
         when(callbacks.getString(PROXY_LISTENER_SETTINGS_NAME)).thenReturn(json);
 
         BurpConfig burpConfig = configPersistence.loadOrCreateNew();

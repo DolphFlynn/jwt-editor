@@ -29,7 +29,7 @@ public class BurpConfig {
     /**
      * Construct Burp config with default options
      */
-    public BurpConfig() {
+    BurpConfig() {
         this(true, null);
     }
 
