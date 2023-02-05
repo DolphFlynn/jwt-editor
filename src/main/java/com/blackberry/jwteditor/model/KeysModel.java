@@ -150,11 +150,11 @@ public class KeysModel {
     /**
      * Remove a set of keys from the model by id
      *
-     * @param indicies indicies of keys to remove
+     * @param indices indices of keys to remove
      */
-    public void deleteKeys(int[] indicies) {
+    public void deleteKeys(int[] indices) {
         synchronized (lock) {
-            for (int index : indicies) {
+            for (int index : indices) {
                 deleteKey(getKey(index).getID());
             }
         }
