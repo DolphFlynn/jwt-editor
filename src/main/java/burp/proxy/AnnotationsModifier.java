@@ -24,7 +24,6 @@ import burp.api.montoya.utilities.ByteUtils;
 import com.blackberry.jwteditor.model.jose.JWS;
 import com.blackberry.jwteditor.model.jose.MutableJOSEObject;
 
-import static burp.api.montoya.core.Annotations.annotations;
 import static com.blackberry.jwteditor.model.jose.JOSEObjectFinder.extractJOSEObjects;
 
 class AnnotationsModifier {
@@ -36,16 +35,25 @@ class AnnotationsModifier {
         this.proxyConfig = proxyConfig;
     }
 
-    Annotations updateAnnotationsIfApplicable(Annotations annotations, ByteArray message) {
-        Counts counts = countJOSEObjects(message);
-
-        return counts.isZero() ? annotations : annotations(counts.comment(), proxyConfig.highlightColor().burpColor);
+    void updateAnnotationsIfApplicable(Annotations annotations, ByteArray data) {
+        String message = byteUtils.convertToString(data.getBytes());
+        updateAnnotationsIfApplicable(annotations, message);
     }
 
-    private Counts countJOSEObjects(ByteArray message) {
-        String messageString = byteUtils.convertToString(message.getBytes());
+    void updateAnnotationsIfApplicable(Annotations annotations, String message) {
+        updateAnnotations(annotations, message);
+    }
 
-        // Extract and count JWE/JWSs from the message
+    private void updateAnnotations(Annotations annotations, String messageString) {
+        Counts counts = countJOSEObjects(messageString);
+
+        if (!counts.isZero()) {
+            annotations.setHighlightColor(proxyConfig.highlightColor().burpColor);
+            annotations.setNotes(counts.comment());
+        }
+    }
+
+    private Counts countJOSEObjects(String messageString) {
         int jwsCount = 0;
         int jweCount = 0;
 

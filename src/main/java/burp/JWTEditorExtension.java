@@ -10,7 +10,9 @@ import burp.api.montoya.utilities.ByteUtils;
 import burp.config.BurpConfig;
 import burp.config.BurpConfigPersistence;
 import burp.intruder.JWSPayloadProcessor;
+import burp.proxy.ProxyConfig;
 import burp.proxy.ProxyHttpMessageHandler;
+import burp.proxy.ProxyWsMessageHandler;
 import com.blackberry.jwteditor.model.KeysModel;
 import com.blackberry.jwteditor.model.persistence.BurpKeysModelPersistence;
 import com.blackberry.jwteditor.model.persistence.KeysModelPersistence;
@@ -76,11 +78,17 @@ public class JWTEditorExtension implements BurpExtension {
         );
 
         Proxy proxy = api.proxy();
+        ProxyConfig proxyConfig = burpConfig.proxyConfig();
         ByteUtils byteUtils = api.utilities().byteUtils();
 
-        ProxyHttpMessageHandler proxyHttpMessageHandler = new ProxyHttpMessageHandler(burpConfig.proxyConfig(), byteUtils);
+        ProxyHttpMessageHandler proxyHttpMessageHandler = new ProxyHttpMessageHandler(proxyConfig, byteUtils);
         proxy.registerRequestHandler(proxyHttpMessageHandler);
         proxy.registerResponseHandler(proxyHttpMessageHandler);
+
+        ProxyWsMessageHandler proxyWsMessageHandler = new ProxyWsMessageHandler(proxyConfig, byteUtils);
+        proxy.registerWebSocketCreationHandler(proxyWebSocketCreation ->
+                proxyWebSocketCreation.proxyWebSocket().registerProxyMessageHandler(proxyWsMessageHandler)
+        );
 
         Intruder intruder = api.intruder();
         intruder.registerPayloadProcessor(new JWSPayloadProcessor(burpConfig.intruderConfig()));

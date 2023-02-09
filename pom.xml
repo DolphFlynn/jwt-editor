@@ -11,7 +11,7 @@
         <java.version>17</java.version>
         <bouncycastle.version>1.70</bouncycastle.version>
         <gui.designer.version>223.8214.52</gui.designer.version>
-        <extender.version>1.0.0</extender.version>
+        <extender.version>2023.2</extender.version>
     </properties>
 
     <repositories>

@@ -18,7 +18,6 @@ limitations under the License.
 
 package burp.proxy;
 
-import burp.api.montoya.core.Annotations;
 import burp.api.montoya.proxy.http.*;
 import burp.api.montoya.utilities.ByteUtils;
 
@@ -31,9 +30,9 @@ public class ProxyHttpMessageHandler implements ProxyRequestHandler, ProxyRespon
 
     @Override
     public ProxyRequestReceivedAction handleRequestReceived(InterceptedRequest interceptedRequest) {
-        Annotations modifiedAnnotations = annotationsModifier.updateAnnotationsIfApplicable(interceptedRequest.annotations(), interceptedRequest.toByteArray());
+        annotationsModifier.updateAnnotationsIfApplicable(interceptedRequest.annotations(), interceptedRequest.toByteArray());
 
-        return ProxyRequestReceivedAction.continueWith(interceptedRequest, modifiedAnnotations);
+        return ProxyRequestReceivedAction.continueWith(interceptedRequest);
     }
 
     @Override
@@ -43,9 +42,9 @@ public class ProxyHttpMessageHandler implements ProxyRequestHandler, ProxyRespon
 
     @Override
     public ProxyResponseReceivedAction handleResponseReceived(InterceptedResponse interceptedResponse) {
-        Annotations modifiedAnnotations = annotationsModifier.updateAnnotationsIfApplicable(interceptedResponse.annotations(), interceptedResponse.toByteArray());
+        annotationsModifier.updateAnnotationsIfApplicable(interceptedResponse.annotations(), interceptedResponse.toByteArray());
 
-        return ProxyResponseReceivedAction.continueWith(interceptedResponse, modifiedAnnotations);
+        return ProxyResponseReceivedAction.continueWith(interceptedResponse);
     }
 
     @Override
