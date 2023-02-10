@@ -23,6 +23,7 @@ import com.blackberry.jwteditor.model.jose.JWE;
 import com.blackberry.jwteditor.model.jose.JWS;
 import com.blackberry.jwteditor.model.jose.MutableJOSEObject;
 import com.blackberry.jwteditor.model.keys.Key;
+import com.blackberry.jwteditor.model.keys.KeyRing;
 import com.blackberry.jwteditor.operations.Operations;
 import com.blackberry.jwteditor.utils.JSONUtils;
 import com.blackberry.jwteditor.utils.Utils;
@@ -367,7 +368,7 @@ public class EditorPresenter extends Presenter {
             messageKey = "error_no_verification_keys";
         } else {
             titleKey = "editor_view_message_title_verification";
-            boolean verificationSuccessful = Operations.verify(getJWS(), keys);
+            boolean verificationSuccessful = new KeyRing(keys).findVerifyingKey(getJWS()).isPresent();
 
             messageKey = verificationSuccessful ? "editor_view_message_verified" : "editor_view_message_not_verified";
         }

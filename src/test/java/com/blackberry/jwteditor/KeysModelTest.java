@@ -19,17 +19,10 @@ limitations under the License.
 package com.blackberry.jwteditor;
 
 import com.blackberry.jwteditor.model.KeysModel;
-import com.blackberry.jwteditor.model.keys.JWKKey;
-import com.blackberry.jwteditor.model.keys.Key;
-import com.blackberry.jwteditor.model.keys.Key.UnsupportedKeyException;
 import com.blackberry.jwteditor.model.keys.PasswordKey;
-import com.blackberry.jwteditor.utils.PEMUtils;
-import com.blackberry.jwteditor.utils.PEMUtils.PemException;
-import com.nimbusds.jose.jwk.JWK;
 import org.junit.jupiter.api.Test;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
+import static com.blackberry.jwteditor.KeysModelBuilder.keysModel;
 import static com.blackberry.jwteditor.PemData.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -104,56 +97,5 @@ class KeysModelTest {
         model.deleteKeys(new int[]{0, 3, 1, 2});
 
         assertThat(model.keys()).isEmpty();
-    }
-
-    private static KeysModelBuilder keysModel() {
-        return new KeysModelBuilder();
-    }
-
-    private static class KeysModelBuilder {
-        private final AtomicInteger keyId = new AtomicInteger();
-        private final KeysModel model = new KeysModel();
-
-        KeysModelBuilder withECKey(String pem) {
-            try {
-                JWK jwk = PEMUtils.pemToECKey(pem, Integer.toString(keyId.incrementAndGet()));
-                model.addKey(new JWKKey(jwk));
-            } catch (PemException | UnsupportedKeyException e) {
-                throw new IllegalStateException(e);
-            }
-
-            return this;
-        }
-
-        KeysModelBuilder withRSAKey(String pem) {
-            try {
-                JWK jwk = PEMUtils.pemToRSAKey(pem, Integer.toString(keyId.incrementAndGet()));
-                model.addKey(new JWKKey(jwk));
-            } catch (PemException | UnsupportedKeyException e) {
-                throw new IllegalStateException(e);
-            }
-
-            return this;
-        }
-
-        KeysModelBuilder withOKPKey(String pem) {
-            try {
-                JWK jwk = PEMUtils.pemToOctetKeyPair(pem, Integer.toString(keyId.incrementAndGet()));
-                model.addKey(new JWKKey(jwk));
-            } catch (PemException | UnsupportedKeyException e) {
-                throw new IllegalStateException(e);
-            }
-
-            return this;
-        }
-
-        KeysModelBuilder withKey(Key key) {
-            model.addKey(key);
-            return this;
-        }
-
-        KeysModel build() {
-            return model;
-        }
     }
 }

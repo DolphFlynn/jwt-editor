@@ -25,7 +25,6 @@ import com.blackberry.jwteditor.model.jose.JWSFactory;
 import com.blackberry.jwteditor.model.jose.exceptions.DecryptionException;
 import com.blackberry.jwteditor.model.jose.exceptions.EncryptionException;
 import com.blackberry.jwteditor.model.jose.exceptions.SigningException;
-import com.blackberry.jwteditor.model.jose.exceptions.VerificationException;
 import com.blackberry.jwteditor.model.keys.JWKKey;
 import com.blackberry.jwteditor.model.keys.Key;
 import com.nimbusds.jose.EncryptionMethod;
@@ -103,29 +102,6 @@ public class Operations {
         Base64URL payload = jws.getEncodedPayload();
 
         return JWSFactory.sign(key, encodedHeader, payload, signingInfo);
-    }
-
-    /**
-     * Attempt to verify a JWS with a list of JWKs
-     *
-     * @param jws the JWS to verify
-     * @param keys a list of JWKs to attempt verification with
-     * @return true if verification successful
-     */
-    public static boolean verify(JWS jws, List<Key> keys) {
-        for(Key key: keys){
-            for(JWSAlgorithm signingAlgorithm: key.getSigningAlgorithms()) {
-                JWSHeader verificationInfo = new JWSHeader.Builder(signingAlgorithm).build();
-                try {
-                    if (jws.verify(key, verificationInfo)) {
-                        return true;
-                    }
-                } catch (VerificationException e) {
-                    // Verification failed for this key & algorithm pair
-                }
-            }
-        }
-        return false;
     }
 
     /**
