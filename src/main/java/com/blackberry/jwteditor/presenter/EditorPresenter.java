@@ -360,22 +360,24 @@ public class EditorPresenter extends Presenter {
     public void onVerifyClicked() {
         List<Key> keys = ((KeysPresenter) presenters.get(KeysPresenter.class)).getVerificationKeys();
         String titleKey;
-        String messageKey;
+        String message;
 
         // Check there are verification keys in the keystore
         if (keys.isEmpty()) {
             titleKey = "error_title_no_verification_keys";
-            messageKey = "error_no_verification_keys";
+            message = Utils.getResourceString("error_no_verification_keys");
         } else {
             titleKey = "editor_view_message_title_verification";
-            boolean verificationSuccessful = new KeyRing(keys).findVerifyingKey(getJWS()).isPresent();
+            KeyRing keyRing = new KeyRing(keys);
 
-            messageKey = verificationSuccessful ? "editor_view_message_verified" : "editor_view_message_not_verified";
+            message = keyRing.findVerifyingKey(getJWS())
+                    .map(key -> Utils.getResourceString("editor_view_message_verified").formatted(key.getID()))
+                    .orElseGet(() -> Utils.getResourceString("editor_view_message_not_verified"));
         }
 
         JOptionPane.showMessageDialog(
                 view.uiComponent(),
-                Utils.getResourceString(messageKey),
+                message,
                 Utils.getResourceString(titleKey),
                 WARNING_MESSAGE
         );
