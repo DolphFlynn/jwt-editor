@@ -57,7 +57,7 @@ class KeysModelTest {
     }
 
     @Test
-    void keyModelWithRsaKeys()  {
+    void keyModelWithRsaKeys() {
         KeysModel model = keysModel()
                 .withRSAKey(RSA1024Private)
                 .withRSAKey(RSA1024Public)
@@ -69,7 +69,7 @@ class KeysModelTest {
     }
 
     @Test
-    void keyModelWithOkpKeys()  {
+    void keyModelWithOkpKeys() {
         KeysModel model = keysModel()
                 .withOKPKey(X25519Private)
                 .withOKPKey(X25519Public)
@@ -81,7 +81,7 @@ class KeysModelTest {
     }
 
     @Test
-    void keyModelWithPasswordKeys()  {
+    void keyModelWithPasswordKeys() {
         KeysModel model = keysModel()
                 .withKey(new PasswordKey("testKeyId", "secret", 8, 1337))
                 .withKey(new PasswordKey("another", "shrubbery", 8, 1337))
@@ -90,6 +90,20 @@ class KeysModelTest {
         String json = model.serialize();
 
         assertThat(json).isEqualTo("[{\"password\":\"secret\",\"key_id\":\"testKeyId\",\"salt_length\":8,\"iterations\":1337},{\"password\":\"shrubbery\",\"key_id\":\"another\",\"salt_length\":8,\"iterations\":1337}]");
+    }
+
+    @Test
+    void deleteMultipleKeys() {
+        KeysModel model = keysModel()
+                .withRSAKey(RSA1024Private)
+                .withRSAKey(RSA1024Public)
+                .withKey(new PasswordKey("testKeyId", "secret", 8, 1337))
+                .withKey(new PasswordKey("another", "shrubbery", 8, 1337))
+                .build();
+
+        model.deleteKeys(new int[]{0, 3, 1, 2});
+
+        assertThat(model.keys()).isEmpty();
     }
 
     private static KeysModelBuilder keysModel() {
@@ -104,7 +118,7 @@ class KeysModelTest {
             try {
                 JWK jwk = PEMUtils.pemToECKey(pem, Integer.toString(keyId.incrementAndGet()));
                 model.addKey(new JWKKey(jwk));
-            } catch (PemException | UnsupportedKeyException  e) {
+            } catch (PemException | UnsupportedKeyException e) {
                 throw new IllegalStateException(e);
             }
 
@@ -115,7 +129,7 @@ class KeysModelTest {
             try {
                 JWK jwk = PEMUtils.pemToRSAKey(pem, Integer.toString(keyId.incrementAndGet()));
                 model.addKey(new JWKKey(jwk));
-            } catch (PemException | UnsupportedKeyException  e) {
+            } catch (PemException | UnsupportedKeyException e) {
                 throw new IllegalStateException(e);
             }
 
@@ -126,7 +140,7 @@ class KeysModelTest {
             try {
                 JWK jwk = PEMUtils.pemToOctetKeyPair(pem, Integer.toString(keyId.incrementAndGet()));
                 model.addKey(new JWKKey(jwk));
-            } catch (PemException | UnsupportedKeyException  e) {
+            } catch (PemException | UnsupportedKeyException e) {
                 throw new IllegalStateException(e);
             }
 

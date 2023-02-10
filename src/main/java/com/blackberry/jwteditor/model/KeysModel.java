@@ -27,6 +27,7 @@ import java.text.ParseException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.IntStream;
 
 import static java.util.Collections.unmodifiableCollection;
 
@@ -154,8 +155,10 @@ public class KeysModel {
      */
     public void deleteKeys(int[] indices) {
         synchronized (lock) {
-            for (int index : indices) {
-                deleteKey(getKey(index).getID());
+            List<String> idsToDelete = IntStream.of(indices).mapToObj(this::getKey).map(Key::getID).toList();
+
+            for (String id : idsToDelete) {
+                deleteKey(id);
             }
         }
     }
