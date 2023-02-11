@@ -24,7 +24,6 @@ import com.blackberry.jwteditor.model.jose.JWS;
 import com.blackberry.jwteditor.model.jose.MutableJOSEObject;
 import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.model.keys.KeyRing;
-import com.blackberry.jwteditor.operations.Operations;
 import com.blackberry.jwteditor.utils.JSONUtils;
 import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.view.EditorView;
@@ -41,6 +40,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static com.blackberry.jwteditor.model.jose.JOSEObjectFinder.containsJOSEObjects;
 import static com.blackberry.jwteditor.model.jose.JOSEObjectFinder.extractJOSEObjects;
@@ -417,26 +417,25 @@ public class EditorPresenter extends Presenter {
         KeysPresenter keysPresenter = (KeysPresenter) presenters.get(KeysPresenter.class);
 
         // Check there are decryption keys in the keystore
-        if(keysPresenter.getDecryptionKeys().size() == 0) {
+        if (keysPresenter.getDecryptionKeys().isEmpty()) {
             JOptionPane.showMessageDialog(view.uiComponent(), Utils.getResourceString("error_no_decryption_keys"), Utils.getResourceString("error_title_no_decryption_keys"), WARNING_MESSAGE);
             return;
         }
 
         // Attempt to decrypt the contents of the editor with all available keys
-        JWS jws = null;
         try {
-            jws = Operations.decrypt(getJWE(), keysPresenter.getDecryptionKeys());
+            List<Key> keys = keysPresenter.getDecryptionKeys();
+            Optional<JWS> jws = new KeyRing(keys).attemptDecryption(getJWE());
+
+            // If decryption was successful, set the contents of the editor to the decrypted JWS and set the editor mode to JWS
+            if (jws.isPresent()) {
+                view.setJWSMode();
+                setJWS(jws.get());
+            } else {
+                JOptionPane.showMessageDialog(view.uiComponent(), Utils.getResourceString("error_decryption_all_keys_failed"), Utils.getResourceString("error_title_unable_to_decrypt"), WARNING_MESSAGE);
+            }
         } catch (ParseException e) {
             JOptionPane.showMessageDialog(view.uiComponent(), Utils.getResourceString("error_decryption_invalid_header"), Utils.getResourceString("error_title_unable_to_decrypt"), WARNING_MESSAGE);
-        }
-
-        // If decryption was successful, set the contents of the editor to the decrypted JWS and set the editor mode to JWS
-        if(jws != null){
-            view.setJWSMode();
-            setJWS(jws);
-        }
-        else {
-            JOptionPane.showMessageDialog(view.uiComponent(), Utils.getResourceString("error_decryption_all_keys_failed"), Utils.getResourceString("error_title_unable_to_decrypt"), WARNING_MESSAGE);
         }
     }
 
@@ -481,12 +480,7 @@ public class EditorPresenter extends Presenter {
      * @return true if changes have been made in the editor
      */
     public boolean isModified() {
-        for(MutableJOSEObject mutableJoseObject : mutableJoseObjects){
-            if(mutableJoseObject.changed()){
-                return true;
-            }
-        }
-        return false;
+        return mutableJoseObjects.stream().anyMatch(MutableJOSEObject::changed);
     }
 
     /**

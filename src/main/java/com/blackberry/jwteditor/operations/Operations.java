@@ -22,7 +22,6 @@ import com.blackberry.jwteditor.model.jose.JWE;
 import com.blackberry.jwteditor.model.jose.JWEFactory;
 import com.blackberry.jwteditor.model.jose.JWS;
 import com.blackberry.jwteditor.model.jose.JWSFactory;
-import com.blackberry.jwteditor.model.jose.exceptions.DecryptionException;
 import com.blackberry.jwteditor.model.jose.exceptions.EncryptionException;
 import com.blackberry.jwteditor.model.jose.exceptions.SigningException;
 import com.blackberry.jwteditor.model.keys.JWKKey;
@@ -34,9 +33,6 @@ import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.util.Base64URL;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.text.ParseException;
-import java.util.List;
 
 /**
  * High-level operations on JWE/JWS
@@ -116,24 +112,5 @@ public class Operations {
      */
     public static JWE encrypt(JWS jws, Key selectedKey, JWEAlgorithm selectedKek, EncryptionMethod selectedCek) throws EncryptionException {
         return JWEFactory.encrypt(jws, selectedKey, selectedKek, selectedCek);
-    }
-
-    /**
-     * Attempt to decrypt a JWE with a set of JWKs
-     *
-     * @param jwe the JWE to decrypt
-     * @param keys a list of JWKs to attempt decryption with
-     * @return the decrypted JWS or null if all keys fail
-     * @throws ParseException if parsing a decrypted JWE as a JWS fails
-     */
-    public static JWS decrypt(JWE jwe, List<Key> keys) throws ParseException {
-        for(Key key: keys){
-            try {
-                return jwe.decrypt(key);
-            } catch (DecryptionException e) {
-                //Decryption failed for this key
-            }
-        }
-        return null;
     }
 }

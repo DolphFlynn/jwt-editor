@@ -18,11 +18,14 @@ limitations under the License.
 
 package com.blackberry.jwteditor.model.keys;
 
+import com.blackberry.jwteditor.model.jose.JWE;
 import com.blackberry.jwteditor.model.jose.JWS;
+import com.blackberry.jwteditor.model.jose.exceptions.DecryptionException;
 import com.blackberry.jwteditor.model.jose.exceptions.VerificationException;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
 
+import java.text.ParseException;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,6 +47,18 @@ public class KeyRing {
                 } catch (VerificationException e) {
                     // Verification failed for this key & algorithm pair
                 }
+            }
+        }
+
+        return Optional.empty();
+    }
+
+    public Optional<JWS> attemptDecryption(JWE jwe) throws ParseException {
+        for (Key key : keys) {
+            try {
+                return Optional.of(jwe.decrypt(key));
+            } catch (DecryptionException e) {
+                //Decryption failed for this key
             }
         }
 
