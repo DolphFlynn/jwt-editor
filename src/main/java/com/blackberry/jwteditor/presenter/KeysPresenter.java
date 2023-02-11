@@ -276,7 +276,7 @@ public class KeysPresenter extends Presenter {
     /**
      * Handle click events on the row delete popup
      *
-     * @param rows array of indicies of the keys to be deleted from the position in the view
+     * @param rows array of indices of the keys to be deleted from the position in the view
      */
     public void onPopupDelete(int[] rows) {
         model.deleteKeys(rows);
