@@ -19,7 +19,7 @@ limitations under the License.
 package com.blackberry.jwteditor.view.dialog.keys;
 
 import com.blackberry.jwteditor.presenter.PresenterStore;
-import com.blackberry.jwteditor.view.RstaFactory;
+import com.blackberry.jwteditor.view.rsta.RstaFactory;
 import com.nimbusds.jose.jwk.ECKey;
 import com.nimbusds.jose.jwk.OctetKeyPair;
 import com.nimbusds.jose.jwk.RSAKey;

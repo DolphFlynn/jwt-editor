@@ -24,7 +24,7 @@ import com.blackberry.jwteditor.presenter.PresenterStore;
 import com.blackberry.jwteditor.utils.JSONUtils;
 import com.blackberry.jwteditor.utils.PEMUtils;
 import com.blackberry.jwteditor.utils.Utils;
-import com.blackberry.jwteditor.view.RstaFactory;
+import com.blackberry.jwteditor.view.rsta.RstaFactory;
 import com.blackberry.jwteditor.view.utils.DocumentAdapter;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.RSAKey;

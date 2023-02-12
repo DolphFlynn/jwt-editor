@@ -23,6 +23,7 @@ import burp.api.montoya.http.message.HttpRequestResponse;
 import burp.api.montoya.http.message.requests.HttpRequest;
 import burp.api.montoya.ui.editor.extension.ExtensionProvidedHttpRequestEditor;
 import com.blackberry.jwteditor.presenter.PresenterStore;
+import com.blackberry.jwteditor.view.rsta.RstaFactory;
 
 import static burp.api.montoya.internal.ObjectFactoryLocator.FACTORY;
 

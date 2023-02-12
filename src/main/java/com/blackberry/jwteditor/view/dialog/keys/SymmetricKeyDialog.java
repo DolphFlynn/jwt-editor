@@ -23,7 +23,7 @@ import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.presenter.PresenterStore;
 import com.blackberry.jwteditor.utils.JSONUtils;
 import com.blackberry.jwteditor.utils.Utils;
-import com.blackberry.jwteditor.view.RstaFactory;
+import com.blackberry.jwteditor.view.rsta.RstaFactory;
 import com.blackberry.jwteditor.view.utils.DocumentAdapter;
 import com.nimbusds.jose.jwk.OctetSequenceKey;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;

@@ -27,11 +27,11 @@ import com.blackberry.jwteditor.utils.JSONUtils;
 import com.blackberry.jwteditor.utils.PEMUtils;
 import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.view.KeysView;
-import com.blackberry.jwteditor.view.RstaFactory;
 import com.blackberry.jwteditor.view.dialog.keys.AsymmetricKeyDialogFactory;
 import com.blackberry.jwteditor.view.dialog.keys.KeyDialog;
 import com.blackberry.jwteditor.view.dialog.keys.PasswordDialog;
 import com.blackberry.jwteditor.view.dialog.keys.SymmetricKeyDialog;
+import com.blackberry.jwteditor.view.rsta.RstaFactory;
 import com.nimbusds.jose.jwk.*;
 
 import javax.swing.*;

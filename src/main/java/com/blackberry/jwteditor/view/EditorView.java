@@ -23,6 +23,7 @@ import burp.api.montoya.ui.editor.extension.ExtensionProvidedEditor;
 import com.blackberry.jwteditor.presenter.EditorPresenter;
 import com.blackberry.jwteditor.presenter.PresenterStore;
 import com.blackberry.jwteditor.utils.Utils;
+import com.blackberry.jwteditor.view.rsta.RstaFactory;
 import org.exbin.deltahex.EditationAllowed;
 import org.exbin.deltahex.ViewMode;
 import org.exbin.deltahex.swing.CodeArea;
@@ -32,7 +33,6 @@ import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.text.JTextComponent;
 import java.awt.*;
 
 import static org.exbin.deltahex.EditationAllowed.ALLOWED;
@@ -528,13 +528,6 @@ public abstract class EditorView implements ExtensionProvidedEditor {
         codeAreaTag.setData(new ByteArrayEditableData(new byte[0]));
         codeAreaTag.setBackground(Color.WHITE);
         panelTag.add(codeAreaTag);
-
-        // https://github.com/bobbylight/RSyntaxTextArea/issues/269#issuecomment-776329702 - Fix keypresses in Repeater
-        JTextComponent.removeKeymap("RTextAreaKeymap");
-        UIManager.put("RSyntaxTextAreaUI.actionMap", null);
-        UIManager.put("RSyntaxTextAreaUI.inputMap", null);
-        UIManager.put("RTextAreaUI.actionMap", null);
-        UIManager.put("RTextAreaUI.inputMap", null);
 
         // Create the Attack popup menu
         JPopupMenu popupMenuAttack = new JPopupMenu();

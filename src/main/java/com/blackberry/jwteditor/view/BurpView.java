@@ -27,6 +27,7 @@ import com.blackberry.jwteditor.model.persistence.KeysModelPersistence;
 import com.blackberry.jwteditor.presenter.BurpPresenter;
 import com.blackberry.jwteditor.presenter.PresenterStore;
 import com.blackberry.jwteditor.utils.Utils;
+import com.blackberry.jwteditor.view.rsta.RstaFactory;
 
 import javax.swing.*;
 import java.awt.*;
