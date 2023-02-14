@@ -16,7 +16,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.blackberry.jwteditor;
+package encryption;
 
 import com.blackberry.jwteditor.model.jose.JWE;
 import com.blackberry.jwteditor.model.jose.JWEFactory;
@@ -30,12 +30,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import utils.ArgumentUtils;
 import utils.BouncyCastleExtension;
 
 import java.util.List;
 import java.util.stream.Stream;
 
-import static com.blackberry.jwteditor.ArgumentUtils.cartesianProduct;
 import static com.nimbusds.jose.EncryptionMethod.*;
 import static com.nimbusds.jose.JWEAlgorithm.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -80,7 +80,7 @@ class PasswordEncryptionTests {
     }
 
     private static Stream<Arguments> algorithmsAndMethods() {
-        return cartesianProduct(ENCRYPTION_ALGORITHMS, ENCRYPTION_METHODS);
+        return ArgumentUtils.cartesianProduct(ENCRYPTION_ALGORITHMS, ENCRYPTION_METHODS);
     }
 
     @ParameterizedTest

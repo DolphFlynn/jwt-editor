@@ -16,9 +16,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.blackberry.jwteditor;
+package data;
 
-interface PemData {
+public interface PemData {
     String PRIME256v1PrivatePKCS8 = """
             -----BEGIN PRIVATE KEY-----
             MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgR7xUBrtHikGBXsJk

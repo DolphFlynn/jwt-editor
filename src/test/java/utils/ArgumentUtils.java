@@ -16,7 +16,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.blackberry.jwteditor;
+package utils;
 
 import org.junit.jupiter.params.provider.Arguments;
 
@@ -27,9 +27,9 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
-class ArgumentUtils {
+public class ArgumentUtils {
 
-    static <T, U> Stream<Arguments> cartesianProduct(Collection<T> a, Collection<U> b) {
+    public static <T, U> Stream<Arguments> cartesianProduct(Collection<T> a, Collection<U> b) {
         List<Arguments> arguments = new LinkedList<>();
 
         for (T t : a) {
@@ -41,7 +41,7 @@ class ArgumentUtils {
         return arguments.stream();
     }
 
-    static <T, U, V> Stream<Arguments> cartesianProduct(Collection<T> a, Collection<U> b, Collection<V> c) {
+    public static <T, U, V> Stream<Arguments> cartesianProduct(Collection<T> a, Collection<U> b, Collection<V> c) {
         List<Arguments> arguments = new LinkedList<>();
 
         for (T t : a) {

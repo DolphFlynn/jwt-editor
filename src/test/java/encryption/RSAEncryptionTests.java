@@ -16,7 +16,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.blackberry.jwteditor;
+package encryption;
 
 import com.blackberry.jwteditor.model.jose.JWE;
 import com.blackberry.jwteditor.model.jose.JWEFactory;
@@ -31,16 +31,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import utils.ArgumentUtils;
 import utils.BouncyCastleExtension;
 
 import java.util.List;
 import java.util.stream.Stream;
 
-import static com.blackberry.jwteditor.ArgumentUtils.cartesianProduct;
-import static com.blackberry.jwteditor.PemData.*;
 import static com.blackberry.jwteditor.utils.PEMUtils.pemToRSAKey;
 import static com.nimbusds.jose.EncryptionMethod.*;
 import static com.nimbusds.jose.JWEAlgorithm.*;
+import static data.PemData.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
@@ -135,7 +135,7 @@ class RSAEncryptionTests {
     }
 
     private static Stream<Arguments> rsaKeysAndAlgorithms() {
-        return cartesianProduct(rsaKeys().toList(), ENCRYPTION_ALGORITHMS);
+        return ArgumentUtils.cartesianProduct(rsaKeys().toList(), ENCRYPTION_ALGORITHMS);
     }
 
     @ParameterizedTest
@@ -163,7 +163,7 @@ class RSAEncryptionTests {
                 Pair.of(pemToRSAKey(RSA4096Public), pemToRSAKey(RSA4096Private))
         );
 
-        return cartesianProduct(keyPairs, ENCRYPTION_ALGORITHMS, ENCRYPTION_METHODS);
+        return ArgumentUtils.cartesianProduct(keyPairs, ENCRYPTION_ALGORITHMS, ENCRYPTION_METHODS);
     }
 
     @ParameterizedTest

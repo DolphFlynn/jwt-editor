@@ -12,7 +12,7 @@ import java.text.ParseException;
 import java.util.Optional;
 
 import static com.blackberry.jwteditor.KeysRingBuilder.keyRing;
-import static com.blackberry.jwteditor.PemData.*;
+import static data.PemData.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class KeyRingTest {

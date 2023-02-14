@@ -16,7 +16,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.blackberry.jwteditor;
+package encryption;
 
 import com.blackberry.jwteditor.model.jose.JWE;
 import com.blackberry.jwteditor.model.jose.JWEFactory;
@@ -31,16 +31,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import utils.ArgumentUtils;
 import utils.BouncyCastleExtension;
 
 import java.util.List;
 import java.util.stream.Stream;
 
-import static com.blackberry.jwteditor.ArgumentUtils.cartesianProduct;
-import static com.blackberry.jwteditor.PemData.*;
 import static com.blackberry.jwteditor.utils.PEMUtils.pemToOctetKeyPair;
 import static com.nimbusds.jose.EncryptionMethod.*;
 import static com.nimbusds.jose.JWEAlgorithm.ECDH_ES;
+import static data.PemData.*;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
@@ -125,7 +125,7 @@ class OKPEncryptionTests {
     }
 
     private static Stream<Arguments> okpKeysAndAlgorithms() {
-        return cartesianProduct(okpKeys().toList(), ENCRYPTION_ALGORITHMS);
+        return ArgumentUtils.cartesianProduct(okpKeys().toList(), ENCRYPTION_ALGORITHMS);
     }
 
     @ParameterizedTest
@@ -152,7 +152,7 @@ class OKPEncryptionTests {
                 Pair.of(pemToOctetKeyPair(X25519Public), pemToOctetKeyPair(X25519Private))
         );
 
-        return cartesianProduct(keyPairs, ENCRYPTION_ALGORITHMS, ENCRYPTION_METHODS);
+        return ArgumentUtils.cartesianProduct(keyPairs, ENCRYPTION_ALGORITHMS, ENCRYPTION_METHODS);
     }
 
     @ParameterizedTest

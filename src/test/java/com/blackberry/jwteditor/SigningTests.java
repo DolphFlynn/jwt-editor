@@ -41,9 +41,9 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static com.blackberry.jwteditor.KeyUtils.*;
-import static com.blackberry.jwteditor.PemData.*;
 import static com.blackberry.jwteditor.model.jose.JWSFactory.jwsFromParts;
 import static com.nimbusds.jose.JWSAlgorithm.*;
+import static data.PemData.*;
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.params.provider.Arguments.arguments;

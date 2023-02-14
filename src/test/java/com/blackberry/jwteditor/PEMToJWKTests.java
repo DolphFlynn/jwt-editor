@@ -33,7 +33,7 @@ import utils.BouncyCastleExtension;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
-import static com.blackberry.jwteditor.PemData.*;
+import static data.PemData.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 

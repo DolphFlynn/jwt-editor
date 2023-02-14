@@ -23,7 +23,7 @@ import com.blackberry.jwteditor.model.keys.PasswordKey;
 import org.junit.jupiter.api.Test;
 
 import static com.blackberry.jwteditor.KeysModelBuilder.keysModel;
-import static com.blackberry.jwteditor.PemData.*;
+import static data.PemData.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class KeysModelTest {
