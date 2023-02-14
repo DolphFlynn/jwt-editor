@@ -25,14 +25,13 @@ import com.blackberry.jwteditor.model.jose.JWSFactory;
 import com.blackberry.jwteditor.model.keys.PasswordKey;
 import com.nimbusds.jose.EncryptionMethod;
 import com.nimbusds.jose.JWEAlgorithm;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import utils.BouncyCastleExtension;
 
-import java.security.Security;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -41,17 +40,13 @@ import static com.nimbusds.jose.EncryptionMethod.*;
 import static com.nimbusds.jose.JWEAlgorithm.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ExtendWith(BouncyCastleExtension.class)
 class PasswordEncryptionTests {
     private static final String TEST_JWS = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJMaWdodG1hbiJ9.cB5NQREgEHk47Zx5XRGWZ85eJ8SgmvBuKW5_Pm4Zo6o";
     private static final List<JWEAlgorithm> ENCRYPTION_ALGORITHMS = List.of(PBES2_HS256_A128KW, PBES2_HS384_A192KW, PBES2_HS512_A256KW);
     private static final List<EncryptionMethod> ENCRYPTION_METHODS = List.of(
             A128GCM, A192GCM, A256GCM, A128CBC_HS256, A128CBC_HS256_DEPRECATED, A192CBC_HS384, A256CBC_HS512, A256CBC_HS512_DEPRECATED
     );
-
-    @BeforeAll
-    static void addBouncyCastle() {
-        Security.addProvider(new BouncyCastleProvider());
-    }
 
     private static final PasswordKey KEY = new PasswordKey("testKeyId", "secret", 8, 1337);
 

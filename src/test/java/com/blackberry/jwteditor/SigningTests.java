@@ -29,15 +29,14 @@ import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.OctetSequenceKey;
 import com.nimbusds.jose.jwk.gen.OctetSequenceKeyGenerator;
 import com.nimbusds.jose.util.Base64URL;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import utils.BouncyCastleExtension;
 
-import java.security.Security;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -49,17 +48,13 @@ import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
+@ExtendWith(BouncyCastleExtension.class)
 class SigningTests {
     private static final JWS TEST_JWS = jwsFromParts(
             Base64URL.encode("{\"typ\":\"JWT\",\"alg\":\"HS256\"}"),
             Base64URL.encode("{\"sub\":\"Test\"}"),
             Base64URL.encode(new byte[0])
     );
-
-    @BeforeAll
-    static void addBouncyCastle() {
-        Security.addProvider(new BouncyCastleProvider());
-    }
 
     private static Stream<Arguments> keysAndExpectedSigningAlgorithms() throws Exception {
         return Stream.of(

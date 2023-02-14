@@ -27,13 +27,12 @@ import com.nimbusds.jose.EncryptionMethod;
 import com.nimbusds.jose.JWEAlgorithm;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.util.Pair;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import utils.BouncyCastleExtension;
 
-import java.security.Security;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -46,6 +45,7 @@ import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
+@ExtendWith(BouncyCastleExtension.class)
 class OKPEncryptionTests {
     private static final String TEST_JWS = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJMaWdodG1hbiJ9.cB5NQREgEHk47Zx5XRGWZ85eJ8SgmvBuKW5_Pm4Zo6o";
     private static final List<JWEAlgorithm> ENCRYPTION_ALGORITHMS = singletonList(ECDH_ES);
@@ -57,11 +57,6 @@ class OKPEncryptionTests {
             A256CBC_HS512,
             A256GCM
     );
-
-    @BeforeAll
-    static void addBouncyCastle() {
-        Security.addProvider(new BouncyCastleProvider());
-    }
 
     private static Stream<Arguments> canEncryptWithOKP() {
         return Stream.of(

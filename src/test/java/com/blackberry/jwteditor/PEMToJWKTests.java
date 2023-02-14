@@ -25,12 +25,11 @@ import com.nimbusds.jose.jwk.ECKey;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.OctetKeyPair;
 import com.nimbusds.jose.jwk.RSAKey;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import utils.BouncyCastleExtension;
 
-import java.security.Security;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
@@ -38,12 +37,8 @@ import static com.blackberry.jwteditor.PemData.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@ExtendWith(BouncyCastleExtension.class)
 class PEMToJWKTests {
-    @BeforeAll
-    static void addBouncyCastle() {
-        Security.addProvider(new BouncyCastleProvider());
-    }
-
     private static Stream<String> ecPrivateValidPEMs() {
         return Stream.of(ECPrivate);
     }
