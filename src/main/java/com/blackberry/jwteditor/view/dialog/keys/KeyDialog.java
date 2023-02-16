@@ -65,7 +65,7 @@ public abstract class KeyDialog extends JDialog {
     /**
      * Handler for OK button click
      */
-    protected void onOK() {
+    void onOK() {
         KeysPresenter keyPresenter = (KeysPresenter) presenters.get(KeysPresenter.class);
         Key newKey = getKey();
 

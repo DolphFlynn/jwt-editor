@@ -106,7 +106,7 @@ public class PasswordDialog extends KeyDialog {
      * OK clicked, build a PasswordKey from the form values
      */
     @Override
-    protected void onOK() {
+    void onOK() {
         key = new PasswordKey(textFieldKeyId.getText(), textFieldPassword.getText(), (Integer) spinnerSaltLength.getValue(), (Integer) spinnerIterations.getValue());
         super.onOK();
     }
