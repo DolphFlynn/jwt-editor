@@ -1,7 +1,7 @@
 package com.blackberry.jwteditor.pem;
 
+import com.blackberry.jwteditor.exceptions.PemException;
 import com.blackberry.jwteditor.utils.OKPCurve;
-import com.blackberry.jwteditor.utils.PEMUtils.PemException;
 import com.nimbusds.jose.jwk.OctetKeyPair;
 import org.bouncycastle.asn1.*;
 import org.bouncycastle.util.io.pem.PemObject;

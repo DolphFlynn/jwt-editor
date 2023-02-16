@@ -18,7 +18,7 @@ limitations under the License.
 
 package com.blackberry.jwteditor.model.jose;
 
-import com.blackberry.jwteditor.model.jose.exceptions.SigningException;
+import com.blackberry.jwteditor.exceptions.SigningException;
 import com.blackberry.jwteditor.model.keys.Key;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSHeader;

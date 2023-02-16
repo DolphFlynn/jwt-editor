@@ -18,10 +18,10 @@ limitations under the License.
 
 package com.blackberry.jwteditor.model.keys;
 
+import com.blackberry.jwteditor.exceptions.DecryptionException;
+import com.blackberry.jwteditor.exceptions.VerificationException;
 import com.blackberry.jwteditor.model.jose.JWE;
 import com.blackberry.jwteditor.model.jose.JWS;
-import com.blackberry.jwteditor.model.jose.exceptions.DecryptionException;
-import com.blackberry.jwteditor.model.jose.exceptions.VerificationException;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
 

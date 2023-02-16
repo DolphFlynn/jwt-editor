@@ -18,6 +18,8 @@ limitations under the License.
 
 package com.blackberry.jwteditor;
 
+import com.blackberry.jwteditor.exceptions.PemException;
+import com.blackberry.jwteditor.exceptions.UnsupportedKeyException;
 import com.blackberry.jwteditor.model.KeysModel;
 import com.blackberry.jwteditor.model.keys.JWKKey;
 import com.blackberry.jwteditor.model.keys.Key;
@@ -34,7 +36,7 @@ class KeysModelBuilder {
         try {
             JWK jwk = PEMUtils.pemToECKey(pem, Integer.toString(keyId.incrementAndGet()));
             model.addKey(new JWKKey(jwk));
-        } catch (PEMUtils.PemException | Key.UnsupportedKeyException e) {
+        } catch (PemException | UnsupportedKeyException e) {
             throw new IllegalStateException(e);
         }
 
@@ -45,7 +47,7 @@ class KeysModelBuilder {
         try {
             JWK jwk = PEMUtils.pemToRSAKey(pem, Integer.toString(keyId.incrementAndGet()));
             model.addKey(new JWKKey(jwk));
-        } catch (PEMUtils.PemException | Key.UnsupportedKeyException e) {
+        } catch (PemException | UnsupportedKeyException e) {
             throw new IllegalStateException(e);
         }
 
@@ -56,7 +58,7 @@ class KeysModelBuilder {
         try {
             JWK jwk = PEMUtils.pemToOctetKeyPair(pem, Integer.toString(keyId.incrementAndGet()));
             model.addKey(new JWKKey(jwk));
-        } catch (PEMUtils.PemException | Key.UnsupportedKeyException e) {
+        } catch (PemException | UnsupportedKeyException e) {
             throw new IllegalStateException(e);
         }
 

@@ -18,10 +18,10 @@ limitations under the License.
 
 package com.blackberry.jwteditor.model.keys;
 
+import com.blackberry.jwteditor.exceptions.UnsupportedKeyException;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.jwk.JWK;
 import org.json.JSONObject;
-
 
 import java.text.ParseException;
 
@@ -81,9 +81,5 @@ public interface Key {
         else {
             return new JWKKey(JWK.parse(jsonObject.toString()));
         }
-    }
-
-
-    class UnsupportedKeyException extends Exception {
     }
 }

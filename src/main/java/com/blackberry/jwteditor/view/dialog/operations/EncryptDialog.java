@@ -18,9 +18,9 @@ limitations under the License.
 
 package com.blackberry.jwteditor.view.dialog.operations;
 
+import com.blackberry.jwteditor.exceptions.EncryptionException;
 import com.blackberry.jwteditor.model.jose.JWE;
 import com.blackberry.jwteditor.model.jose.JWS;
-import com.blackberry.jwteditor.model.jose.exceptions.EncryptionException;
 import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.operations.Operations;
 import com.blackberry.jwteditor.utils.Utils;

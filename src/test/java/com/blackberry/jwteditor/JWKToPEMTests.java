@@ -18,11 +18,12 @@ limitations under the License.
 
 package com.blackberry.jwteditor;
 
+import com.blackberry.jwteditor.exceptions.PemException;
+import com.blackberry.jwteditor.exceptions.UnsupportedKeyException;
 import com.blackberry.jwteditor.model.keys.JWKKey;
 import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.model.keys.PasswordKey;
 import com.blackberry.jwteditor.utils.PEMUtils;
-import com.blackberry.jwteditor.utils.PEMUtils.PemException;
 import com.nimbusds.jose.jwk.ECKey;
 import com.nimbusds.jose.jwk.OctetKeyPair;
 import com.nimbusds.jose.jwk.OctetSequenceKey;
@@ -155,7 +156,7 @@ class JWKToPEMTests {
         assertThrows(Exception.class, () -> OctetKeyPair.parse(jwkString));
     }
 
-    private static Stream<Arguments> keyToPemData() throws ParseException, Key.UnsupportedKeyException {
+    private static Stream<Arguments> keyToPemData() throws ParseException, UnsupportedKeyException {
         return Stream.of(
                 arguments(new JWKKey(RSAKey.parse(RSA2048PrivateDEN)), true),
                 arguments(new JWKKey(ECKey.parse(P256Private)), true),

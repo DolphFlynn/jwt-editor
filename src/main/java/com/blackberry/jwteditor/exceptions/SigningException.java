@@ -1,4 +1,4 @@
-package com.blackberry.jwteditor.model.jose.exceptions;
+package com.blackberry.jwteditor.exceptions;
 
 public class SigningException extends Exception {
     public SigningException(String msg) {

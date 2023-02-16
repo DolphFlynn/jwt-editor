@@ -18,6 +18,7 @@ limitations under the License.
 
 package com.blackberry.jwteditor.utils;
 
+import com.blackberry.jwteditor.exceptions.PemException;
 import com.blackberry.jwteditor.pem.JWKToPemConverterFactory;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.Curve;
@@ -53,12 +54,6 @@ import java.util.Map;
  * Class containing utilities to convert between PEM and nimbus-jose JWK formats
  */
 public class PEMUtils {
-    public static class PemException extends Exception{
-        public PemException(String msg) {
-            super(msg);
-        }
-    }
-
     /**
      * Convert a JWK object to its PEM representation
      * @param jwk JWK to convert
@@ -161,9 +156,7 @@ public class PEMUtils {
                     JcaPEMKeyConverter converter = new JcaPEMKeyConverter().setProvider("BC"); //NON-NLS
                     PrivateKey privateKey = converter.getPrivateKey((PrivateKeyInfo) pemObject);
 
-                    if (privateKey instanceof BCECPrivateKey) {
-                        BCECPrivateKey ecPrivateKey = (BCECPrivateKey) privateKey;
-
+                    if (privateKey instanceof BCECPrivateKey ecPrivateKey) {
                         // Derive a public key from the private key
                         BigInteger d = ecPrivateKey.getD();
                         ECParameterSpec ecParameterSpec = ecPrivateKey.getParameters();
@@ -225,8 +218,7 @@ public class PEMUtils {
             ASN1Encodable integerOrSequencePrimitive = outerSequence.getObjectAt(0);
 
             // Private key
-            if(integerOrSequencePrimitive instanceof ASN1Integer){
-                ASN1Integer i = (ASN1Integer) integerOrSequencePrimitive;
+            if(integerOrSequencePrimitive instanceof ASN1Integer i){
                 DLSequence algorithmSequence = (DLSequence) outerSequence.getObjectAt(1);
                 DEROctetString outerOctetString = (DEROctetString) outerSequence.getObjectAt(2);
 

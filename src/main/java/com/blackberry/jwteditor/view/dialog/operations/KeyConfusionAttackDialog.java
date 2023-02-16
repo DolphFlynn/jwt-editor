@@ -18,12 +18,13 @@ limitations under the License.
 
 package com.blackberry.jwteditor.view.dialog.operations;
 
+import com.blackberry.jwteditor.exceptions.PemException;
+import com.blackberry.jwteditor.exceptions.SigningException;
+import com.blackberry.jwteditor.exceptions.UnsupportedKeyException;
 import com.blackberry.jwteditor.model.jose.JWS;
-import com.blackberry.jwteditor.model.jose.exceptions.SigningException;
 import com.blackberry.jwteditor.model.keys.JWKKey;
 import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.operations.Attacks;
-import com.blackberry.jwteditor.utils.PEMUtils;
 import com.blackberry.jwteditor.utils.Utils;
 import com.nimbusds.jose.JWSAlgorithm;
 
@@ -105,7 +106,7 @@ public class KeyConfusionAttackDialog extends JDialog {
         // Try to perform the attack, show dialog if this fails
         try{
             jws = Attacks.hmacKeyConfusion(jws, selectedKey, selectedAlgorithm, checkBoxTrailingNewline.isSelected());
-        } catch (SigningException | PEMUtils.PemException | Key.UnsupportedKeyException e) {
+        } catch (SigningException | PemException | UnsupportedKeyException e) {
             jws = null;
             JOptionPane.showMessageDialog(this, e.getMessage(), Utils.getResourceString("error_title_unable_to_sign"), JOptionPane.WARNING_MESSAGE);
         }

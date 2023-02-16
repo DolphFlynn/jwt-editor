@@ -18,7 +18,7 @@ limitations under the License.
 
 package com.blackberry.jwteditor.model.jose;
 
-import com.blackberry.jwteditor.model.jose.exceptions.DecryptionException;
+import com.blackberry.jwteditor.exceptions.DecryptionException;
 import com.blackberry.jwteditor.model.keys.Key;
 import com.nimbusds.jose.JWEDecrypter;
 import com.nimbusds.jose.JWEHeader;

@@ -18,6 +18,7 @@ limitations under the License.
 
 package com.blackberry.jwteditor.model;
 
+import com.blackberry.jwteditor.exceptions.UnsupportedKeyException;
 import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.presenter.KeysPresenter;
 import org.json.JSONArray;
@@ -65,7 +66,7 @@ public class KeysModel {
             }
 
             return keysModel;
-        } catch (Key.UnsupportedKeyException | ParseException e) {
+        } catch (UnsupportedKeyException | ParseException e) {
             throw new ParseException(e.getMessage(), 0);
         }
     }

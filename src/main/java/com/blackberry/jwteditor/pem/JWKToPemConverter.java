@@ -1,6 +1,6 @@
 package com.blackberry.jwteditor.pem;
 
-import com.blackberry.jwteditor.utils.PEMUtils.PemException;
+import com.blackberry.jwteditor.exceptions.PemException;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.JWK;
 import org.bouncycastle.util.io.pem.PemObject;

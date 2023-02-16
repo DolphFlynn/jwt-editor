@@ -18,8 +18,8 @@ limitations under the License.
 
 package com.blackberry.jwteditor.view.dialog.operations;
 
+import com.blackberry.jwteditor.exceptions.SigningException;
 import com.blackberry.jwteditor.model.jose.JWS;
-import com.blackberry.jwteditor.model.jose.exceptions.SigningException;
 import com.blackberry.jwteditor.model.keys.JWKKey;
 import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.operations.Attacks;

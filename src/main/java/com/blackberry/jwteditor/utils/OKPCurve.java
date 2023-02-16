@@ -1,5 +1,6 @@
 package com.blackberry.jwteditor.utils;
 
+import com.blackberry.jwteditor.exceptions.PemException;
 import com.nimbusds.jose.jwk.Curve;
 import com.nimbusds.jose.jwk.OctetKeyPair;
 import com.nimbusds.jose.util.Base64URL;
@@ -29,9 +30,9 @@ public enum OKPCurve {
         this.oid = new ASN1ObjectIdentifier(oid);
     }
 
-    public OctetKeyPair buildPrivateKeyFrom(byte[] octets) throws PEMUtils.PemException {
+    public OctetKeyPair buildPrivateKeyFrom(byte[] octets) throws PemException {
         if (octets.length != keyLength) {
-            throw new PEMUtils.PemException("Invalid key length");
+            throw new PemException("Invalid key length");
         }
 
         Base64URL x = Base64URL.encode(extractPublicKeyFromPrivateKey(octets));
@@ -62,17 +63,17 @@ public enum OKPCurve {
         };
     }
 
-    public static OKPCurve fromStandardName(String name) throws PEMUtils.PemException {
+    public static OKPCurve fromStandardName(String name) throws PemException {
         return stream(values())
                 .filter(curve -> curve.curve.getStdName().equals(name))
                 .findFirst()
-                .orElseThrow(() -> new PEMUtils.PemException("Invalid curve with name: " + name));
+                .orElseThrow(() -> new PemException("Invalid curve with name: " + name));
     }
 
-    public static OKPCurve fromAlgorithmId(String oid) throws PEMUtils.PemException {
+    public static OKPCurve fromAlgorithmId(String oid) throws PemException {
         return stream(values())
                 .filter(curve -> curve.oid.getId().equals(oid))
                 .findFirst()
-                .orElseThrow(() -> new PEMUtils.PemException("Invalid curve with OID: " + oid));
+                .orElseThrow(() -> new PemException("Invalid curve with OID: " + oid));
     }
 }

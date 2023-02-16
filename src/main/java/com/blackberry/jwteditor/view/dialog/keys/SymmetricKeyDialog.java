@@ -18,6 +18,7 @@ limitations under the License.
 
 package com.blackberry.jwteditor.view.dialog.keys;
 
+import com.blackberry.jwteditor.exceptions.UnsupportedKeyException;
 import com.blackberry.jwteditor.model.keys.JWKKey;
 import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.presenter.PresenterStore;
@@ -169,17 +170,11 @@ public class SymmetricKeyDialog extends KeyDialog {
      * Get the new/modified key resulting from the operations of this dialog
      * @return the new/modified JWK
      */
-    public Key getKey(){
-        if(jwk == null){
+    public Key getKey() {
+        try {
+            return jwk == null ? null : new JWKKey(jwk);
+        } catch (UnsupportedKeyException ignored) {
             return null;
-        }
-        else {
-            try{
-                return new JWKKey(jwk);
-            }
-            catch (Key.UnsupportedKeyException e){
-                return null;
-            }
         }
     }
 

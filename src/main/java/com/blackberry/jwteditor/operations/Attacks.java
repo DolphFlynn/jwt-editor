@@ -18,11 +18,12 @@ limitations under the License.
 
 package com.blackberry.jwteditor.operations;
 
+import com.blackberry.jwteditor.exceptions.PemException;
+import com.blackberry.jwteditor.exceptions.SigningException;
+import com.blackberry.jwteditor.exceptions.UnsupportedKeyException;
 import com.blackberry.jwteditor.model.jose.JWS;
 import com.blackberry.jwteditor.model.jose.JWSFactory;
-import com.blackberry.jwteditor.model.jose.exceptions.SigningException;
 import com.blackberry.jwteditor.model.keys.JWKKey;
-import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.utils.ByteArrayUtils;
 import com.blackberry.jwteditor.utils.PEMUtils;
 import com.nimbusds.jose.JOSEObjectType;
@@ -50,11 +51,11 @@ public class Attacks {
      * @param algorithm the HMAC algorithm to sign with
      * @param stripTrailingNewlines remove trailing '/n' characters from the public key
      * @return a JWS signed using HMAC with the RSA public key
-     * @throws PEMUtils.PemException if the RSA public key is not a valid PEM
-     * @throws Key.UnsupportedKeyException if HMAC key creation fails
+     * @throws PemException if the RSA public key is not a valid PEM
+     * @throws UnsupportedKeyException if HMAC key creation fails
      * @throws SigningException if signing fails
      */
-    public static JWS hmacKeyConfusion(JWS jws, JWKKey key, JWSAlgorithm algorithm, boolean stripTrailingNewlines) throws PEMUtils.PemException, Key.UnsupportedKeyException, SigningException {
+    public static JWS hmacKeyConfusion(JWS jws, JWKKey key, JWSAlgorithm algorithm, boolean stripTrailingNewlines) throws PemException, UnsupportedKeyException, SigningException {
 
         // Convert the key to its public key in PEM format
         byte[] pemBytes = PEMUtils.jwkToPem(key.getJWK().toPublicJWK()).getBytes();

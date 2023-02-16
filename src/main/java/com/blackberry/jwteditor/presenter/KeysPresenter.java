@@ -18,6 +18,7 @@ limitations under the License.
 
 package com.blackberry.jwteditor.presenter;
 
+import com.blackberry.jwteditor.exceptions.PemException;
 import com.blackberry.jwteditor.model.KeysModel;
 import com.blackberry.jwteditor.model.keys.JWKKey;
 import com.blackberry.jwteditor.model.keys.Key;
@@ -303,7 +304,7 @@ public class KeysPresenter extends Presenter {
         JWK jwk = jwkKey.getJWK();
         try {
             Utils.copyToClipboard(PEMUtils.jwkToPem(jwk));
-        } catch (PEMUtils.PemException e) {
+        } catch (PemException e) {
             throw new IllegalStateException("Shouldn't happen - call canCopyPEM first");
         }
     }
@@ -329,7 +330,7 @@ public class KeysPresenter extends Presenter {
         JWK jwk = jwkKey.getJWK().toPublicJWK();
         try {
             Utils.copyToClipboard(PEMUtils.jwkToPem(jwk));
-        } catch (PEMUtils.PemException e) {
+        } catch (PemException e) {
             throw new IllegalStateException("Shouldn't happen - call canCopyPEM first");
         }
     }

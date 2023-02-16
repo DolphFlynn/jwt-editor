@@ -18,6 +18,8 @@ limitations under the License.
 
 package com.blackberry.jwteditor.view.dialog.keys;
 
+import com.blackberry.jwteditor.exceptions.PemException;
+import com.blackberry.jwteditor.exceptions.UnsupportedKeyException;
 import com.blackberry.jwteditor.model.keys.JWKKey;
 import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.presenter.PresenterStore;
@@ -180,7 +182,7 @@ public class AsymmetricKeyDialog extends KeyDialog {
                     labelError.setText(Utils.getResourceString("error_invalid_key_type"));
                 }
 
-            } catch (ParseException | IllegalArgumentException | PEMUtils.PemException e) {
+            } catch (ParseException | IllegalArgumentException | PemException e) {
                 // Set the error state if any parse errors are encountered
                 keyError = true;
                 if (textFieldKeyId.getText().length() == 0) {
@@ -237,7 +239,7 @@ public class AsymmetricKeyDialog extends KeyDialog {
                     JWK tempJWK = jwk;
                     textFieldKeyId.setText(tempJWK.getKeyID());
                     textAreaKey.setText(PEMUtils.jwkToPem(tempJWK));
-                } catch (PEMUtils.PemException e) {
+                } catch (PemException e) {
                     textFieldKeyId.setText("");
                     textAreaKey.setText("");
                 }
@@ -282,7 +284,7 @@ public class AsymmetricKeyDialog extends KeyDialog {
                         textFieldKeyId.setText(jwk.getKeyID());
                         textAreaKey.setText(PEMUtils.jwkToPem(jwk));
                     }
-                } catch (PEMUtils.PemException | InterruptedException | ExecutionException e) {
+                } catch (PemException | InterruptedException | ExecutionException e) {
                     labelError.setText(Utils.getResourceString("error_key_generation"));
                 }
 
@@ -309,13 +311,9 @@ public class AsymmetricKeyDialog extends KeyDialog {
      * @return the new/modified JWK
      */
     public Key getKey() {
-        if (jwk == null) {
-            return null;
-        }
-
         try {
-            return new JWKKey(jwk);
-        } catch (Key.UnsupportedKeyException e) {
+            return jwk == null ? null : new JWKKey(jwk);
+        } catch (UnsupportedKeyException e) {
             return null;
         }
     }

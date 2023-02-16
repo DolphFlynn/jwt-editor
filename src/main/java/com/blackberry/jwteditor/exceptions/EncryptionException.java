@@ -1,4 +1,4 @@
-package com.blackberry.jwteditor.model.jose.exceptions;
+package com.blackberry.jwteditor.exceptions;
 
 public class EncryptionException extends Exception {
     public EncryptionException(String msg) {

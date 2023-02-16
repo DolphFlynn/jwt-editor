@@ -22,6 +22,7 @@ import com.blackberry.jwteditor.cryptography.okp.OKPDecrypter;
 import com.blackberry.jwteditor.cryptography.okp.OKPEncrypter;
 import com.blackberry.jwteditor.cryptography.okp.OKPSigner;
 import com.blackberry.jwteditor.cryptography.okp.OKPVerifier;
+import com.blackberry.jwteditor.exceptions.UnsupportedKeyException;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.*;
 import com.nimbusds.jose.jwk.*;
