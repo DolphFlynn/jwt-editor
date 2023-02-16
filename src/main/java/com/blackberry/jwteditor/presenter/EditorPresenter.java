@@ -27,10 +27,7 @@ import com.blackberry.jwteditor.model.keys.KeyRing;
 import com.blackberry.jwteditor.utils.JSONUtils;
 import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.view.EditorView;
-import com.blackberry.jwteditor.view.dialog.operations.EncryptDialog;
-import com.blackberry.jwteditor.view.dialog.operations.KeyConfusionAttackDialog;
-import com.blackberry.jwteditor.view.dialog.operations.NoneDialog;
-import com.blackberry.jwteditor.view.dialog.operations.SignDialog;
+import com.blackberry.jwteditor.view.dialog.operations.*;
 import com.nimbusds.jose.util.Base64URL;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
@@ -316,6 +313,19 @@ public class EditorPresenter extends Presenter {
 
         if (unsignedJWS != null) {
             setJWS(unsignedJWS);
+        }
+    }
+
+    public void onAttackSignEmptyKeyClicked() {
+        EmptyKeySigningDialog signingDialog = new EmptyKeySigningDialog(view.window(), getJWS());
+        signingDialog.pack();
+        signingDialog.setLocationRelativeTo(view.window());
+        signingDialog.setVisible(true);
+
+        JWS signedJWS = signingDialog.getJWS();
+
+        if (signedJWS != null) {
+            setJWS(signedJWS);
         }
     }
 

