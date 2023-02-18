@@ -79,13 +79,13 @@ public class KeysPresenter extends Presenter {
     /**
      * Handler for double-click events from the keys view
      */
-    public void onTableKeysDoubleClick(){
+    public void onTableKeysDoubleClick() {
         Key key = model.getKey(view.getSelectedRow());
 
         KeyDialog d;
 
         // Get the dialog type based on the key type
-        if(key instanceof JWKKey) {
+        if (key instanceof JWKKey) {
             JWK jwk = ((JWKKey) key).getJWK();
             if (jwk instanceof RSAKey rsaKey) {
                 d = asymmetricKeyDialogFactory.rsaKeyDialog(rsaKey);
@@ -98,11 +98,9 @@ public class KeysPresenter extends Presenter {
             } else {
                 return;
             }
-        }
-        else if(key instanceof PasswordKey){
+        } else if (key instanceof PasswordKey) {
             d = new PasswordDialog(view.getParent(), presenters, (PasswordKey) key);
-        }
-        else {
+        } else {
             return;
         }
 
@@ -114,7 +112,7 @@ public class KeysPresenter extends Presenter {
 
         // If dialog returned a key, replace the key in the store with the new key
         Key newKey = d.getKey();
-        if(newKey != null){
+        if (newKey != null) {
             model.deleteKey(key.getID());
             model.addKey(d.getKey());
         }
@@ -123,7 +121,7 @@ public class KeysPresenter extends Presenter {
     /**
      * Refresh the keys view based on the contents of the current model
      */
-    private void updateView(){
+    private void updateView() {
         // Create a new table view model
         KeysView.KeysTableModel keysTableModel = new KeysView.KeysTableModel();
 
@@ -153,15 +151,11 @@ public class KeysPresenter extends Presenter {
      * @param keyId id of key to check
      * @return true if the key exists in the model
      */
-    public boolean keyExists(String keyId){
+    public boolean keyExists(String keyId) {
         return model.getKey(keyId) != null;
     }
 
-    /**
-     * Generic handler for new key dialogs
-     * @param d the type of dialog to display
-     */
-    public void onButtonNewClicked(KeyDialog d) {
+    private void onButtonNewClicked(KeyDialog d) {
         // Display the dialog
         d.pack();
         d.setLocationRelativeTo(SwingUtilities.getWindowAncestor(view.getParent()));
@@ -169,7 +163,7 @@ public class KeysPresenter extends Presenter {
         // Block here until the dialog returns
 
         // If the dialog returned a key, add it to the model
-        if(d.getKey() != null){
+        if (d.getKey() != null) {
             model.addKey(d.getKey());
         }
     }
@@ -280,7 +274,18 @@ public class KeysPresenter extends Presenter {
      * @param rows array of indices of the keys to be deleted from the position in the view
      */
     public void onPopupDelete(int[] rows) {
-        model.deleteKeys(rows);
+        String messageResourceId = rows.length > 1 ? "keys_confirm_delete_multiple" : "keys_confirm_delete_single";
+
+        int option = JOptionPane.showConfirmDialog(
+                view.getParent(),
+                Utils.getResourceString(messageResourceId),
+                Utils.getResourceString("keys_confirm_delete_title"),
+                JOptionPane.YES_NO_OPTION
+        );
+
+        if (option == JOptionPane.OK_OPTION) {
+            model.deleteKeys(rows);
+        }
     }
 
     /**
@@ -347,29 +352,37 @@ public class KeysPresenter extends Presenter {
 
     /**
      * Get a list of signing keys from the model
+     *
      * @return list of keys that can be used for signing
      */
-    public List<Key> getSigningKeys(){
+    public List<Key> getSigningKeys() {
         return model.getSigningKeys();
     }
 
     /**
      * Get a list of encryption keys from the model
+     *
      * @return list of keys that can be used for encryption
      */
-    public List<Key> getEncryptionKeys(){
+    public List<Key> getEncryptionKeys() {
         return model.getEncryptionKeys();
     }
 
     /**
      * Get a list of decryption keys from the model
+     *
      * @return list of keys that can be used for decryption
      */
-    public List<Key> getDecryptionKeys() { return model.getDecryptionKeys(); }
+    public List<Key> getDecryptionKeys() {
+        return model.getDecryptionKeys();
+    }
 
     /**
      * Get a list of verification keys from the model
+     *
      * @return list of keys that can be used for verification
      */
-    public List<Key> getVerificationKeys() { return model.getVerificationKeys(); }
+    public List<Key> getVerificationKeys() {
+        return model.getVerificationKeys();
+    }
 }
