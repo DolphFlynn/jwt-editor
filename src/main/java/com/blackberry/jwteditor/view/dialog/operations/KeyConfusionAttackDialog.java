@@ -31,14 +31,12 @@ import com.nimbusds.jose.JWSAlgorithm;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.List;
 
 /**
  * Attack > HMAC Key Confusion dialog from the Editor tab
  */
-public class KeyConfusionAttackDialog extends JDialog {
+public class KeyConfusionAttackDialog extends OperationDialog {
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
@@ -54,26 +52,14 @@ public class KeyConfusionAttackDialog extends JDialog {
      * @param jws the content to sign
      */
     public KeyConfusionAttackDialog(Window parent, List<Key> signingKeys, JWS jws) {
-        super(parent);
+        super(parent, "key_confusion_attack_dialog_title");
         this.jws = jws;
 
         setContentPane(contentPane);
-        setModal(true);
         getRootPane().setDefaultButton(buttonOK);
 
-        setTitle(Utils.getResourceString("key_confusion_attack_dialog_title"));
-
         buttonOK.addActionListener(e -> onOK());
-
         buttonCancel.addActionListener(e -> onCancel());
-
-        // call onCancel() when cross is clicked
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                onCancel();
-            }
-        });
 
         // call onCancel() on ESCAPE
         contentPane.registerKeyboardAction(e -> onCancel(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
@@ -111,13 +97,6 @@ public class KeyConfusionAttackDialog extends JDialog {
             JOptionPane.showMessageDialog(this, e.getMessage(), Utils.getResourceString("error_title_unable_to_sign"), JOptionPane.WARNING_MESSAGE);
         }
 
-        dispose();
-    }
-
-    /**
-     * Called when the Cancel or X button is pressed. Destroy the window
-     */
-    private void onCancel() {
         dispose();
     }
 

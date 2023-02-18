@@ -30,14 +30,12 @@ import com.nimbusds.jose.JWSAlgorithm;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.List;
 
 /**
  * Sign and Attack > Embedded JWK dialog from the Editor tab
  */
-public class SignDialog extends JDialog {
+public class SignDialog extends OperationDialog {
 
     public enum Mode {
         NORMAL("sign_dialog_title"),
@@ -66,37 +64,26 @@ public class SignDialog extends JDialog {
 
     /**
      * Show the signing dialog
+     *
      * @param signingKeys the signing keys available
-     * @param jws the content to sign
-     * @param mode whether the dialog should be used for normal signing, or the embedded JWK attack
+     * @param jws         the content to sign
+     * @param mode        whether the dialog should be used for normal signing, or the embedded JWK attack
      */
     public SignDialog(Window parent, List<Key> signingKeys, JWS jws, Mode mode) {
-        super(parent);
+        super(parent, mode.titleResourceId);
         this.jws = jws;
         this.mode = mode;
 
         setContentPane(contentPane);
-        setModal(true);
         getRootPane().setDefaultButton(buttonOK);
 
-        setTitle(Utils.getResourceString(mode.titleResourceId));
-
         buttonOK.addActionListener(e -> onOK());
-
         buttonCancel.addActionListener(e -> onCancel());
-
-        // call onCancel() when cross is clicked
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                onCancel();
-            }
-        });
 
         // call onCancel() on ESCAPE
         contentPane.registerKeyboardAction(e -> onCancel(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
-        // Conver the signingKeys from a List to an Array
+        // Convert the signingKeys from a List to an Array
         Key[] signingKeysArray = new Key[signingKeys.size()];
         signingKeys.toArray(signingKeysArray);
 
@@ -114,17 +101,18 @@ public class SignDialog extends JDialog {
         // Set the signing key to the first entry, also triggering the event handler
         comboBoxSigningKey.setSelectedIndex(0);
 
-        // If the dialog is being used for the embeded JWK attack, hide the Header Options
-        if(mode != Mode.NORMAL){
+        // If the dialog is being used for the embedded JWK attack, hide the Header Options
+        if (mode != Mode.NORMAL) {
             panelOptions.setVisible(false);
         }
     }
 
     /**
      * Get the result of the dialog
+     *
      * @return the header/payload as a signed JWS
      */
-    public JWS getJWS(){
+    public JWS getJWS() {
         return jws;
     }
 
@@ -139,22 +127,19 @@ public class SignDialog extends JDialog {
 
         // Get the header update mode based on the selected radio button, convert to the associated enum value
         Operations.SigningUpdateMode signingUpdateMode;
-        if(radioButtonUpdateGenerateAlg.isSelected()){
+        if (radioButtonUpdateGenerateAlg.isSelected()) {
             signingUpdateMode = Operations.SigningUpdateMode.ALG;
-        }
-        else if(radioButtonUpdateGenerateJWT.isSelected()){
+        } else if (radioButtonUpdateGenerateJWT.isSelected()) {
             signingUpdateMode = Operations.SigningUpdateMode.JWT;
-        }
-        else{
+        } else {
             signingUpdateMode = Operations.SigningUpdateMode.NONE;
         }
 
         // Perform a signing operation or the embedded JWK attack based on the dialog mode
-        try{
-            if(mode == Mode.NORMAL){
+        try {
+            if (mode == Mode.NORMAL) {
                 jws = Operations.sign(jws, selectedKey, selectedAlgorithm, signingUpdateMode);
-            }
-            else if (mode == Mode.EMBED_JWK) {
+            } else if (mode == Mode.EMBED_JWK) {
                 jws = Attacks.embeddedJWK(jws, selectedKey, selectedAlgorithm);
             }
         } catch (SigningException | NoSuchFieldException | IllegalAccessException e) {
@@ -162,13 +147,6 @@ public class SignDialog extends JDialog {
             JOptionPane.showMessageDialog(this, e.getMessage(), Utils.getResourceString("error_title_unable_to_sign"), JOptionPane.WARNING_MESSAGE);
         }
 
-        dispose();
-    }
-
-    /**
-     * Called when the Cancel or X button is pressed. Destroy the window
-     */
-    private void onCancel() {
         dispose();
     }
 }

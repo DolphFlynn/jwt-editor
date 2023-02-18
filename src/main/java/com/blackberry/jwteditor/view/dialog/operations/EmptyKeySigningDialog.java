@@ -27,12 +27,12 @@ import com.nimbusds.jose.JWSAlgorithm;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.text.ParseException;
 
-public class EmptyKeySigningDialog extends JDialog {
-    private static final JWSAlgorithm[] ALGORITHMS = {JWSAlgorithm.HS256, JWSAlgorithm.HS384, JWSAlgorithm.HS512};
+import static com.nimbusds.jose.JWSAlgorithm.*;
+
+public class EmptyKeySigningDialog extends OperationDialog {
+    private static final JWSAlgorithm[] ALGORITHMS = {HS256, HS384, HS512};
 
     private JPanel contentPane;
     private JButton buttonOK;
@@ -41,25 +41,14 @@ public class EmptyKeySigningDialog extends JDialog {
     private JWS jws;
 
     public EmptyKeySigningDialog(Window parent, JWS jws) {
-        super(parent);
+        super(parent, "empty_key_signing_dialog_title");
         this.jws = jws;
 
         setContentPane(contentPane);
-        setModal(true);
         getRootPane().setDefaultButton(buttonOK);
-
-        setTitle(Utils.getResourceString("empty_key_signing_dialog_title"));
 
         buttonOK.addActionListener(e -> onOK());
         buttonCancel.addActionListener(e -> onCancel());
-
-        // call onCancel() when cross is clicked
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                onCancel();
-            }
-        });
 
         // call onCancel() on ESCAPE
         contentPane.registerKeyboardAction(
@@ -91,13 +80,6 @@ public class EmptyKeySigningDialog extends JDialog {
             );
         }
 
-        dispose();
-    }
-
-    /**
-     * Called when the Cancel or X button is pressed. Destroy the window
-     */
-    private void onCancel() {
         dispose();
     }
 }

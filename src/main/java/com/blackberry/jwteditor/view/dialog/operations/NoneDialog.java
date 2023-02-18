@@ -19,15 +19,12 @@ package com.blackberry.jwteditor.view.dialog.operations;
 
 import com.blackberry.jwteditor.model.jose.JWS;
 import com.blackberry.jwteditor.operations.Attacks;
-import com.blackberry.jwteditor.utils.Utils;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 
-public class NoneDialog extends JDialog {
+public class NoneDialog extends OperationDialog {
     private static final String[] NONE_ALGORITHM_VALUES = {"none", "None", "NONE", "nOnE"};
 
     private JPanel contentPane;
@@ -42,25 +39,14 @@ public class NoneDialog extends JDialog {
      * @param jws the content to remove signature from
      */
     public NoneDialog(Window parent, JWS jws) {
-        super(parent);
+        super(parent, "none_attack_dialog_title");
         this.jws = jws;
 
         setContentPane(contentPane);
-        setModal(true);
         getRootPane().setDefaultButton(buttonOK);
-
-        setTitle(Utils.getResourceString("none_attack_dialog_title"));
 
         buttonOK.addActionListener(e -> onOK());
         buttonCancel.addActionListener(e -> onCancel());
-
-        // call onCancel() when cross is clicked
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                onCancel();
-            }
-        });
 
         // call onCancel() on ESCAPE
         contentPane.registerKeyboardAction(
@@ -89,13 +75,6 @@ public class NoneDialog extends JDialog {
 
         jws = Attacks.noneSigning(jws, selectedAlgorithm);
 
-        dispose();
-    }
-
-    /**
-     * Called when the Cancel or X button is pressed. Destroy the window
-     */
-    private void onCancel() {
         dispose();
     }
 }

@@ -30,14 +30,12 @@ import com.nimbusds.jose.JWEAlgorithm;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.List;
 
 /**
  * Encrypt dialog from the Editor tab
  */
-public class EncryptDialog extends JDialog {
+public class EncryptDialog extends OperationDialog {
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
@@ -46,34 +44,23 @@ public class EncryptDialog extends JDialog {
     private JComboBox<Key> comboBoxEncryptionKey;
 
     private final JWS jws;
-    private JWE jwe = null;
+    private JWE jwe;
 
     /**
      * Show the encryption dialog
-     * @param jws the JWS to sign
+     *
+     * @param jws            the JWS to sign
      * @param encryptionKeys the available encryption keys
      */
     public EncryptDialog(Window parent, JWS jws, List<Key> encryptionKeys) {
-        super(parent);
+        super(parent, "encrypt_dialog_title");
         this.jws = jws;
 
         setContentPane(contentPane);
-        setModal(true);
         getRootPane().setDefaultButton(buttonOK);
 
-        setTitle(Utils.getResourceString("encrypt_dialog_title"));
-
         buttonOK.addActionListener(e -> onOK());
-
         buttonCancel.addActionListener(e -> onCancel());
-
-        // call onCancel() when cross is clicked
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                onCancel();
-            }
-        });
 
         // call onCancel() on ESCAPE
         contentPane.registerKeyboardAction(e -> onCancel(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
@@ -96,7 +83,7 @@ public class EncryptDialog extends JDialog {
     /**
      * Event handler called when the Encryption Key dropdown is changed
      */
-    private void updateKEK(){
+    private void updateKEK() {
         // Get the selected encryption key
         Key selectedKey = (Key) comboBoxEncryptionKey.getSelectedItem();
 
@@ -111,8 +98,7 @@ public class EncryptDialog extends JDialog {
         if (kekAlgorithms.length > 0) {
             comboBoxKEK.setSelectedIndex(0);
             comboBoxKEK.setEnabled(true);
-        }
-        else {
+        } else {
             comboBoxKEK.setEnabled(false);
         }
 
@@ -123,7 +109,7 @@ public class EncryptDialog extends JDialog {
     /**
      * Event handler called when the Key Encryption Algorithm dropdown is changed
      */
-    private void updateCEK(){
+    private void updateCEK() {
 
         // Get the selected encryption key
         Key selectedKey = (Key) comboBoxEncryptionKey.getSelectedItem();
@@ -147,15 +133,13 @@ public class EncryptDialog extends JDialog {
                 } else {
                     comboBoxCEK.setEnabled(false);
                 }
-            }
-            else {
+            } else {
                 // Disable the form and the Content Encryption Algorithm dropdown if there is no Key Encryption Algorithm selected
                 comboBoxCEK.setModel(new DefaultComboBoxModel<>());
                 comboBoxCEK.setEnabled(false);
                 buttonOK.setEnabled(false);
             }
-        }
-        else {
+        } else {
             // Disable the form and the Content Encryption Algorithm dropdown if there is no Encryption Key selected
             comboBoxCEK.setModel(new DefaultComboBoxModel<>());
             comboBoxCEK.setEnabled(false);
@@ -182,16 +166,10 @@ public class EncryptDialog extends JDialog {
 
     /**
      * Get the result of the dialog
+     *
      * @return the encrypted JWS as a JWE
      */
-    public JWE getJWE(){
+    public JWE getJWE() {
         return jwe;
-    }
-
-    /**
-     * Called when the Cancel or X button is pressed. Destroy the window
-     */
-    private void onCancel() {
-        dispose();
     }
 }
