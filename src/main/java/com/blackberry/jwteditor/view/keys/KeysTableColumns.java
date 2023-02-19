@@ -42,19 +42,19 @@ enum KeysTableColumns {
         this.type = type;
     }
 
-    String label() {
-        return label;
-    }
-
-    Class<?> type() {
-        return type;
-    }
-
     static int[] columnWidthPercentages() {
         return stream(values()).mapToInt(c -> c.widthPercentage).toArray();
     }
 
-    static KeysTableColumns fromIndex(int position) {
-        return values()[position];
+    static KeysTableColumns fromIndex(int index) {
+        return values()[index];
+    }
+
+    static String labelWithIndex(int index) {
+        return values()[index].label;
+    }
+
+    static Class<?> typeForIndex(int index) {
+        return values()[index].type;
     }
 }

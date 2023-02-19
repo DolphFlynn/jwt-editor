@@ -28,9 +28,10 @@ import java.util.List;
  * Model for the keys table
  */
 class KeysTableModel extends AbstractTableModel {
-    private final List<Key> data = new ArrayList<>();
+    private final List<Key> data;
 
     KeysTableModel(Iterable<Key> keys) {
+        this.data = new ArrayList<>();
         keys.forEach(data::add);
     }
 
@@ -62,9 +63,9 @@ class KeysTableModel extends AbstractTableModel {
         }
 
         Key key = data.get(rowIndex);
-        KeysTableColumns columns = KeysTableColumns.fromIndex(columnIndex);
+        KeysTableColumns column = KeysTableColumns.fromIndex(columnIndex);
 
-        return switch (columns) {
+        return switch (column) {
             case ID -> key.getID();
             case TYPE -> key.getDescription();
             case PUBLIC_KEY -> key.isPublic();
@@ -78,11 +79,11 @@ class KeysTableModel extends AbstractTableModel {
 
     @Override
     public String getColumnName(int column) {
-        return KeysTableColumns.values()[column].label();
+        return KeysTableColumns.labelWithIndex(column);
     }
 
     @Override
     public Class<?> getColumnClass(int columnIndex) {
-        return KeysTableColumns.values()[columnIndex].type();
+        return KeysTableColumns.typeForIndex(columnIndex);
     }
 }
