@@ -20,7 +20,7 @@ package com.blackberry.jwteditor.presenter;
 
 import burp.config.BurpConfig;
 import burp.config.BurpConfigPersistence;
-import com.blackberry.jwteditor.view.BurpView;
+import com.blackberry.jwteditor.view.burp.BurpView;
 import com.blackberry.jwteditor.view.dialog.config.BurpConfigDialog;
 
 import javax.swing.*;

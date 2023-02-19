@@ -16,7 +16,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.blackberry.jwteditor.view;
+package com.blackberry.jwteditor.view.editor;
 
 import burp.api.montoya.ui.Selection;
 import burp.api.montoya.ui.editor.extension.ExtensionProvidedEditor;
@@ -24,6 +24,7 @@ import com.blackberry.jwteditor.presenter.EditorPresenter;
 import com.blackberry.jwteditor.presenter.PresenterStore;
 import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.view.rsta.RstaFactory;
+import com.blackberry.jwteditor.view.utils.HexCodeAreaCommandHandler;
 import org.exbin.deltahex.EditationAllowed;
 import org.exbin.deltahex.ViewMode;
 import org.exbin.deltahex.swing.CodeArea;

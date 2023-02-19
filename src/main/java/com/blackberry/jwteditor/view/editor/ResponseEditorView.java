@@ -16,39 +16,35 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.blackberry.jwteditor.view;
+package com.blackberry.jwteditor.view.editor;
 
-import burp.api.montoya.http.HttpService;
 import burp.api.montoya.http.message.HttpRequestResponse;
-import burp.api.montoya.http.message.requests.HttpRequest;
-import burp.api.montoya.ui.editor.extension.ExtensionProvidedHttpRequestEditor;
+import burp.api.montoya.http.message.responses.HttpResponse;
+import burp.api.montoya.ui.editor.extension.ExtensionProvidedHttpResponseEditor;
 import com.blackberry.jwteditor.presenter.PresenterStore;
 import com.blackberry.jwteditor.view.rsta.RstaFactory;
 
 import static burp.api.montoya.internal.ObjectFactoryLocator.FACTORY;
 
-public class RequestEditorView extends EditorView implements ExtensionProvidedHttpRequestEditor {
-    private volatile HttpService httpService;
-
-    public RequestEditorView(PresenterStore presenters, RstaFactory rstaFactory, boolean editable) {
+public class ResponseEditorView extends EditorView implements ExtensionProvidedHttpResponseEditor {
+    public ResponseEditorView(PresenterStore presenters, RstaFactory rstaFactory, boolean editable) {
         super(presenters, rstaFactory, editable);
     }
 
     @Override
     public void setRequestResponse(HttpRequestResponse requestResponse) {
-        HttpRequest httpRequest = requestResponse.request();
-        httpService = httpRequest.httpService();
-        presenter.setMessage(httpRequest.toByteArray().toString());
+        HttpResponse httpResponse = requestResponse.response();
+        presenter.setMessage(httpResponse.toByteArray().toString());
     }
 
     @Override
     public boolean isEnabledFor(HttpRequestResponse requestResponse) {
-        String content = requestResponse.request().toByteArray().toString();
+        String content = requestResponse.response().toByteArray().toString();
         return presenter.isEnabled(content);
     }
 
     @Override
-    public HttpRequest getRequest() {
-        return FACTORY.httpRequest(httpService, presenter.getMessage());
+    public HttpResponse getResponse() {
+        return FACTORY.httpResponse(presenter.getMessage());
     }
 }

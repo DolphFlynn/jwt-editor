@@ -16,7 +16,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.blackberry.jwteditor.view;
+package com.blackberry.jwteditor.view.utils;
 
 import com.blackberry.jwteditor.utils.Utils;
 import com.nimbusds.jose.util.Base64URL;

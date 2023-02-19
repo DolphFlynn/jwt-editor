@@ -18,9 +18,9 @@ import com.blackberry.jwteditor.model.persistence.BurpKeysModelPersistence;
 import com.blackberry.jwteditor.model.persistence.KeysModelPersistence;
 import com.blackberry.jwteditor.presenter.PresenterStore;
 import com.blackberry.jwteditor.utils.Utils;
-import com.blackberry.jwteditor.view.BurpView;
-import com.blackberry.jwteditor.view.RequestEditorView;
-import com.blackberry.jwteditor.view.ResponseEditorView;
+import com.blackberry.jwteditor.view.burp.BurpView;
+import com.blackberry.jwteditor.view.editor.RequestEditorView;
+import com.blackberry.jwteditor.view.editor.ResponseEditorView;
 import com.blackberry.jwteditor.view.rsta.DefaultRstaFactory;
 import com.blackberry.jwteditor.view.rsta.RstaFactory;
 

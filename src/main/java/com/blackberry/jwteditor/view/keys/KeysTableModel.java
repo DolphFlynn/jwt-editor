@@ -1,4 +1,4 @@
-package com.blackberry.jwteditor.view;
+package com.blackberry.jwteditor.view.keys;
 
 import com.blackberry.jwteditor.utils.Utils;
 

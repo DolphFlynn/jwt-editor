@@ -16,7 +16,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.blackberry.jwteditor.view;
+package com.blackberry.jwteditor.view.burp;
 
 import burp.api.montoya.ui.Theme;
 import burp.api.montoya.ui.UserInterface;
@@ -27,6 +27,7 @@ import com.blackberry.jwteditor.model.persistence.KeysModelPersistence;
 import com.blackberry.jwteditor.presenter.BurpPresenter;
 import com.blackberry.jwteditor.presenter.PresenterStore;
 import com.blackberry.jwteditor.utils.Utils;
+import com.blackberry.jwteditor.view.keys.KeysView;
 import com.blackberry.jwteditor.view.rsta.RstaFactory;
 
 import javax.swing.*;
