@@ -1,21 +1,19 @@
 package com.blackberry.jwteditor.view.keys;
 
-import com.blackberry.jwteditor.utils.Utils;
+import com.blackberry.jwteditor.model.keys.Key;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
 import java.util.List;
 
-import static java.util.Arrays.stream;
-
 /**
  * Model for the keys table
  */
 public class KeysTableModel extends AbstractTableModel {
-    private final List<Object[]> data = new ArrayList<>();
+    private final List<Key> data = new ArrayList<>();
 
-    public void addRow(Object[] row) {
-        data.add(row);
+    public void addKey(Key key) {
+        data.add(key);
     }
 
     @Override
@@ -30,41 +28,32 @@ public class KeysTableModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        return data.get(rowIndex)[columnIndex];
+        if (rowIndex < 0 || rowIndex >= data.size()) {
+            return null;
+        }
+
+        Key key = data.get(rowIndex);
+        KeysTableColumns columns = KeysTableColumns.fromIndex(columnIndex);
+
+        return switch (columns) {
+            case ID -> key.getID();
+            case TYPE -> key.getDescription();
+            case PUBLIC_KEY -> key.isPublic();
+            case PRIVATE_KEY -> key.isPrivate();
+            case SIGNING -> key.canSign();
+            case VERIFICATION -> key.canVerify();
+            case ENCRYPTION -> key.canEncrypt();
+            case DECRYPTION -> key.canDecrypt();
+        };
     }
 
     @Override
     public String getColumnName(int column) {
-        return KeysTableColumns.values()[column].label;
+        return KeysTableColumns.values()[column].label();
     }
 
     @Override
     public Class<?> getColumnClass(int columnIndex) {
-        return KeysTableColumns.values()[columnIndex].type;
-    }
-
-    enum KeysTableColumns {
-        ID("id", 30, String.class),
-        TYPE("type", 10, String.class),
-        PUBLIC_KEY("public_key", 10, Boolean.class),
-        PRIVATE_KEY("private_key", 10, Boolean.class),
-        SIGNING("signing", 10, Boolean.class),
-        VERIFICATION("verification", 10, Boolean.class),
-        ENCRYPTION("encryption", 10, Boolean.class),
-        DECRYPTION("decryption", 10, Boolean.class);
-
-        private final String label;
-        private final int widthPercentage;
-        private final Class<?> type;
-
-        KeysTableColumns(String labelResourceId, int widthPercentage, Class<?> type) {
-            this.label = Utils.getResourceString(labelResourceId);
-            this.widthPercentage = widthPercentage;
-            this.type = type;
-        }
-
-        static int[] columnWidthPercentages() {
-            return stream(values()).mapToInt(c -> c.widthPercentage).toArray();
-        }
+        return KeysTableColumns.values()[columnIndex].type();
     }
 }
