@@ -19,6 +19,7 @@ limitations under the License.
 package com.blackberry.jwteditor.model.keys;
 
 import com.blackberry.jwteditor.exceptions.UnsupportedKeyException;
+import com.blackberry.jwteditor.model.keys.KeysModelListener.InertKeyModelListener;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -26,7 +27,6 @@ import java.text.ParseException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.IntStream;
 
 import static java.util.Collections.unmodifiableCollection;
@@ -36,12 +36,13 @@ import static java.util.Collections.unmodifiableCollection;
  */
 public class KeysModel {
     private final Map<String, Key> keys;
-    private final List<KeysModelListener> modelListeners;
     private final Object lock;
+    
+    private KeysModelListener modelListener;
 
     public KeysModel() {
         this.keys = new LinkedHashMap<>();
-        this.modelListeners = new CopyOnWriteArrayList<>();
+        this.modelListener = new InertKeyModelListener();
         this.lock = new Object();
     }
 
@@ -51,8 +52,8 @@ public class KeysModel {
         }
     }
 
-    public void addKeyModelListener(KeysModelListener listener) {
-        modelListeners.add(listener);
+    public void addKeyModelListener(KeysModelListener modelListener) {
+        this.modelListener = modelListener;
     }
 
     /**
@@ -128,7 +129,21 @@ public class KeysModel {
             keys.put(key.getID(), key);
         }
 
-        modelListeners.forEach(KeysModelListener::notifyKeyInserted);
+        modelListener.notifyKeyInserted(key);
+    }
+
+    private int findIndexOfKeyWithId(String id) {
+        int i = 0;
+
+        for (Key key : keys.values()) {
+            if (key.getID().equals(id)) {
+                return i;
+            }
+
+            i++;
+        }
+
+        return -1;
     }
 
     /**
@@ -137,11 +152,16 @@ public class KeysModel {
      * @param keyId key id to remove
      */
     public void deleteKey(String keyId) {
+        int rowIndex;
+
         synchronized (lock) {
+            rowIndex = findIndexOfKeyWithId(keyId);
             keys.remove(keyId);
         }
 
-        modelListeners.forEach(KeysModelListener::notifyKeyDeleted);
+        if (rowIndex >= 0) {
+            modelListener.notifyKeyDeleted(rowIndex);
+        }
     }
 
     /**
@@ -158,7 +178,7 @@ public class KeysModel {
             }
         }
 
-        modelListeners.forEach(KeysModelListener::notifyKeyDeleted);
+        IntStream.of(indices).forEach(rowIndex -> modelListener.notifyKeyDeleted(rowIndex));
     }
 
     /**

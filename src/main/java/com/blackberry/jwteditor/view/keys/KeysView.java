@@ -18,6 +18,7 @@ limitations under the License.
 
 package com.blackberry.jwteditor.view.keys;
 
+import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.model.keys.KeysModel;
 import com.blackberry.jwteditor.model.persistence.KeysModelPersistence;
 import com.blackberry.jwteditor.presenter.KeysPresenter;
@@ -35,17 +36,21 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+import static com.blackberry.jwteditor.view.keys.KeysTableColumns.columnWidthPercentages;
+
 /**
  * View class for the Keys tab
  */
 public class KeysView {
     private final KeysPresenter presenter;
     private final Window parent;
+    private final KeysTableModel keysTableModel;
 
     private JButton buttonNewSymmetric;
     private JButton buttonNewRSA;
     private JButton buttonNewEC;
     private JButton buttonNewPassword;
+    @SuppressWarnings("unused")
     private JPanel panel;
     private JButton buttonNewOKP;
     private JTable tableKeys;
@@ -64,6 +69,9 @@ public class KeysView {
             KeysModel keysModel,
             RstaFactory rstaFactory) {
         this.parent = parent;
+
+        keysTableModel = new KeysTableModel(keysModel.keys());
+        tableKeys.setModel(keysTableModel);
 
         // Initialise the presenter
         presenter = new KeysPresenter(
@@ -89,7 +97,7 @@ public class KeysView {
         private Integer popupRow;
 
         public JTablePopup() {
-            super(KeysTableColumns.columnWidthPercentages());
+            super(columnWidthPercentages());
         }
 
         @Override
@@ -153,9 +161,7 @@ public class KeysView {
      * Custom form initialisation
      */
     private void createUIComponents() {
-        // Create the table using the custom model
         tableKeys = new JTablePopup();
-        tableKeys.setModel(new KeysTableModel());
 
         // Add a handler for double-click events
         tableKeys.addMouseListener(new MouseAdapter() {
@@ -229,14 +235,14 @@ public class KeysView {
         tableKeys.setComponentPopupMenu(popupMenu);
     }
 
-    public void setTableModel(KeysTableModel model){
-        tableKeys.setModel(model);
+    public void addKey(Key key) {
+        keysTableModel.addKey(key);
     }
 
-    /**
-     * Get the view's parent Window
-     * @return parent Window
-     */
+    public void deleteKey(int rowIndex) {
+        keysTableModel.deleteRow(rowIndex);
+    }
+
     public Window getParent() {
         return parent;
     }

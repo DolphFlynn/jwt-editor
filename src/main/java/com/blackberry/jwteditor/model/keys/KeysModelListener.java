@@ -1,7 +1,17 @@
 package com.blackberry.jwteditor.model.keys;
 
 public interface KeysModelListener {
-    void notifyKeyInserted();
+    void notifyKeyInserted(Key key);
 
-    void notifyKeyDeleted();
+    void notifyKeyDeleted(int rowIndex);
+
+    class InertKeyModelListener implements KeysModelListener {
+        @Override
+        public void notifyKeyInserted(Key key) {
+        }
+
+        @Override
+        public void notifyKeyDeleted(int rowIndex) {
+        }
+    }
 }

@@ -19,8 +19,6 @@ limitations under the License.
 package com.blackberry.jwteditor.view.utils;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
@@ -35,13 +33,6 @@ public class PercentageBasedColumnWidthTable extends JTable {
         addHierarchyListener(new ResizeColumnsOnFirstRenderHierarchyListener());
 
         tableHeader.setReorderingAllowed(false);
-        columnModel.addColumnModelListener(new ColumnWidthPercentageUpdatingColumnModelListener());
-    }
-
-    @Override
-    public void createDefaultColumnsFromModel() {
-        super.createDefaultColumnsFromModel();
-        resizeColumns();
     }
 
     private void resizeColumns() {
@@ -68,21 +59,6 @@ public class PercentageBasedColumnWidthTable extends JTable {
 
             resizeColumns();
             removeHierarchyListener(this);
-        }
-    }
-
-    private class ColumnWidthPercentageUpdatingColumnModelListener extends InertTableColumnModelListener {
-        @Override
-        public void columnMarginChanged(ChangeEvent e) {
-            TableColumn resizingColumn = tableHeader.getResizingColumn();
-
-            if (resizingColumn != null) {
-                int tableWidth = getWidth();
-                int percentage = (int) ((100.0 * resizingColumn.getPreferredWidth()) / tableWidth);
-                int columnIndex = resizingColumn.getModelIndex();
-
-                columnWidthPercentages[columnIndex] = percentage;
-            }
         }
     }
 }

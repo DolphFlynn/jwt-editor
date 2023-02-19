@@ -28,7 +28,6 @@ import com.blackberry.jwteditor.view.dialog.keys.AsymmetricKeyDialogFactory;
 import com.blackberry.jwteditor.view.dialog.keys.KeyDialog;
 import com.blackberry.jwteditor.view.dialog.keys.PasswordDialog;
 import com.blackberry.jwteditor.view.dialog.keys.SymmetricKeyDialog;
-import com.blackberry.jwteditor.view.keys.KeysTableModel;
 import com.blackberry.jwteditor.view.keys.KeysView;
 import com.blackberry.jwteditor.view.rsta.RstaFactory;
 import com.nimbusds.jose.jwk.*;
@@ -45,7 +44,6 @@ public class KeysPresenter extends Presenter {
     private final KeysView view;
     private final RstaFactory rstaFactory;
     private final PresenterStore presenters;
-    private final KeysModelPersistence keysModelPersistence;
     private final AsymmetricKeyDialogFactory asymmetricKeyDialogFactory;
 
     /**
@@ -65,24 +63,24 @@ public class KeysPresenter extends Presenter {
         this.view = view;
         this.rstaFactory = rstaFactory;
         this.presenters = presenters;
-        this.keysModelPersistence = keysModelPersistence;
         this.model = keysModel;
         this.asymmetricKeyDialogFactory = new AsymmetricKeyDialogFactory(view.getParent(), presenters, rstaFactory);
 
         model.addKeyModelListener(new KeysModelListener() {
             @Override
-            public void notifyKeyInserted() {
-                onModelUpdated();
+            public void notifyKeyInserted(Key key) {
+                view.addKey(key);
+                keysModelPersistence.save(keysModel);
             }
 
             @Override
-            public void notifyKeyDeleted() {
-                onModelUpdated();
+            public void notifyKeyDeleted(int rowIndex) {
+                view.deleteKey(rowIndex);
+                keysModelPersistence.save(keysModel);
             }
         });
 
         presenters.register(this);
-        updateView();
     }
 
     /**
@@ -125,21 +123,6 @@ public class KeysPresenter extends Presenter {
             model.deleteKey(key.getID());
             model.addKey(d.getKey());
         }
-    }
-
-    /**
-     * Refresh the keys view based on the contents of the current model
-     */
-    private void updateView() {
-        // Create a new table view model
-        KeysTableModel keysTableModel = new KeysTableModel();
-
-        for (Key key : model.keys()) {
-            keysTableModel.addKey(key);
-        }
-
-        // Change the view table model to the newly created one
-        view.setTableModel(keysTableModel);
     }
 
     /**
@@ -198,16 +181,6 @@ public class KeysPresenter extends Presenter {
      */
     public void onButtonNewPasswordClick() {
         onButtonNewClicked(new PasswordDialog(view.getParent(), presenters));
-    }
-
-    /**
-     * Callback called by the model when the model changes
-     */
-    public void onModelUpdated() {
-        keysModelPersistence.save(model);
-
-        // Refresh the view
-        updateView();
     }
 
     /**
