@@ -19,10 +19,7 @@ limitations under the License.
 package com.blackberry.jwteditor.presenter;
 
 import com.blackberry.jwteditor.exceptions.PemException;
-import com.blackberry.jwteditor.model.keys.JWKKey;
-import com.blackberry.jwteditor.model.keys.Key;
-import com.blackberry.jwteditor.model.keys.KeysModel;
-import com.blackberry.jwteditor.model.keys.PasswordKey;
+import com.blackberry.jwteditor.model.keys.*;
 import com.blackberry.jwteditor.model.persistence.KeysModelPersistence;
 import com.blackberry.jwteditor.utils.JSONUtils;
 import com.blackberry.jwteditor.utils.PEMUtils;
@@ -71,7 +68,18 @@ public class KeysPresenter extends Presenter {
         this.model = keysModel;
         this.asymmetricKeyDialogFactory = new AsymmetricKeyDialogFactory(view.getParent(), presenters, rstaFactory);
 
-        model.setPresenter(this);
+        model.addKeyModelListener(new KeysModelListener() {
+            @Override
+            public void notifyKeyInserted() {
+                onModelUpdated();
+            }
+
+            @Override
+            public void notifyKeyDeleted() {
+                onModelUpdated();
+            }
+        });
+
         presenters.register(this);
         updateView();
     }

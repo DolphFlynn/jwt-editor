@@ -19,7 +19,6 @@ limitations under the License.
 package com.blackberry.jwteditor.model.keys;
 
 import com.blackberry.jwteditor.exceptions.UnsupportedKeyException;
-import com.blackberry.jwteditor.presenter.KeysPresenter;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -27,6 +26,7 @@ import java.text.ParseException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.IntStream;
 
 import static java.util.Collections.unmodifiableCollection;
@@ -35,15 +35,24 @@ import static java.util.Collections.unmodifiableCollection;
  * A container class for Key objects
  */
 public class KeysModel {
-    private final Map<String, Key> keys = new LinkedHashMap<>();
-    private final Object lock = new Object();
+    private final Map<String, Key> keys;
+    private final List<KeysModelListener> modelListeners;
+    private final Object lock;
 
-    private KeysPresenter presenter;
+    public KeysModel() {
+        this.keys = new LinkedHashMap<>();
+        this.modelListeners = new CopyOnWriteArrayList<>();
+        this.lock = new Object();
+    }
 
     public Iterable<Key> keys() {
         synchronized (lock) {
             return unmodifiableCollection(keys.values());
         }
+    }
+
+    public void addKeyModelListener(KeysModelListener listener) {
+        modelListeners.add(listener);
     }
 
     /**
@@ -85,15 +94,6 @@ public class KeysModel {
         return jsonArray.toString();
     }
 
-    /**
-     * Associate a UI presenter with this model that will be notified when the model changes
-     *
-     * @param presenter presenter to associate
-     */
-    public void setPresenter(KeysPresenter presenter) {
-        this.presenter = presenter;
-    }
-
     public List<Key> getSigningKeys() {
         synchronized (lock) {
             return keys.values().stream().filter(Key::canSign).toList();
@@ -128,9 +128,7 @@ public class KeysModel {
             keys.put(key.getID(), key);
         }
 
-        if (presenter != null) {
-            presenter.onModelUpdated();
-        }
+        modelListeners.forEach(KeysModelListener::notifyKeyInserted);
     }
 
     /**
@@ -143,9 +141,7 @@ public class KeysModel {
             keys.remove(keyId);
         }
 
-        if (presenter != null) {
-            presenter.onModelUpdated();
-        }
+        modelListeners.forEach(KeysModelListener::notifyKeyDeleted);
     }
 
     /**
@@ -161,6 +157,8 @@ public class KeysModel {
                 deleteKey(id);
             }
         }
+
+        modelListeners.forEach(KeysModelListener::notifyKeyDeleted);
     }
 
     /**
