@@ -19,7 +19,7 @@ limitations under the License.
 package com.blackberry.jwteditor.model.persistence;
 
 import burp.api.montoya.persistence.Preferences;
-import com.blackberry.jwteditor.model.KeysModel;
+import com.blackberry.jwteditor.model.keys.KeysModel;
 
 import java.text.ParseException;
 

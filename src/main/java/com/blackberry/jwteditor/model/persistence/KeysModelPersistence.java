@@ -18,7 +18,7 @@ limitations under the License.
 
 package com.blackberry.jwteditor.model.persistence;
 
-import com.blackberry.jwteditor.model.KeysModel;
+import com.blackberry.jwteditor.model.keys.KeysModel;
 
 public interface KeysModelPersistence {
     KeysModel loadOrCreateNew();

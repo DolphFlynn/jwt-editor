@@ -13,7 +13,7 @@ import burp.intruder.JWSPayloadProcessor;
 import burp.proxy.ProxyConfig;
 import burp.proxy.ProxyHttpMessageHandler;
 import burp.proxy.ProxyWsMessageHandler;
-import com.blackberry.jwteditor.model.KeysModel;
+import com.blackberry.jwteditor.model.keys.KeysModel;
 import com.blackberry.jwteditor.model.persistence.BurpKeysModelPersistence;
 import com.blackberry.jwteditor.model.persistence.KeysModelPersistence;
 import com.blackberry.jwteditor.presenter.PresenterStore;

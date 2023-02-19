@@ -18,7 +18,7 @@ limitations under the License.
 
 package com.blackberry.jwteditor;
 
-import com.blackberry.jwteditor.model.KeysModel;
+import com.blackberry.jwteditor.model.keys.KeysModel;
 import com.blackberry.jwteditor.model.keys.PasswordKey;
 import org.junit.jupiter.api.Test;
 

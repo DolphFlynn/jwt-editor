@@ -20,9 +20,9 @@ package com.blackberry.jwteditor;
 
 import com.blackberry.jwteditor.exceptions.PemException;
 import com.blackberry.jwteditor.exceptions.UnsupportedKeyException;
-import com.blackberry.jwteditor.model.KeysModel;
 import com.blackberry.jwteditor.model.keys.JWKKey;
 import com.blackberry.jwteditor.model.keys.Key;
+import com.blackberry.jwteditor.model.keys.KeysModel;
 import com.blackberry.jwteditor.utils.PEMUtils;
 import com.nimbusds.jose.jwk.JWK;
 

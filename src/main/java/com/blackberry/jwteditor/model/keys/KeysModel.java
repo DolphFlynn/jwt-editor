@@ -16,10 +16,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.blackberry.jwteditor.model;
+package com.blackberry.jwteditor.model.keys;
 
 import com.blackberry.jwteditor.exceptions.UnsupportedKeyException;
-import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.presenter.KeysPresenter;
 import org.json.JSONArray;
 import org.json.JSONObject;

@@ -19,9 +19,9 @@ limitations under the License.
 package com.blackberry.jwteditor.presenter;
 
 import com.blackberry.jwteditor.exceptions.PemException;
-import com.blackberry.jwteditor.model.KeysModel;
 import com.blackberry.jwteditor.model.keys.JWKKey;
 import com.blackberry.jwteditor.model.keys.Key;
+import com.blackberry.jwteditor.model.keys.KeysModel;
 import com.blackberry.jwteditor.model.keys.PasswordKey;
 import com.blackberry.jwteditor.model.persistence.KeysModelPersistence;
 import com.blackberry.jwteditor.utils.JSONUtils;

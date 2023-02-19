@@ -22,7 +22,7 @@ import burp.api.montoya.ui.Theme;
 import burp.api.montoya.ui.UserInterface;
 import burp.config.BurpConfig;
 import burp.config.BurpConfigPersistence;
-import com.blackberry.jwteditor.model.KeysModel;
+import com.blackberry.jwteditor.model.keys.KeysModel;
 import com.blackberry.jwteditor.model.persistence.KeysModelPersistence;
 import com.blackberry.jwteditor.presenter.BurpPresenter;
 import com.blackberry.jwteditor.presenter.PresenterStore;

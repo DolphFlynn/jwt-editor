@@ -18,7 +18,7 @@ limitations under the License.
 
 package com.blackberry.jwteditor.view;
 
-import com.blackberry.jwteditor.model.KeysModel;
+import com.blackberry.jwteditor.model.keys.KeysModel;
 import com.blackberry.jwteditor.model.persistence.KeysModelPersistence;
 import com.blackberry.jwteditor.presenter.KeysPresenter;
 import com.blackberry.jwteditor.presenter.PresenterStore;
