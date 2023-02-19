@@ -23,22 +23,18 @@ import com.blackberry.jwteditor.model.persistence.KeysModelPersistence;
 import com.blackberry.jwteditor.presenter.KeysPresenter;
 import com.blackberry.jwteditor.presenter.PresenterStore;
 import com.blackberry.jwteditor.utils.Utils;
+import com.blackberry.jwteditor.view.KeysTableModel.KeysTableColumns;
 import com.blackberry.jwteditor.view.rsta.RstaFactory;
 import com.blackberry.jwteditor.view.utils.AlternateRowBackgroundDecoratingTableCellRenderer;
 import com.blackberry.jwteditor.view.utils.PercentageBasedColumnWidthTable;
 import com.blackberry.jwteditor.view.utils.RowHeightDecoratingTableCellRenderer;
 
 import javax.swing.*;
-import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.List;
-
-import static java.util.Arrays.stream;
 
 /**
  * View class for the Keys tab
@@ -85,67 +81,6 @@ public class KeysView {
         buttonNewOKP.addActionListener(e -> presenter.onButtonNewOKPClick());
         buttonNewRSA.addActionListener(e -> presenter.onButtonNewRSAClick());
         buttonNewPassword.addActionListener(e -> presenter.onButtonNewPasswordClick());
-    }
-
-    private enum KeysTableColumns {
-        ID("id", 30, String.class),
-        TYPE("type", 10, String.class),
-        PUBLIC_KEY("public_key", 10, Boolean.class),
-        PRIVATE_KEY("private_key", 10, Boolean.class),
-        SIGNING("signing", 10, Boolean.class),
-        VERIFICATION("verification", 10, Boolean.class),
-        ENCRYPTION("encryption", 10, Boolean.class),
-        DECRYPTION("decryption", 10, Boolean.class);
-
-        private final String label;
-        private final int widthPercentage;
-        private final Class<?> type;
-
-        KeysTableColumns(String labelResourceId, int widthPercentage, Class<?> type) {
-            this.label = Utils.getResourceString(labelResourceId);
-            this.widthPercentage = widthPercentage;
-            this.type = type;
-        }
-
-        static int[] columnWidthPercentages() {
-            return stream(values()).mapToInt(c -> c.widthPercentage).toArray();
-        }
-    }
-
-    /**
-     * Model for the keys table
-     */
-    public static class KeysTableModel extends AbstractTableModel {
-        private final List<Object[]> data = new ArrayList<>();
-
-        public void addRow(Object[] row) {
-            data.add(row);
-        }
-
-        @Override
-        public int getRowCount() {
-            return data.size();
-        }
-
-        @Override
-        public int getColumnCount() {
-            return KeysTableColumns.values().length;
-        }
-
-        @Override
-        public Object getValueAt(int rowIndex, int columnIndex) {
-            return data.get(rowIndex)[columnIndex];
-        }
-
-        @Override
-        public String getColumnName(int column) {
-            return KeysTableColumns.values()[column].label;
-        }
-
-        @Override
-        public Class<?> getColumnClass(int columnIndex) {
-            return KeysTableColumns.values()[columnIndex].type;
-        }
     }
 
     /**

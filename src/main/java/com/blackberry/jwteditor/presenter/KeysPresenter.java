@@ -24,6 +24,7 @@ import com.blackberry.jwteditor.model.persistence.KeysModelPersistence;
 import com.blackberry.jwteditor.utils.JSONUtils;
 import com.blackberry.jwteditor.utils.PEMUtils;
 import com.blackberry.jwteditor.utils.Utils;
+import com.blackberry.jwteditor.view.KeysTableModel;
 import com.blackberry.jwteditor.view.KeysView;
 import com.blackberry.jwteditor.view.dialog.keys.AsymmetricKeyDialogFactory;
 import com.blackberry.jwteditor.view.dialog.keys.KeyDialog;
@@ -131,7 +132,7 @@ public class KeysPresenter extends Presenter {
      */
     private void updateView() {
         // Create a new table view model
-        KeysView.KeysTableModel keysTableModel = new KeysView.KeysTableModel();
+        KeysTableModel keysTableModel = new KeysTableModel();
 
         // Add the relevant information about each key in the store
         for (Key key : model.keys()) {
