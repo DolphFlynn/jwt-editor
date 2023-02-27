@@ -329,6 +329,19 @@ public class EditorPresenter extends Presenter {
         }
     }
 
+    public void onAttackPsychicSignatureClicked() {
+        PsychicSignatureDialog signingDialog = new PsychicSignatureDialog(view.window(), getJWS());
+        signingDialog.pack();
+        signingDialog.setLocationRelativeTo(view.window());
+        signingDialog.setVisible(true);
+
+        JWS signedJWS = signingDialog.getJWS();
+
+        if (signedJWS != null) {
+            setJWS(signedJWS);
+        }
+    }
+
     /**
      * Handle click events from the Sign button
      */
