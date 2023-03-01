@@ -23,18 +23,16 @@ import burp.intruder.FuzzLocation;
 import burp.intruder.IntruderConfig;
 import burp.proxy.HighlightColor;
 import burp.proxy.ProxyConfig;
-import com.blackberry.jwteditor.utils.Utils;
+import com.blackberry.jwteditor.view.dialog.AbstractDialog;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 
 /**
  *  Dialog for Burp proxy config
  */
-public class BurpConfigDialog extends JDialog {
+public class BurpConfigDialog extends AbstractDialog {
     private final BurpConfig burpConfig;
 
     private JPanel contentPane;
@@ -54,28 +52,17 @@ public class BurpConfigDialog extends JDialog {
      * @param burpConfig burp config instance
      */
     public BurpConfigDialog(Window parent, BurpConfig burpConfig) {
-        super(parent);
+        super(parent, "burp_config");
         this.burpConfig = burpConfig;
 
         setContentPane(contentPane);
-        setModal(true);
         getRootPane().setDefaultButton(buttonOK);
 
         buttonOK.addActionListener(e -> onOK());
         buttonCancel.addActionListener(e -> onCancel());
 
-        // call onCancel() when cross is clicked
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                onCancel();
-            }
-        });
-
         // call onCancel() on ESCAPE
         contentPane.registerKeyboardAction(e -> onCancel(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-
-        setTitle(Utils.getResourceString("burp_config"));
 
         ProxyConfig proxyConfig = burpConfig.proxyConfig();
 
@@ -109,13 +96,6 @@ public class BurpConfigDialog extends JDialog {
         intruderConfig.setFuzzParameter(intruderParameterName.getText());
         intruderConfig.setFuzzLocation((FuzzLocation) comboBoxPayloadPosition.getSelectedItem());
 
-        dispose();
-    }
-
-    /**
-     * Called when the Cancel or X button is pressed. Destroys the window
-     */
-    private void onCancel() {
         dispose();
     }
 

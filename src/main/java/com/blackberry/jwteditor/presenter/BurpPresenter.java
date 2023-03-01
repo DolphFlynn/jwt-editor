@@ -59,11 +59,7 @@ public class BurpPresenter extends Presenter {
     public void onButtonConfigurationClick() {
         BurpConfigDialog dialog = new BurpConfigDialog(window, burpConfig);
 
-        // Display the dialog
-        dialog.pack();
-        dialog.setLocationRelativeTo(window);
-        dialog.setVisible(true);
-        // Block here until the dialog returns
+        dialog.display();
 
         burpConfigPersistence.save(burpConfig);
     }

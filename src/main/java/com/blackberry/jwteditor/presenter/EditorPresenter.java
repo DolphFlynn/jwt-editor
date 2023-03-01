@@ -287,14 +287,11 @@ public class EditorPresenter extends Presenter {
 
         // Create the key confusion attack dialog with the JWS currently in the editor fields
         KeyConfusionAttackDialog keyConfusionAttackDialog = new KeyConfusionAttackDialog(view.window(), verificationKeys, getJWS());
-        keyConfusionAttackDialog.pack();
-        keyConfusionAttackDialog.setLocationRelativeTo(view.window());
-        keyConfusionAttackDialog.setVisible(true);
-        // Blocks here until dialog finishes
+        keyConfusionAttackDialog.display();
 
         // Set the result as the JWS in the editor if the attack succeeds
         JWS signedJWS = keyConfusionAttackDialog.getJWS();
-        if(signedJWS != null) {
+        if (signedJWS != null) {
             setJWS(signedJWS);
         }
     }
@@ -305,9 +302,7 @@ public class EditorPresenter extends Presenter {
     public void onAttackSignNoneClicked() {
         // Get the JWS from the editor, strip the signature and set the editor to the new JWS
         NoneDialog noneDialog = new NoneDialog(view.window(), getJWS());
-        noneDialog.pack();
-        noneDialog.setLocationRelativeTo(view.window());
-        noneDialog.setVisible(true);
+        noneDialog.display();
 
         JWS unsignedJWS = noneDialog.getJWS();
 
@@ -318,9 +313,7 @@ public class EditorPresenter extends Presenter {
 
     public void onAttackSignEmptyKeyClicked() {
         EmptyKeySigningDialog signingDialog = new EmptyKeySigningDialog(view.window(), getJWS());
-        signingDialog.pack();
-        signingDialog.setLocationRelativeTo(view.window());
-        signingDialog.setVisible(true);
+        signingDialog.display();
 
         JWS signedJWS = signingDialog.getJWS();
 
@@ -331,9 +324,7 @@ public class EditorPresenter extends Presenter {
 
     public void onAttackPsychicSignatureClicked() {
         PsychicSignatureDialog signingDialog = new PsychicSignatureDialog(view.window(), getJWS());
-        signingDialog.pack();
-        signingDialog.setLocationRelativeTo(view.window());
-        signingDialog.setVisible(true);
+        signingDialog.display();
 
         JWS signedJWS = signingDialog.getJWS();
 
@@ -358,21 +349,17 @@ public class EditorPresenter extends Presenter {
         KeysPresenter keysPresenter = (KeysPresenter) presenters.get(KeysPresenter.class);
 
         // Check there are signing keys in the keystore
-        if(keysPresenter.getSigningKeys().size() == 0) {
+        if (keysPresenter.getSigningKeys().size() == 0) {
             JOptionPane.showMessageDialog(view.uiComponent(), Utils.getResourceString("error_no_signing_keys"), Utils.getResourceString("error_title_no_signing_keys"), WARNING_MESSAGE);
             return;
         }
 
-        // Create a new signing dialog
         SignDialog signDialog = new SignDialog(view.window(), keysPresenter.getSigningKeys(), getJWS(), mode);
-        signDialog.pack();
-        signDialog.setLocationRelativeTo(view.window());
-        signDialog.setVisible(true);
-        // Block here until dialog completes
+        signDialog.display();
 
         // If a JWS was created by the dialog, replace the contents of the editor
         JWS signedJWS = signDialog.getJWS();
-        if(signedJWS != null) {
+        if (signedJWS != null) {
             setJWS(signedJWS);
         }
     }
@@ -418,16 +405,12 @@ public class EditorPresenter extends Presenter {
             return;
         }
 
-        // Show the encryption dialog
         EncryptDialog encryptDialog = new EncryptDialog(view.window(), getJWS(), keysPresenter.getEncryptionKeys());
-        encryptDialog.pack();
-        encryptDialog.setLocationRelativeTo(view.window());
-        encryptDialog.setVisible(true);
-        // Block here until dialog completes
+        encryptDialog.display();
 
         // If a JWE was created by the dialog, replace the contents of the editor and change to JWE mode
         JWE jwe = encryptDialog.getJWE();
-        if(jwe != null){
+        if (jwe != null) {
             view.setJWEMode();
             setJWE(jwe);
         }

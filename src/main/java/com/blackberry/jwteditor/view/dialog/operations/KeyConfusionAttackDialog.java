@@ -26,6 +26,7 @@ import com.blackberry.jwteditor.model.keys.JWKKey;
 import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.operations.Attacks;
 import com.blackberry.jwteditor.utils.Utils;
+import com.blackberry.jwteditor.view.dialog.AbstractDialog;
 import com.nimbusds.jose.JWSAlgorithm;
 
 import javax.swing.*;
@@ -36,7 +37,7 @@ import java.util.List;
 /**
  * Attack > HMAC Key Confusion dialog from the Editor tab
  */
-public class KeyConfusionAttackDialog extends OperationDialog {
+public class KeyConfusionAttackDialog extends AbstractDialog {
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;

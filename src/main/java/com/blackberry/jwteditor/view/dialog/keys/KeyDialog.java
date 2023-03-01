@@ -62,6 +62,12 @@ public abstract class KeyDialog extends JDialog {
 
     abstract void onCancel();
 
+    public void display() {
+        pack();
+        setLocationRelativeTo(getOwner());
+        setVisible(true);
+    }
+
     /**
      * Handler for OK button click
      */

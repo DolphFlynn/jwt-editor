@@ -24,6 +24,7 @@ import com.blackberry.jwteditor.model.jose.JWS;
 import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.operations.Operations;
 import com.blackberry.jwteditor.utils.Utils;
+import com.blackberry.jwteditor.view.dialog.AbstractDialog;
 import com.nimbusds.jose.EncryptionMethod;
 import com.nimbusds.jose.JWEAlgorithm;
 
@@ -35,7 +36,7 @@ import java.util.List;
 /**
  * Encrypt dialog from the Editor tab
  */
-public class EncryptDialog extends OperationDialog {
+public class EncryptDialog extends AbstractDialog {
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;

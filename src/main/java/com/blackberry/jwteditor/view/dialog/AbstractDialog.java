@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.blackberry.jwteditor.view.dialog.operations;
+package com.blackberry.jwteditor.view.dialog;
 
 import com.blackberry.jwteditor.utils.Utils;
 
@@ -26,9 +26,9 @@ import java.awt.event.WindowEvent;
 
 import static java.awt.Dialog.ModalityType.APPLICATION_MODAL;
 
-abstract class OperationDialog extends JDialog {
+public abstract class AbstractDialog extends JDialog {
 
-    OperationDialog(Window parent, String titleResourceId) {
+    protected AbstractDialog(Window parent, String titleResourceId) {
         super(parent, Utils.getResourceString(titleResourceId), APPLICATION_MODAL);
 
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -41,7 +41,13 @@ abstract class OperationDialog extends JDialog {
         });
     }
 
-    void onCancel() {
+    public void display() {
+        pack();
+        setLocationRelativeTo(getOwner());
+        setVisible(true);
+    }
+
+    protected void onCancel() {
         dispose();
     }
 }

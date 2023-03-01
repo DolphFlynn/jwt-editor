@@ -25,6 +25,7 @@ import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.operations.Attacks;
 import com.blackberry.jwteditor.operations.Operations;
 import com.blackberry.jwteditor.utils.Utils;
+import com.blackberry.jwteditor.view.dialog.AbstractDialog;
 import com.nimbusds.jose.JWSAlgorithm;
 
 import javax.swing.*;
@@ -35,7 +36,7 @@ import java.util.List;
 /**
  * Sign and Attack > Embedded JWK dialog from the Editor tab
  */
-public class SignDialog extends OperationDialog {
+public class SignDialog extends AbstractDialog {
 
     public enum Mode {
         NORMAL("sign_dialog_title"),

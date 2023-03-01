@@ -19,12 +19,13 @@ package com.blackberry.jwteditor.view.dialog.operations;
 
 import com.blackberry.jwteditor.model.jose.JWS;
 import com.blackberry.jwteditor.operations.Attacks;
+import com.blackberry.jwteditor.view.dialog.AbstractDialog;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 
-public class NoneDialog extends OperationDialog {
+public class NoneDialog extends AbstractDialog {
     private static final String[] NONE_ALGORITHM_VALUES = {"none", "None", "NONE", "nOnE"};
 
     private JPanel contentPane;

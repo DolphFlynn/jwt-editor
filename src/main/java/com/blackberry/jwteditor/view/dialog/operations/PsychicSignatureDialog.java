@@ -20,6 +20,7 @@ package com.blackberry.jwteditor.view.dialog.operations;
 import com.blackberry.jwteditor.model.jose.JWS;
 import com.blackberry.jwteditor.operations.Attacks;
 import com.blackberry.jwteditor.utils.Utils;
+import com.blackberry.jwteditor.view.dialog.AbstractDialog;
 import com.nimbusds.jose.JWSAlgorithm;
 
 import javax.swing.*;
@@ -29,7 +30,7 @@ import java.text.ParseException;
 
 import static com.nimbusds.jose.JWSAlgorithm.*;
 
-public class PsychicSignatureDialog extends OperationDialog {
+public class PsychicSignatureDialog extends AbstractDialog {
     private static final JWSAlgorithm[] ALGORITHMS = {ES256, ES384, ES512};
 
     private JPanel contentPane;

@@ -111,11 +111,7 @@ public class KeysPresenter extends Presenter {
             return;
         }
 
-        // Show the dialog
-        d.pack();
-        d.setLocationRelativeTo(SwingUtilities.getWindowAncestor(view.getParent()));
-        d.setVisible(true);
-        // Block here until dialog completes
+        d.display();
 
         // If dialog returned a key, replace the key in the store with the new key
         Key newKey = d.getKey();
@@ -136,11 +132,7 @@ public class KeysPresenter extends Presenter {
     }
 
     private void onButtonNewClicked(KeyDialog d) {
-        // Display the dialog
-        d.pack();
-        d.setLocationRelativeTo(SwingUtilities.getWindowAncestor(view.getParent()));
-        d.setVisible(true);
-        // Block here until the dialog returns
+        d.display();
 
         // If the dialog returned a key, add it to the model
         if (d.getKey() != null) {
