@@ -24,7 +24,9 @@ import com.blackberry.jwteditor.model.keys.JWKKey;
 import com.blackberry.jwteditor.operations.Attacks;
 import com.blackberry.jwteditor.utils.PEMUtils;
 import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.jwk.JWK;
+import com.nimbusds.jose.util.JSONObjectUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -33,7 +35,10 @@ import org.junit.jupiter.params.provider.ValueSource;
 import utils.BouncyCastleExtension;
 
 import java.text.ParseException;
+import java.util.Map;
 
+import static com.nimbusds.jose.HeaderParameterNames.ALGORITHM;
+import static com.nimbusds.jose.HeaderParameterNames.KEY_ID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(BouncyCastleExtension.class)
@@ -94,6 +99,14 @@ class AttackTests {
     void testEmbeddedJWKAll(JWKKey jwk, JWSAlgorithm alg) throws Exception {
         JWS jws = JWSFactory.parse(HMAC_KEY_CONFUSION_JWS);
 
-        Attacks.embeddedJWK(jws, jwk, alg);
+        JWS signedJWS = Attacks.embeddedJWK(jws, jwk, alg);
+        Map<String, Object> headerJsonMap = JSONObjectUtils.parse(signedJWS.getHeader());
+
+        assertThat(headerJsonMap.get(ALGORITHM)).isEqualTo(alg.getName());
+        assertThat(headerJsonMap.get(KEY_ID)).isEqualTo(jwk.getID());
+        assertThat(signedJWS.getEncodedPayload()).isEqualTo(jws.getEncodedPayload());
+
+        JWSHeader signingInfo = new JWSHeader.Builder(alg).build();
+        assertThat(signedJWS.verify(jwk, signingInfo)).isTrue();
     }
 }
