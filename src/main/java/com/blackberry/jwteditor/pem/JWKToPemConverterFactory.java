@@ -2,7 +2,7 @@ package com.blackberry.jwteditor.pem;
 
 import com.blackberry.jwteditor.exceptions.PemException;
 import com.blackberry.jwteditor.exceptions.UnsupportedKeyException;
-import com.blackberry.jwteditor.model.keys.JWKKey;
+import com.blackberry.jwteditor.model.keys.JWKKeyFactory;
 import com.blackberry.jwteditor.model.keys.KeyType;
 import com.nimbusds.jose.jwk.ECKey;
 import com.nimbusds.jose.jwk.JWK;
@@ -23,7 +23,7 @@ public class JWKToPemConverterFactory {
 
     private static KeyType keyTypeFor(JWK jwk) throws PemException {
         try {
-            return new JWKKey(jwk).getKeyType();
+            return JWKKeyFactory.from(jwk).getKeyType();
         } catch (UnsupportedKeyException e) {
             throw new PemException("Invalid JWK type for PEM conversions");
         }

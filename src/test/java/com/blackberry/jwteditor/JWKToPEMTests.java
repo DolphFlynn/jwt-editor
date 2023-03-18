@@ -20,7 +20,7 @@ package com.blackberry.jwteditor;
 
 import com.blackberry.jwteditor.exceptions.PemException;
 import com.blackberry.jwteditor.exceptions.UnsupportedKeyException;
-import com.blackberry.jwteditor.model.keys.JWKKey;
+import com.blackberry.jwteditor.model.keys.JWKKeyFactory;
 import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.model.keys.PasswordKey;
 import com.blackberry.jwteditor.utils.PEMUtils;
@@ -158,10 +158,10 @@ class JWKToPEMTests {
 
     private static Stream<Arguments> keyToPemData() throws ParseException, UnsupportedKeyException {
         return Stream.of(
-                arguments(new JWKKey(RSAKey.parse(RSA2048PrivateDEN)), true),
-                arguments(new JWKKey(ECKey.parse(P256Private)), true),
-                arguments(new JWKKey(OctetKeyPair.parse(Ed25519Private)), true),
-                arguments(new JWKKey(new OctetSequenceKey.Builder("secret123".getBytes()).build()), false),
+                arguments(JWKKeyFactory.from(RSAKey.parse(RSA2048PrivateDEN)), true),
+                arguments(JWKKeyFactory.from(ECKey.parse(P256Private)), true),
+                arguments(JWKKeyFactory.from(OctetKeyPair.parse(Ed25519Private)), true),
+                arguments(JWKKeyFactory.from(new OctetSequenceKey.Builder("secret123".getBytes()).build()), false),
                 arguments(new PasswordKey("keyId", "secret123", 17, 29), false)
         );
     }

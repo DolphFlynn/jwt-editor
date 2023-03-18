@@ -23,6 +23,7 @@ import com.blackberry.jwteditor.model.jose.JWEFactory;
 import com.blackberry.jwteditor.model.jose.JWS;
 import com.blackberry.jwteditor.model.jose.JWSFactory;
 import com.blackberry.jwteditor.model.keys.JWKKey;
+import com.blackberry.jwteditor.model.keys.JWKKeyFactory;
 import com.nimbusds.jose.EncryptionMethod;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWEAlgorithm;
@@ -59,14 +60,14 @@ class OctetEncryptionTests {
     @ParameterizedTest
     @MethodSource("octetSequenceKeys")
     void allOctetSequenceKeyCanEncrypt(OctetSequenceKey octKey) throws Exception {
-        JWKKey key = new JWKKey(octKey);
+        JWKKey key = JWKKeyFactory.from(octKey);
         assertThat(key.canEncrypt()).isTrue();
     }
 
     @ParameterizedTest
     @MethodSource("octetSequenceKeys")
     void allOctetSequenceKeyCanDecrypt(OctetSequenceKey octKey) throws Exception {
-        JWKKey key = new JWKKey(octKey);
+        JWKKey key = JWKKeyFactory.from(octKey);
         assertThat(key.canDecrypt()).isTrue();
     }
 
@@ -83,7 +84,7 @@ class OctetEncryptionTests {
     @ParameterizedTest
     @MethodSource("octetSequenceKeysAndExpectedAlgorithms")
     void octKeysHaveCorrectEncryptionAlgorithms(OctetSequenceKey octKey, List<JWEAlgorithm> expectedAlgorithms) throws Exception {
-        JWKKey key = new JWKKey(octKey);
+        JWKKey key = JWKKeyFactory.from(octKey);
 
         JWEAlgorithm[] keyEncryptionKeyAlgorithms = key.getKeyEncryptionKeyAlgorithms();
 
@@ -115,7 +116,7 @@ class OctetEncryptionTests {
     @ParameterizedTest
     @MethodSource("octetSequenceKeysAndAlgorithm")
     void octKeysHaveCorrectEncryptionMethods(OctetSequenceKey octKey, JWEAlgorithm keyEncryptionKeyAlgorithm, List<EncryptionMethod> expectedEncryptionMethod) throws Exception {
-        JWKKey key = new JWKKey(octKey);
+        JWKKey key = JWKKeyFactory.from(octKey);
 
         EncryptionMethod[] keyEncryptionKeyAlgorithms = key.getContentEncryptionKeyAlgorithms(keyEncryptionKeyAlgorithm);
 
@@ -178,7 +179,7 @@ class OctetEncryptionTests {
     @ParameterizedTest
     @MethodSource("octKeysAndAlgorithms")
     void octEncryptionConsistency(OctetSequenceKey octKey, JWEAlgorithm kek, EncryptionMethod cek) throws Exception {
-        JWKKey key = new JWKKey(octKey);
+        JWKKey key = JWKKeyFactory.from(octKey);
 
         JWE jwe = JWEFactory.encrypt(JWSFactory.parse(TEST_JWS), key, kek, cek);
         JWS decrypt = jwe.decrypt(key);

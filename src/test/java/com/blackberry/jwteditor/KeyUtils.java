@@ -19,6 +19,7 @@ limitations under the License.
 package com.blackberry.jwteditor;
 
 import com.blackberry.jwteditor.model.keys.JWKKey;
+import com.blackberry.jwteditor.model.keys.JWKKeyFactory;
 import com.blackberry.jwteditor.utils.PEMUtils;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.OctetSequenceKey;
@@ -37,17 +38,17 @@ public class KeyUtils {
 
     static JWKKey rsaKeyFrom(String pem) throws Exception {
         JWK rsaKey = PEMUtils.pemToRSAKey(pem);
-        return new JWKKey(rsaKey);
+        return JWKKeyFactory.from(rsaKey);
     }
 
     static JWKKey ecKeyFrom(String pem) throws Exception {
         JWK ecKey = PEMUtils.pemToECKey(pem);
-        return new JWKKey(ecKey);
+        return JWKKeyFactory.from(ecKey);
     }
 
     static JWKKey okpPrivateKeyFrom(String pem) throws Exception {
         JWK octetKeyPair = PEMUtils.pemToOctetKeyPair(pem);
-        return new JWKKey(octetKeyPair);
+        return JWKKeyFactory.from(octetKeyPair);
     }
 
     static Stream<Arguments> keySigningAlgorithmPairs() throws Exception {
@@ -94,24 +95,24 @@ public class KeyUtils {
                 arguments(okpPrivateKeyFrom(ED448Private), EdDSA),
                 arguments(okpPrivateKeyFrom(ED25519Private), EdDSA),
                 // Octet Sequences - should be able to sign and verify with any supported algorithm
-                arguments(new JWKKey(new OctetSequenceKeyGenerator(128).generate()), HS256),
-                arguments(new JWKKey(new OctetSequenceKeyGenerator(128).generate()), HS384),
-                arguments(new JWKKey(new OctetSequenceKeyGenerator(128).generate()), HS512),
-                arguments(new JWKKey(new OctetSequenceKeyGenerator(192).generate()), HS256),
-                arguments(new JWKKey(new OctetSequenceKeyGenerator(192).generate()), HS384),
-                arguments(new JWKKey(new OctetSequenceKeyGenerator(192).generate()), HS512),
-                arguments(new JWKKey(new OctetSequenceKeyGenerator(256).generate()), HS256),
-                arguments(new JWKKey(new OctetSequenceKeyGenerator(256).generate()), HS384),
-                arguments(new JWKKey(new OctetSequenceKeyGenerator(256).generate()), HS512),
-                arguments(new JWKKey(new OctetSequenceKeyGenerator(384).generate()), HS256),
-                arguments(new JWKKey(new OctetSequenceKeyGenerator(384).generate()), HS384),
-                arguments(new JWKKey(new OctetSequenceKeyGenerator(384).generate()), HS512),
-                arguments(new JWKKey(new OctetSequenceKeyGenerator(512).generate()), HS256),
-                arguments(new JWKKey(new OctetSequenceKeyGenerator(512).generate()), HS384),
-                arguments(new JWKKey(new OctetSequenceKeyGenerator(512).generate()), HS512),
-                arguments(new JWKKey(new OctetSequenceKey.Builder("secret123".getBytes()).build()), HS256),
-                arguments(new JWKKey(new OctetSequenceKey.Builder("secret123".getBytes()).build()), HS384),
-                arguments(new JWKKey(new OctetSequenceKey.Builder("secret123".getBytes()).build()), HS512)
+                arguments(JWKKeyFactory.from(new OctetSequenceKeyGenerator(128).generate()), HS256),
+                arguments(JWKKeyFactory.from(new OctetSequenceKeyGenerator(128).generate()), HS384),
+                arguments(JWKKeyFactory.from(new OctetSequenceKeyGenerator(128).generate()), HS512),
+                arguments(JWKKeyFactory.from(new OctetSequenceKeyGenerator(192).generate()), HS256),
+                arguments(JWKKeyFactory.from(new OctetSequenceKeyGenerator(192).generate()), HS384),
+                arguments(JWKKeyFactory.from(new OctetSequenceKeyGenerator(192).generate()), HS512),
+                arguments(JWKKeyFactory.from(new OctetSequenceKeyGenerator(256).generate()), HS256),
+                arguments(JWKKeyFactory.from(new OctetSequenceKeyGenerator(256).generate()), HS384),
+                arguments(JWKKeyFactory.from(new OctetSequenceKeyGenerator(256).generate()), HS512),
+                arguments(JWKKeyFactory.from(new OctetSequenceKeyGenerator(384).generate()), HS256),
+                arguments(JWKKeyFactory.from(new OctetSequenceKeyGenerator(384).generate()), HS384),
+                arguments(JWKKeyFactory.from(new OctetSequenceKeyGenerator(384).generate()), HS512),
+                arguments(JWKKeyFactory.from(new OctetSequenceKeyGenerator(512).generate()), HS256),
+                arguments(JWKKeyFactory.from(new OctetSequenceKeyGenerator(512).generate()), HS384),
+                arguments(JWKKeyFactory.from(new OctetSequenceKeyGenerator(512).generate()), HS512),
+                arguments(JWKKeyFactory.from(new OctetSequenceKey.Builder("secret123".getBytes()).build()), HS256),
+                arguments(JWKKeyFactory.from(new OctetSequenceKey.Builder("secret123".getBytes()).build()), HS384),
+                arguments(JWKKeyFactory.from(new OctetSequenceKey.Builder("secret123".getBytes()).build()), HS512)
         );
     }
 }

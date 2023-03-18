@@ -21,6 +21,7 @@ package com.blackberry.jwteditor;
 import com.blackberry.jwteditor.model.jose.JWS;
 import com.blackberry.jwteditor.model.jose.JWSFactory;
 import com.blackberry.jwteditor.model.keys.JWKKey;
+import com.blackberry.jwteditor.model.keys.JWKKeyFactory;
 import com.blackberry.jwteditor.operations.Attacks;
 import com.blackberry.jwteditor.utils.PEMUtils;
 import com.nimbusds.jose.JWSAlgorithm;
@@ -75,7 +76,7 @@ class AttackTests {
     void testHMACKeyConfusion() throws Exception {
         JWS jws = JWSFactory.parse(HMAC_KEY_CONFUSION_JWS);
         JWS expectedJWS = JWSFactory.parse(HMAC_KEY_CONFUSION_EXPECTED_JWS);
-        JWKKey key = new JWKKey(PEMUtils.pemToRSAKey(HMAC_KEY_CONFUSION_PEM));
+        JWKKey key = JWKKeyFactory.from(PEMUtils.pemToRSAKey(HMAC_KEY_CONFUSION_PEM));
 
         JWS modifiedJWS  = Attacks.hmacKeyConfusion(jws, key, JWSAlgorithm.HS256, false);
 
@@ -86,7 +87,7 @@ class AttackTests {
     // Test the Embedded JWK attack produces a known-good value
     void testEmbeddedJWKKnown() throws Exception {
         JWS jws = JWSFactory.parse(HMAC_KEY_CONFUSION_JWS);
-        JWKKey jwk = new JWKKey(JWK.parse(EMBEDDED_JWK_KEY));
+        JWKKey jwk = JWKKeyFactory.from(JWK.parse(EMBEDDED_JWK_KEY));
 
         JWS modifiedJWS = Attacks.embeddedJWK(jws, jwk, JWSAlgorithm.RS256);
 

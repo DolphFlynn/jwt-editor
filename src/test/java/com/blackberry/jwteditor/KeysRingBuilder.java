@@ -20,7 +20,7 @@ package com.blackberry.jwteditor;
 
 import com.blackberry.jwteditor.exceptions.PemException;
 import com.blackberry.jwteditor.exceptions.UnsupportedKeyException;
-import com.blackberry.jwteditor.model.keys.JWKKey;
+import com.blackberry.jwteditor.model.keys.JWKKeyFactory;
 import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.model.keys.KeyRing;
 import com.blackberry.jwteditor.utils.PEMUtils;
@@ -37,7 +37,7 @@ class KeysRingBuilder {
     KeysRingBuilder withECKey(String pem) {
         try {
             JWK jwk = PEMUtils.pemToECKey(pem, Integer.toString(keyId.incrementAndGet()));
-            keys.add(new JWKKey(jwk));
+            keys.add(JWKKeyFactory.from(jwk));
         } catch (PemException | UnsupportedKeyException e) {
             throw new IllegalStateException(e);
         }
@@ -48,7 +48,7 @@ class KeysRingBuilder {
     KeysRingBuilder withRSAKey(String pem) {
         try {
             JWK jwk = PEMUtils.pemToRSAKey(pem, Integer.toString(keyId.incrementAndGet()));
-            keys.add(new JWKKey(jwk));
+            keys.add(JWKKeyFactory.from(jwk));
         } catch (PemException | UnsupportedKeyException e) {
             throw new IllegalStateException(e);
         }
@@ -59,7 +59,7 @@ class KeysRingBuilder {
     KeysRingBuilder withOKPKey(String pem) {
         try {
             JWK jwk = PEMUtils.pemToOctetKeyPair(pem, Integer.toString(keyId.incrementAndGet()));
-            keys.add(new JWKKey(jwk));
+            keys.add(JWKKeyFactory.from(jwk));
         } catch (PemException | UnsupportedKeyException e) {
             throw new IllegalStateException(e);
         }

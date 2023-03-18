@@ -20,7 +20,7 @@ package com.blackberry.jwteditor.view.dialog.keys;
 
 import com.blackberry.jwteditor.exceptions.PemException;
 import com.blackberry.jwteditor.exceptions.UnsupportedKeyException;
-import com.blackberry.jwteditor.model.keys.JWKKey;
+import com.blackberry.jwteditor.model.keys.JWKKeyFactory;
 import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.presenter.PresenterStore;
 import com.blackberry.jwteditor.utils.JSONUtils;
@@ -312,7 +312,7 @@ public class AsymmetricKeyDialog extends KeyDialog {
      */
     public Key getKey() {
         try {
-            return jwk == null ? null : new JWKKey(jwk);
+            return jwk == null ? null : JWKKeyFactory.from(jwk);
         } catch (UnsupportedKeyException e) {
             return null;
         }

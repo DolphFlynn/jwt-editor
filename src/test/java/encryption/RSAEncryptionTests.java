@@ -23,6 +23,7 @@ import com.blackberry.jwteditor.model.jose.JWEFactory;
 import com.blackberry.jwteditor.model.jose.JWS;
 import com.blackberry.jwteditor.model.jose.JWSFactory;
 import com.blackberry.jwteditor.model.keys.JWKKey;
+import com.blackberry.jwteditor.model.keys.JWKKeyFactory;
 import com.nimbusds.jose.EncryptionMethod;
 import com.nimbusds.jose.JWEAlgorithm;
 import com.nimbusds.jose.jwk.JWK;
@@ -81,7 +82,7 @@ class RSAEncryptionTests {
     @MethodSource("canEncryptWithRSA")
     void canOnlyEncryptWithRSAKeysWithAtLeast2048Bits(String pem, boolean canEncrypt) throws Exception {
         JWK rsaKey = pemToRSAKey(pem);
-        JWKKey key = new JWKKey(rsaKey);
+        JWKKey key = JWKKeyFactory.from(rsaKey);
         assertThat(key.canEncrypt()).isEqualTo(canEncrypt);
     }
 
@@ -104,7 +105,7 @@ class RSAEncryptionTests {
     @MethodSource("canDecryptWithRSA")
     void canOnlyDecryptWithPrivateRSAKeysWithAtLeast2048Bits(String pem, boolean canDecrypt) throws Exception {
         JWK rsaKey = pemToRSAKey(pem);
-        JWKKey key = new JWKKey(rsaKey);
+        JWKKey key = JWKKeyFactory.from(rsaKey);
         assertThat(key.canDecrypt()).isEqualTo(canDecrypt);
     }
 
@@ -127,7 +128,7 @@ class RSAEncryptionTests {
     @MethodSource("rsaKeys")
     void rsaKeysHaveCorrectEncryptionAlgorithms(String pem) throws Exception {
         JWK rsaKey = pemToRSAKey(pem);
-        JWKKey key = new JWKKey(rsaKey);
+        JWKKey key = JWKKeyFactory.from(rsaKey);
 
         JWEAlgorithm[] keyEncryptionKeyAlgorithms = key.getKeyEncryptionKeyAlgorithms();
 
@@ -142,7 +143,7 @@ class RSAEncryptionTests {
     @MethodSource("rsaKeysAndAlgorithms")
     void rsaKeysHaveCorrectEncryptionMethods(String pem, JWEAlgorithm keyEncryptionKeyAlgorithm) throws Exception {
         JWK rsaKey = pemToRSAKey(pem);
-        JWKKey key = new JWKKey(rsaKey);
+        JWKKey key = JWKKeyFactory.from(rsaKey);
 
         EncryptionMethod[] keyEncryptionKeyAlgorithms = key.getContentEncryptionKeyAlgorithms(keyEncryptionKeyAlgorithm);
 
@@ -169,8 +170,8 @@ class RSAEncryptionTests {
     @ParameterizedTest
     @MethodSource("rsaKeyPairsAndAlgorithms")
     void rsaEncryptionConsistency(Pair<JWK, JWK> keyPair, JWEAlgorithm kek, EncryptionMethod cek) throws Exception {
-        JWKKey publicKey = new JWKKey(keyPair.getLeft());
-        JWKKey privateKey = new JWKKey(keyPair.getRight());
+        JWKKey publicKey = JWKKeyFactory.from(keyPair.getLeft());
+        JWKKey privateKey = JWKKeyFactory.from(keyPair.getRight());
 
         JWE jwe = JWEFactory.encrypt(JWSFactory.parse(TEST_JWS), publicKey, kek, cek);
         JWS decrypt = jwe.decrypt(privateKey);

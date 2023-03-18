@@ -23,6 +23,7 @@ import com.blackberry.jwteditor.model.jose.JWEFactory;
 import com.blackberry.jwteditor.model.jose.JWS;
 import com.blackberry.jwteditor.model.jose.JWSFactory;
 import com.blackberry.jwteditor.model.keys.JWKKey;
+import com.blackberry.jwteditor.model.keys.JWKKeyFactory;
 import com.nimbusds.jose.EncryptionMethod;
 import com.nimbusds.jose.JWEAlgorithm;
 import com.nimbusds.jose.jwk.JWK;
@@ -75,7 +76,7 @@ class OKPEncryptionTests {
     @MethodSource("canEncryptWithOKP")
     void canOnlyEncryptWithOKPKeysOnCurvesX25519AndX448(String pem, boolean canEncrypt) throws Exception {
         JWK okpKey = pemToOctetKeyPair(pem);
-        JWKKey key = new JWKKey(okpKey);
+        JWKKey key = JWKKeyFactory.from(okpKey);
         assertThat(key.canEncrypt()).isEqualTo(canEncrypt);
     }
 
@@ -96,7 +97,7 @@ class OKPEncryptionTests {
     @MethodSource("canDecryptWithOKP")
     void canOnlyDecryptWithPrivateOKPKeysOnCurvesX25519AndX448(String pem, boolean canDecrypt) throws Exception {
         JWK okpKey = pemToOctetKeyPair(pem);
-        JWKKey key = new JWKKey(okpKey);
+        JWKKey key = JWKKeyFactory.from(okpKey);
         assertThat(key.canDecrypt()).isEqualTo(canDecrypt);
     }
 
@@ -117,7 +118,7 @@ class OKPEncryptionTests {
     @MethodSource("okpKeys")
     void okpKeysHaveCorrectEncryptionAlgorithms(String pem) throws Exception {
         JWK okpKeys = pemToOctetKeyPair(pem);
-        JWKKey key = new JWKKey(okpKeys);
+        JWKKey key = JWKKeyFactory.from(okpKeys);
 
         JWEAlgorithm[] keyEncryptionKeyAlgorithms = key.getKeyEncryptionKeyAlgorithms();
 
@@ -132,7 +133,7 @@ class OKPEncryptionTests {
     @MethodSource("okpKeysAndAlgorithms")
     void okpKeysHaveCorrectEncryptionMethods(String pem, JWEAlgorithm keyEncryptionKeyAlgorithm) throws Exception {
         JWK okpKey = pemToOctetKeyPair(pem);
-        JWKKey key = new JWKKey(okpKey);
+        JWKKey key = JWKKeyFactory.from(okpKey);
 
         EncryptionMethod[] keyEncryptionKeyAlgorithms = key.getContentEncryptionKeyAlgorithms(keyEncryptionKeyAlgorithm);
 
@@ -158,8 +159,8 @@ class OKPEncryptionTests {
     @ParameterizedTest
     @MethodSource("okpKeyPairsAndAlgorithms")
     void okpEncryptionConsistency(Pair<JWK, JWK> keyPair, JWEAlgorithm kek, EncryptionMethod cek) throws Exception {
-        JWKKey publicKey = new JWKKey(keyPair.getLeft());
-        JWKKey privateKey = new JWKKey(keyPair.getRight());
+        JWKKey publicKey = JWKKeyFactory.from(keyPair.getLeft());
+        JWKKey privateKey = JWKKeyFactory.from(keyPair.getRight());
 
         JWE jwe = JWEFactory.encrypt(JWSFactory.parse(TEST_JWS), publicKey, kek, cek);
         JWS decrypt = jwe.decrypt(privateKey);

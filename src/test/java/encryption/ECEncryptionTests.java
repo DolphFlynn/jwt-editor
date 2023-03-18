@@ -23,6 +23,7 @@ import com.blackberry.jwteditor.model.jose.JWEFactory;
 import com.blackberry.jwteditor.model.jose.JWS;
 import com.blackberry.jwteditor.model.jose.JWSFactory;
 import com.blackberry.jwteditor.model.keys.JWKKey;
+import com.blackberry.jwteditor.model.keys.JWKKeyFactory;
 import com.nimbusds.jose.EncryptionMethod;
 import com.nimbusds.jose.JWEAlgorithm;
 import com.nimbusds.jose.jwk.JWK;
@@ -78,7 +79,7 @@ class ECEncryptionTests {
     @MethodSource("canEncryptWithEC")
     void canEncryptWithAllECKeysExceptThoseUsingSecp256k1(String pem, boolean canEncrypt) throws Exception {
         JWK ecKey = pemToECKey(pem);
-        JWKKey key = new JWKKey(ecKey);
+        JWKKey key = JWKKeyFactory.from(ecKey);
         assertThat(key.canEncrypt()).isEqualTo(canEncrypt);
     }
 
@@ -103,7 +104,7 @@ class ECEncryptionTests {
     @MethodSource("canDecryptWithEC")
     void canOnlyDecryptWithPrivateECKeysAndKeysNotUsingSecp256k1(String pem, boolean canDecrypt) throws Exception {
         JWK ecKey = pemToECKey(pem);
-        JWKKey key = new JWKKey(ecKey);
+        JWKKey key = JWKKeyFactory.from(ecKey);
         assertThat(key.canDecrypt()).isEqualTo(canDecrypt);
     }
 
@@ -128,7 +129,7 @@ class ECEncryptionTests {
     @MethodSource("ecKeys")
     void ecKeysHaveCorrectEncryptionAlgorithms(String pem) throws Exception {
         JWK ecKey = pemToECKey(pem);
-        JWKKey key = new JWKKey(ecKey);
+        JWKKey key = JWKKeyFactory.from(ecKey);
 
         JWEAlgorithm[] keyEncryptionKeyAlgorithms = key.getKeyEncryptionKeyAlgorithms();
 
@@ -143,7 +144,7 @@ class ECEncryptionTests {
     @MethodSource("ecKeysAndAlgorithms")
     void ecKeysHaveCorrectEncryptionMethods(String pem, JWEAlgorithm keyEncryptionKeyAlgorithm) throws Exception {
         JWK ecKey = pemToECKey(pem);
-        JWKKey key = new JWKKey(ecKey);
+        JWKKey key = JWKKeyFactory.from(ecKey);
 
         EncryptionMethod[] keyEncryptionKeyAlgorithms = key.getContentEncryptionKeyAlgorithms(keyEncryptionKeyAlgorithm);
 
@@ -173,8 +174,8 @@ class ECEncryptionTests {
     @ParameterizedTest
     @MethodSource("ecKeyPairsAndAlgorithms")
     void ecEncryptionConsistency(Pair<JWK, JWK> keyPair, JWEAlgorithm kek, EncryptionMethod cek) throws Exception {
-        JWKKey publicKey = new JWKKey(keyPair.getLeft());
-        JWKKey privateKey = new JWKKey(keyPair.getRight());
+        JWKKey publicKey = JWKKeyFactory.from(keyPair.getLeft());
+        JWKKey privateKey = JWKKeyFactory.from(keyPair.getRight());
 
         JWE jwe = JWEFactory.encrypt(JWSFactory.parse(TEST_JWS), publicKey, kek, cek);
         JWS decrypt = jwe.decrypt(privateKey);

@@ -21,6 +21,7 @@ package com.blackberry.jwteditor;
 import com.blackberry.jwteditor.model.jose.JWS;
 import com.blackberry.jwteditor.model.jose.JWSFactory;
 import com.blackberry.jwteditor.model.keys.JWKKey;
+import com.blackberry.jwteditor.model.keys.JWKKeyFactory;
 import com.blackberry.jwteditor.model.keys.PasswordKey;
 import com.blackberry.jwteditor.utils.PEMUtils;
 import com.nimbusds.jose.JWSAlgorithm;
@@ -79,12 +80,12 @@ class SigningTests {
                 arguments(okpPrivateKeyFrom(X448Private), emptyList()),
                 arguments(okpPrivateKeyFrom(X25519Private), emptyList()),
                 // Octet Sequences
-                arguments(new JWKKey(new OctetSequenceKeyGenerator(128).generate()), List.of(HS256, HS384, HS512)),
-                arguments(new JWKKey(new OctetSequenceKeyGenerator(192).generate()), List.of(HS256, HS384, HS512)),
-                arguments(new JWKKey(new OctetSequenceKeyGenerator(256).generate()), List.of(HS256, HS384, HS512)),
-                arguments(new JWKKey(new OctetSequenceKeyGenerator(384).generate()), List.of(HS256, HS384, HS512)),
-                arguments(new JWKKey(new OctetSequenceKeyGenerator(512).generate()), List.of(HS256, HS384, HS512)),
-                arguments(new JWKKey(new OctetSequenceKey.Builder("secret123".getBytes()).build()), List.of(HS256, HS384, HS512))
+                arguments(JWKKeyFactory.from(new OctetSequenceKeyGenerator(128).generate()), List.of(HS256, HS384, HS512)),
+                arguments(JWKKeyFactory.from(new OctetSequenceKeyGenerator(192).generate()), List.of(HS256, HS384, HS512)),
+                arguments(JWKKeyFactory.from(new OctetSequenceKeyGenerator(256).generate()), List.of(HS256, HS384, HS512)),
+                arguments(JWKKeyFactory.from(new OctetSequenceKeyGenerator(384).generate()), List.of(HS256, HS384, HS512)),
+                arguments(JWKKeyFactory.from(new OctetSequenceKeyGenerator(512).generate()), List.of(HS256, HS384, HS512)),
+                arguments(JWKKeyFactory.from(new OctetSequenceKey.Builder("secret123".getBytes()).build()), List.of(HS256, HS384, HS512))
         );
     }
 
@@ -117,8 +118,8 @@ class SigningTests {
     @ValueSource(strings = {ED448Private, ED25519Private})
     void okpSigning(String pem) throws Exception {
         JWK octetKeyPair = PEMUtils.pemToOctetKeyPair(pem);
-        JWKKey privateKey = new JWKKey(octetKeyPair);
-        JWKKey publicKey = new JWKKey(octetKeyPair.toPublicJWK());
+        JWKKey privateKey = JWKKeyFactory.from(octetKeyPair);
+        JWKKey publicKey = JWKKeyFactory.from(octetKeyPair.toPublicJWK());
 
         JWSHeader signingInfo = new JWSHeader.Builder(EdDSA).build();
         Base64URL header = signingInfo.toBase64URL();

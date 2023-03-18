@@ -24,6 +24,7 @@ import com.blackberry.jwteditor.exceptions.UnsupportedKeyException;
 import com.blackberry.jwteditor.model.jose.JWS;
 import com.blackberry.jwteditor.model.jose.JWSFactory;
 import com.blackberry.jwteditor.model.keys.JWKKey;
+import com.blackberry.jwteditor.model.keys.JWKKeyFactory;
 import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.utils.ByteArrayUtils;
 import com.blackberry.jwteditor.utils.PEMUtils;
@@ -82,7 +83,7 @@ public class Attacks {
         JWSHeader signingInfo = new JWSHeader.Builder(algorithm).type(JOSEObjectType.JWT).build();
 
         // Construct a HMAC signing key from the PEM bytes
-        JWKKey signingKey = new JWKKey(new OctetSequenceKey.Builder((pemBytes)).build());
+        JWKKey signingKey = JWKKeyFactory.from(new OctetSequenceKey.Builder((pemBytes)).build());
 
         // Sign and return the new JWS
         Base64URL header = signingInfo.toBase64URL();
@@ -115,7 +116,7 @@ public class Attacks {
         Base64URL headerBase64 = JWSHeader.parse(headerJsonMap).toBase64URL();
 
         JWSHeader signingInfo = new JWSHeader.Builder(algorithm).type(JWT).build();
-        Key key = new JWKKey(new OctetSequenceKey.Builder(EMPTY_KEY).build());
+        Key key = JWKKeyFactory.from(new OctetSequenceKey.Builder(EMPTY_KEY).build());
 
         return JWSFactory.sign(key, headerBase64, jws.getEncodedPayload(), signingInfo);
     }

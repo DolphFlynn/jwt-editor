@@ -79,7 +79,7 @@ public interface Key {
             return new PasswordKey(key_id, password, salt_length, iterations);
         }
         else {
-            return new JWKKey(JWK.parse(jsonObject.toString()));
+            return JWKKeyFactory.from(JWK.parse(jsonObject.toString()));
         }
     }
 }
