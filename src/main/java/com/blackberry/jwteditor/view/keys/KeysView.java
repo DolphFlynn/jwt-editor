@@ -61,6 +61,7 @@ public class KeysView {
     private JMenuItem menuItemCopyPublicJWK;
     private JMenuItem menuItemCopyPublicPEM;
     private JMenuItem menuItemCopyPassword;
+    private JMenuItem menuItemCopyJWKSet;
 
     public KeysView(
             Window parent,
@@ -117,6 +118,7 @@ public class KeysView {
             boolean copyPublicJWKEnabled = false;
             boolean copyPublicPEMEnabled = false;
             boolean copyPasswordEnabled = false;
+            boolean copyJWKKeySet = false;
 
             // No selection, set the selection
             if (tableKeys.getSelectedRowCount() == 0) {
@@ -129,10 +131,13 @@ public class KeysView {
                 copyPublicJWKEnabled = presenter.canCopyPublicJWK(popupRow);
                 copyPublicPEMEnabled = presenter.canCopyPublicPEM(popupRow);
                 copyPasswordEnabled = presenter.canCopyPassword(popupRow);
+                copyJWKKeySet = presenter.canCopyJWKSet(new int[]{popupRow});
             }
             // Selection doesn't equal right-clicked row, change the selection
             else if(tableKeys.getSelectedRowCount() == 1 && tableKeys.getSelectedRow() != popupRow) {
                 tableKeys.changeSelection(popupRow, 0, false, false);
+            } else {
+                copyJWKKeySet = presenter.canCopyJWKSet(tableKeys.getSelectedRows());
             }
 
             menuItemCopyJWK.setEnabled(copyJWKEnabled);
@@ -140,6 +145,7 @@ public class KeysView {
             menuItemCopyPublicJWK.setEnabled(copyPublicJWKEnabled);
             menuItemCopyPublicPEM.setEnabled(copyPublicPEMEnabled);
             menuItemCopyPassword.setEnabled(copyPasswordEnabled);
+            menuItemCopyJWKSet.setEnabled(copyJWKKeySet);
 
             return super.getComponentPopupMenu();
         }
@@ -191,27 +197,25 @@ public class KeysView {
         menuItemCopyPublicJWK = new JMenuItem(Utils.getResourceString("keys_menu_copy_public_jwk"));
         menuItemCopyPublicPEM = new JMenuItem(Utils.getResourceString("keys_menu_copy_public_pem"));
         menuItemCopyPassword = new JMenuItem(Utils.getResourceString("keys_menu_copy_password"));
+        menuItemCopyJWKSet = new JMenuItem(Utils.getResourceString("keys_menu_jwk_set"));
 
         // Event handlers that call the presenter for menu item clicks on the right-click menu
         ActionListener popupMenuActionListener = e -> {
             JMenuItem menuItem = (JMenuItem) e.getSource();
-            if(menuItem == menuItemDelete){
+            if (menuItem == menuItemDelete) {
                 presenter.onPopupDelete(tableKeys.getSelectedRows());
-            }
-            else if(menuItem == menuItemCopyJWK){
+            } else if (menuItem == menuItemCopyJWK) {
                 presenter.onPopupCopyJWK(((JTablePopup) tableKeys).getPopupRow());
-            }
-            else if(menuItem == menuItemCopyPEM){
+            } else if (menuItem == menuItemCopyPEM) {
                 presenter.onPopupCopyPEM(((JTablePopup) tableKeys).getPopupRow());
-            }
-            else if(menuItem == menuItemCopyPublicJWK){
+            } else if (menuItem == menuItemCopyPublicJWK) {
                 presenter.onPopupCopyPublicJWK(((JTablePopup) tableKeys).getPopupRow());
-            }
-            else if(menuItem == menuItemCopyPublicPEM){
+            } else if (menuItem == menuItemCopyPublicPEM) {
                 presenter.onPopupCopyPublicPEM(((JTablePopup) tableKeys).getPopupRow());
-            }
-            else if(menuItem == menuItemCopyPassword){
+            } else if (menuItem == menuItemCopyPassword) {
                 presenter.onPopupCopyPassword(((JTablePopup) tableKeys).getPopupRow());
+            } else if (menuItem == menuItemCopyJWKSet) {
+                presenter.onPopupJWKSet(tableKeys.getSelectedRows());
             }
         };
 
@@ -222,6 +226,7 @@ public class KeysView {
         menuItemCopyPublicJWK.addActionListener(popupMenuActionListener);
         menuItemCopyPublicPEM.addActionListener(popupMenuActionListener);
         menuItemCopyPassword.addActionListener(popupMenuActionListener);
+        menuItemCopyJWKSet.addActionListener(popupMenuActionListener);
 
         // Add the buttons to the right-click menu
         popupMenu.add(menuItemDelete);
@@ -230,6 +235,7 @@ public class KeysView {
         popupMenu.add(menuItemCopyPublicJWK);
         popupMenu.add(menuItemCopyPublicPEM);
         popupMenu.add(menuItemCopyPassword);
+        popupMenu.add(menuItemCopyJWKSet);
 
         // Associate the right-click menu to the table
         tableKeys.setComponentPopupMenu(popupMenu);

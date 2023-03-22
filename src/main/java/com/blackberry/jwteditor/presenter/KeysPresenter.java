@@ -19,9 +19,9 @@ limitations under the License.
 package com.blackberry.jwteditor.presenter;
 
 import com.blackberry.jwteditor.exceptions.PemException;
+import com.blackberry.jwteditor.model.jose.JWKSet;
 import com.blackberry.jwteditor.model.keys.*;
 import com.blackberry.jwteditor.model.persistence.KeysModelPersistence;
-import com.blackberry.jwteditor.utils.JSONUtils;
 import com.blackberry.jwteditor.utils.PEMUtils;
 import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.view.dialog.keys.AsymmetricKeyDialogFactory;
@@ -34,6 +34,10 @@ import com.nimbusds.jose.jwk.*;
 
 import javax.swing.*;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.IntStream;
+
+import static com.blackberry.jwteditor.utils.JSONUtils.prettyPrintJSON;
 
 /**
  * Presenter for the Keys tab
@@ -230,6 +234,13 @@ public class KeysPresenter extends Presenter {
         return key instanceof PasswordKey;
     }
 
+    public boolean canCopyJWKSet(int[] rows) {
+        return IntStream.of(rows)
+                .mapToObj(model::getKey)
+                .filter(Objects::nonNull)
+                .anyMatch(Key::hasJWK);
+    }
+
     /**
      * Handle click events on the row delete popup
      *
@@ -258,7 +269,7 @@ public class KeysPresenter extends Presenter {
     public void onPopupCopyJWK(int row) {
         JWKKey jwkKey = (JWKKey) model.getKey(row);
         JWK jwk = jwkKey.getJWK();
-        Utils.copyToClipboard(JSONUtils.prettyPrintJSON(jwk.toJSONString()));
+        Utils.copyToClipboard(prettyPrintJSON(jwk.toJSONString()));
     }
 
     /**
@@ -284,7 +295,7 @@ public class KeysPresenter extends Presenter {
     public void onPopupCopyPublicJWK(int row) {
         JWKKey jwkKey = (JWKKey) model.getKey(row);
         JWK jwk = jwkKey.getJWK().toPublicJWK();
-        Utils.copyToClipboard(JSONUtils.prettyPrintJSON(jwk.toJSONString()));
+        Utils.copyToClipboard(prettyPrintJSON(jwk.toJSONString()));
     }
 
     /**
@@ -310,6 +321,20 @@ public class KeysPresenter extends Presenter {
     public void onPopupCopyPassword(int row) {
         PasswordKey passwordKey = (PasswordKey) model.getKey(row);
         Utils.copyToClipboard(passwordKey.getPassword());
+    }
+
+    public void onPopupJWKSet(int[] rows) {
+        List<JWK> selectedJwk = IntStream.of(rows)
+                .mapToObj(model::getKey)
+                .filter(Objects::nonNull)
+                .filter(key -> key instanceof JWKKey)
+                .map(key -> ((JWKKey) key).getJWK())
+                .toList();
+
+        JWKSet jwkSet = new JWKSet(selectedJwk);
+        String jwkSetJson = jwkSet.serialize();
+
+        Utils.copyToClipboard(jwkSetJson);
     }
 
     /**

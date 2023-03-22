@@ -14,6 +14,7 @@ It was written by Fraser Winterborn, formerly of BlackBerry Security Research Gr
 * Update to Java 17 and PortSwigger's new Montoya API
 * Add ability to enable/disable JWT highlighting within proxied messages and to change highlight color
 * Fix issue where invalid JWS's not recognised
+* Add ability to export keys as a JWK set
 * Add ability to sign with empty keys (CVE-2019-20933)
 * Add ability to sign with psychic signatures (CVE-2022-21449)
 * Remove standalone mode
