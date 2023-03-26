@@ -54,6 +54,7 @@ class CustomizedRSyntaxTextArea extends RSyntaxTextArea {
         });
 
         setUseFocusableTips(false);
+        setBracketMatchingEnabled(false);
     }
 
     @Override
