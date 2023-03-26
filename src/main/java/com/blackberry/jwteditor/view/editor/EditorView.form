@@ -3,7 +3,7 @@
   <grid id="27dc6" binding="panel" layout-manager="GridLayoutManager" row-count="4" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="0" left="0" bottom="0" right="0"/>
     <constraints>
-      <xy x="20" y="20" width="721" height="609"/>
+      <xy x="20" y="20" width="721" height="698"/>
     </constraints>
     <properties/>
     <border type="none"/>
@@ -69,11 +69,14 @@
                       <lineWrap value="true"/>
                       <text value=""/>
                     </properties>
+                    <clientProperties>
+                      <html.disable class="java.lang.Boolean" value="true"/>
+                    </clientProperties>
                   </component>
                 </children>
               </scrollpane>
               <grid id="bf819" layout-manager="GridLayoutManager" row-count="1" column-count="4" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
-                <margin top="0" left="0" bottom="0" right="0"/>
+                <margin top="0" left="0" bottom="3" right="0"/>
                 <constraints>
                   <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
                 </constraints>
@@ -153,11 +156,14 @@
                               <currentLineHighlightColor color="-1"/>
                               <syntaxEditingStyle value="text/json"/>
                             </properties>
+                            <clientProperties>
+                              <html.disable class="java.lang.Boolean" value="true"/>
+                            </clientProperties>
                           </component>
                         </children>
                       </scrollpane>
                       <grid id="c7ea0" layout-manager="GridLayoutManager" row-count="3" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
-                        <margin top="0" left="0" bottom="0" right="0"/>
+                        <margin top="0" left="0" bottom="0" right="7"/>
                         <constraints>
                           <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
                         </constraints>
@@ -212,11 +218,14 @@
                               <currentLineHighlightColor color="-1"/>
                               <syntaxEditingStyle value="text/json"/>
                             </properties>
+                            <clientProperties>
+                              <html.disable class="java.lang.Boolean" value="true"/>
+                            </clientProperties>
                           </component>
                         </children>
                       </scrollpane>
-                      <grid id="b93bc" layout-manager="GridLayoutManager" row-count="3" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
-                        <margin top="0" left="0" bottom="0" right="0"/>
+                      <grid id="b93bc" layout-manager="GridLayoutManager" row-count="3" column-count="1" same-size-horizontally="true" same-size-vertically="false" hgap="-1" vgap="-1">
+                        <margin top="0" left="0" bottom="0" right="7"/>
                         <constraints>
                           <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
                         </constraints>
@@ -292,11 +301,14 @@
                               <currentLineHighlightColor color="-1"/>
                               <syntaxEditingStyle value="text/json"/>
                             </properties>
+                            <clientProperties>
+                              <html.disable class="java.lang.Boolean" value="true"/>
+                            </clientProperties>
                           </component>
                         </children>
                       </scrollpane>
                       <grid id="7cf1b" layout-manager="GridLayoutManager" row-count="3" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="0" vgap="0">
-                        <margin top="0" left="0" bottom="0" right="0"/>
+                        <margin top="0" left="0" bottom="0" right="7"/>
                         <constraints>
                           <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
                         </constraints>
