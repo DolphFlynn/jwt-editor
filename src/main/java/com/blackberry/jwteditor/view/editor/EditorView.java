@@ -556,9 +556,9 @@ public abstract class EditorView implements ExtensionProvidedEditor {
         buttonAttack = new JButton();
         buttonAttack.setComponentPopupMenu(popupMenuAttack);
         buttonAttack.addActionListener(e -> onAttackClicked());
-        textAreaSerialized = rstaFactory.build();
-        textAreaJWEHeader = rstaFactory.build();
-        textAreaJWSHeader = rstaFactory.build();
-        textAreaPayload = rstaFactory.build();
+        textAreaSerialized = rstaFactory.buildSerializedJWTTextArea();
+        textAreaJWEHeader = rstaFactory.buildDefaultTextArea();
+        textAreaJWSHeader = rstaFactory.buildDefaultTextArea();
+        textAreaPayload = rstaFactory.buildDefaultTextArea();
     }
 }

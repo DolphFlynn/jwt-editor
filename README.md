@@ -17,6 +17,7 @@ It was written by Fraser Winterborn, formerly of BlackBerry Security Research Gr
 * Add ability to export keys as a JWK set
 * Add ability to sign with empty keys (CVE-2019-20933)
 * Add ability to sign with psychic signatures (CVE-2022-21449)
+* Color sections of serialized JWT differently 
 * Remove standalone mode
 * Minor bug fixes and enhancements
 

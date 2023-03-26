@@ -21,10 +21,12 @@ package com.blackberry.jwteditor.view.rsta;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.Theme;
 
+import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.function.Consumer;
 
+import static com.blackberry.jwteditor.view.rsta.CustomTokenColors.customTokenColors;
 import static java.awt.event.HierarchyEvent.SHOWING_CHANGED;
 import static org.fife.ui.rsyntaxtextarea.Theme.load;
 
@@ -34,16 +36,24 @@ class CustomizedRSyntaxTextArea extends RSyntaxTextArea {
 
     private final DarkModeDetector darkModeDetector;
     private final Consumer<String> errorLogger;
+    private final CustomTokenColors customTokenColors;
 
     CustomizedRSyntaxTextArea(DarkModeDetector darkModeDetector, Consumer<String> errorLogger) {
+        this(darkModeDetector, errorLogger, customTokenColors().build());
+    }
+
+    CustomizedRSyntaxTextArea(DarkModeDetector darkModeDetector, Consumer<String> errorLogger, CustomTokenColors customTokenColors) {
         this.darkModeDetector = darkModeDetector;
         this.errorLogger = errorLogger;
+        this.customTokenColors = customTokenColors;
 
         this.addHierarchyListener(e -> {
             if (e.getChangeFlags() == SHOWING_CHANGED && e.getComponent().isShowing()) {
                 applyTheme();
             }
         });
+
+        setUseFocusableTips(false);
     }
 
     @Override
@@ -66,6 +76,13 @@ class CustomizedRSyntaxTextArea extends RSyntaxTextArea {
     public void updateUI() {
         super.updateUI();
         applyTheme();
+    }
+
+    @Override
+    public Color getForegroundForTokenType(int type) {
+        return customTokenColors
+                .foregroundForTokenType(type)
+                .orElse(super.getForegroundForTokenType(type));
     }
 
     private void applyTheme() {

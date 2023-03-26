@@ -328,6 +328,6 @@ public class AsymmetricKeyDialog extends KeyDialog {
     }
 
     private void createUIComponents() {
-        textAreaKey = rstaFactory.build();
+        textAreaKey = rstaFactory.buildDefaultTextArea();
     }
 }

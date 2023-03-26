@@ -21,7 +21,6 @@ import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.view.burp.BurpView;
 import com.blackberry.jwteditor.view.editor.RequestEditorView;
 import com.blackberry.jwteditor.view.editor.ResponseEditorView;
-import com.blackberry.jwteditor.view.rsta.DefaultRstaFactory;
 import com.blackberry.jwteditor.view.rsta.RstaFactory;
 
 import java.awt.*;
@@ -45,7 +44,7 @@ public class JWTEditorExtension implements BurpExtension {
         UserInterface userInterface = api.userInterface();
         Window suiteWindow = userInterface.swingUtils().suiteFrame();
 
-        RstaFactory rstaFactory = new DefaultRstaFactory(userInterface, api.logging());
+        RstaFactory rstaFactory = new RstaFactory(userInterface, api.logging());
         PresenterStore presenters = new PresenterStore();
 
         BurpView burpView = new BurpView(

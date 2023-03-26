@@ -18,8 +18,68 @@ limitations under the License.
 
 package com.blackberry.jwteditor.view.rsta;
 
+import burp.api.montoya.logging.Logging;
+import burp.api.montoya.ui.UserInterface;
+import com.blackberry.jwteditor.view.rsta.jwt.JWTTokenMaker;
+import com.blackberry.jwteditor.view.rsta.jwt.JWTTokenizerConstants;
+import org.fife.ui.rsyntaxtextarea.AbstractTokenMakerFactory;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
+import org.fife.ui.rsyntaxtextarea.TokenMakerFactory;
 
-public interface RstaFactory {
-    RSyntaxTextArea build();
+import javax.swing.*;
+import javax.swing.text.JTextComponent;
+import java.awt.*;
+
+import static com.blackberry.jwteditor.view.rsta.CustomTokenColors.customTokenColors;
+import static com.blackberry.jwteditor.view.rsta.jwt.JWTTokenMaker.*;
+import static com.blackberry.jwteditor.view.rsta.jwt.JWTTokenizerConstants.MAPPING;
+import static com.blackberry.jwteditor.view.rsta.jwt.JWTTokenizerConstants.TOKEN_MAKER_FQCN;
+
+public class RstaFactory {
+    private final DarkModeDetector darkModeDetector;
+    private final Logging logging;
+
+    public RstaFactory(UserInterface userInterface, Logging logging) {
+        this.darkModeDetector = new DarkModeDetector(userInterface);
+        this.logging = logging;
+
+        // Ensure Burp key events not captured - https://github.com/bobbylight/RSyntaxTextArea/issues/269#issuecomment-776329702
+        JTextComponent.removeKeymap("RTextAreaKeymap");
+        UIManager.put("RSyntaxTextAreaUI.actionMap", null);
+        UIManager.put("RSyntaxTextAreaUI.inputMap", null);
+        UIManager.put("RTextAreaUI.actionMap", null);
+        UIManager.put("RTextAreaUI.inputMap", null);
+
+        AbstractTokenMakerFactory tokenMakerFactory = (AbstractTokenMakerFactory) TokenMakerFactory.getDefaultInstance();
+        tokenMakerFactory.putMapping(MAPPING, TOKEN_MAKER_FQCN);
+        JWTTokenMaker.errorLogger = logging::logToError;
+    }
+
+    public RSyntaxTextArea buildDefaultTextArea() {
+        return new CustomizedRSyntaxTextArea(darkModeDetector, logging::logToError);
+    }
+
+    public RSyntaxTextArea buildSerializedJWTTextArea() {
+        CustomTokenColors customTokenColors = customTokenColors()
+                .withForeground(JWT_PART1, Color.decode("#FB015B"))
+                .withForeground(JWT_PART2, Color.decode("#D63AFF"))
+                .withForeground(JWT_PART3, Color.decode("#00B9F1"))
+                .withForeground(JWT_PART4, Color.decode("#EA7600"))
+                .withForeground(JWT_PART5, Color.decode("#EDB219"))
+                .withForeground(JWT_SEPARATOR1, Color.decode("#A6A282"))
+                .withForeground(JWT_SEPARATOR2, Color.decode("#A6A282"))
+                .withForeground(JWT_SEPARATOR3, Color.decode("#A6A282"))
+                .withForeground(JWT_SEPARATOR4, Color.decode("#A6A282"))
+                .build();
+
+        RSyntaxTextArea textArea = new CustomizedRSyntaxTextArea(
+                darkModeDetector,
+                logging::logToError,
+                customTokenColors
+        );
+
+        textArea.setSyntaxEditingStyle(JWTTokenizerConstants.MAPPING);
+
+        return textArea;
+    }
 }

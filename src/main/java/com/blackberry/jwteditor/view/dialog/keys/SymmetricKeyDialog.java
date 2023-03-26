@@ -188,6 +188,6 @@ public class SymmetricKeyDialog extends KeyDialog {
     }
 
     private void createUIComponents() {
-        textAreaKey = rstaFactory.build();
+        textAreaKey = rstaFactory.buildDefaultTextArea();
     }
 }
