@@ -23,10 +23,9 @@ import burp.api.montoya.ui.editor.extension.ExtensionProvidedEditor;
 import com.blackberry.jwteditor.presenter.EditorPresenter;
 import com.blackberry.jwteditor.presenter.PresenterStore;
 import com.blackberry.jwteditor.utils.Utils;
+import com.blackberry.jwteditor.view.hexcodearea.HexCodeAreaFactory;
 import com.blackberry.jwteditor.view.rsta.RstaFactory;
-import com.blackberry.jwteditor.view.utils.HexCodeAreaCommandHandler;
 import org.exbin.deltahex.EditationAllowed;
-import org.exbin.deltahex.ViewMode;
 import org.exbin.deltahex.swing.CodeArea;
 import org.exbin.utils.binary_data.ByteArrayEditableData;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
@@ -474,61 +473,25 @@ public abstract class EditorView implements ExtensionProvidedEditor {
     private void createUIComponents() {
         // Create CodeAreas for byte[] inputs. The form editor cannot handle these, so create manually
 
-        // Create a CodeArea for the signature
-        panelSignature = new JPanel();
-        panelSignature.setLayout(new GridLayout());
-        codeAreaSignature = new CodeArea();
-        codeAreaSignature.setCommandHandler(new HexCodeAreaCommandHandler(codeAreaSignature));
-        codeAreaSignature.setShowHeader(false);
-        codeAreaSignature.setShowLineNumbers(false);
-        codeAreaSignature.setViewMode(ViewMode.CODE_MATRIX);
-        codeAreaSignature.setData(new ByteArrayEditableData(new byte[0]));
+        panelSignature = new JPanel(new BorderLayout());
+        codeAreaSignature = HexCodeAreaFactory.build();
         panelSignature.add(codeAreaSignature);
 
-        // Create a CodeArea for the encrypted key
-        panelKey = new JPanel();
-        panelKey.setLayout(new GridLayout());
-        codeAreaEncryptedKey = new CodeArea();
-        codeAreaEncryptedKey.setCommandHandler(new HexCodeAreaCommandHandler(codeAreaEncryptedKey));
-        codeAreaEncryptedKey.setShowHeader(false);
-        codeAreaEncryptedKey.setShowLineNumbers(false);
-        codeAreaEncryptedKey.setViewMode(ViewMode.CODE_MATRIX);
-        codeAreaEncryptedKey.setData(new ByteArrayEditableData(new byte[0]));
-        panelKey.add(codeAreaEncryptedKey);
+        panelKey = new JPanel(new BorderLayout());
+        codeAreaEncryptedKey = HexCodeAreaFactory.build();
+        panelKey.add(codeAreaEncryptedKey, BorderLayout.CENTER);
 
-        // Create a CodeArea for the ciphertext
-        panelCiphertext = new JPanel();
-        panelCiphertext.setLayout(new GridLayout());
-        codeAreaCiphertext = new CodeArea();
-        codeAreaCiphertext.setCommandHandler(new HexCodeAreaCommandHandler(codeAreaCiphertext));
-        codeAreaCiphertext.setShowHeader(false);
-        codeAreaCiphertext.setShowLineNumbers(false);
-        codeAreaCiphertext.setViewMode(ViewMode.CODE_MATRIX);
-        codeAreaCiphertext.setData(new ByteArrayEditableData(new byte[0]));
-        panelCiphertext.add(codeAreaCiphertext);
+        panelCiphertext = new JPanel(new BorderLayout());
+        codeAreaCiphertext = HexCodeAreaFactory.build();
+        panelCiphertext.add(codeAreaCiphertext, BorderLayout.CENTER);
 
-        // Create a CodeArea for the IV
-        panelIV = new JPanel();
-        panelIV.setLayout(new GridLayout());
-        codeAreaIV = new CodeArea();
-        codeAreaIV.setCommandHandler(new HexCodeAreaCommandHandler(codeAreaIV));
-        codeAreaIV.setShowHeader(false);
-        codeAreaIV.setShowLineNumbers(false);
-        codeAreaIV.setViewMode(ViewMode.CODE_MATRIX);
-        codeAreaIV.setData(new ByteArrayEditableData());
-        panelIV.add(codeAreaIV);
+        panelIV = new JPanel(new BorderLayout());
+        codeAreaIV = HexCodeAreaFactory.build();
+        panelIV.add(codeAreaIV, BorderLayout.CENTER);
 
-        // Create a CodeArea for the tag
-        panelTag = new JPanel();
-        panelTag.setLayout(new GridLayout());
-        codeAreaTag = new CodeArea();
-        codeAreaTag.setCommandHandler(new HexCodeAreaCommandHandler(codeAreaTag));
-        codeAreaTag.setShowHeader(false);
-        codeAreaTag.setShowLineNumbers(false);
-        codeAreaTag.setViewMode(ViewMode.CODE_MATRIX);
-        codeAreaTag.setData(new ByteArrayEditableData(new byte[0]));
-        codeAreaTag.setBackground(Color.WHITE);
-        panelTag.add(codeAreaTag);
+        panelTag = new JPanel(new BorderLayout());
+        codeAreaTag = HexCodeAreaFactory.build();
+        panelTag.add(codeAreaTag, BorderLayout.CENTER);
 
         // Create the Attack popup menu
         JPopupMenu popupMenuAttack = new JPopupMenu();
@@ -556,6 +519,7 @@ public abstract class EditorView implements ExtensionProvidedEditor {
         buttonAttack = new JButton();
         buttonAttack.setComponentPopupMenu(popupMenuAttack);
         buttonAttack.addActionListener(e -> onAttackClicked());
+
         textAreaSerialized = rstaFactory.buildSerializedJWTTextArea();
         textAreaJWEHeader = rstaFactory.buildDefaultTextArea();
         textAreaJWSHeader = rstaFactory.buildDefaultTextArea();

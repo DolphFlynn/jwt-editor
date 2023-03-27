@@ -16,7 +16,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.blackberry.jwteditor.view.utils;
+package com.blackberry.jwteditor.view.hexcodearea;
 
 import com.blackberry.jwteditor.utils.Utils;
 import com.nimbusds.jose.util.Base64URL;
@@ -55,11 +55,11 @@ import static org.apache.commons.codec.binary.Hex.encodeHex;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public class HexCodeAreaCommandHandler extends DefaultCodeAreaCommandHandler {
+class HexCodeAreaCommandHandler extends DefaultCodeAreaCommandHandler {
 
     private final CodeArea codeArea;
 
-    public HexCodeAreaCommandHandler(CodeArea codeArea) {
+    HexCodeAreaCommandHandler(CodeArea codeArea) {
         super(codeArea);
         this.codeArea = codeArea;
     }
