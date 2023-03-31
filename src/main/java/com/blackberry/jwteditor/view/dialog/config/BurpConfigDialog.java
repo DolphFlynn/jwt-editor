@@ -23,6 +23,7 @@ import burp.intruder.FuzzLocation;
 import burp.intruder.IntruderConfig;
 import burp.proxy.HighlightColor;
 import burp.proxy.ProxyConfig;
+import burp.scanner.ScannerConfig;
 import com.blackberry.jwteditor.view.dialog.AbstractDialog;
 
 import javax.swing.*;
@@ -44,6 +45,8 @@ public class BurpConfigDialog extends AbstractDialog {
     private JLabel labelHighlightJWT;
     private JTextField intruderParameterName;
     private JComboBox comboBoxPayloadPosition;
+    private JCheckBox checkBoxHeaderInsertionPoint;
+    private JTextField scannerParameterName;
 
     /**
      * Creates new ProxyConfigDialog
@@ -71,7 +74,6 @@ public class BurpConfigDialog extends AbstractDialog {
         comboBoxHighlightColor.setRenderer(new HighlightComboRenderer());
         comboBoxHighlightColor.setSelectedItem(proxyConfig.highlightColor());
 
-        // Set an event handler to enable/disable highlight color
         checkBoxHighlightJWT.addActionListener(e -> comboBoxHighlightColor.setEnabled(checkBoxHighlightJWT.isSelected()));
 
         checkBoxHighlightJWT.setSelected(proxyConfig.highlightJWT());
@@ -82,6 +84,14 @@ public class BurpConfigDialog extends AbstractDialog {
         comboBoxPayloadPosition.setModel(new DefaultComboBoxModel<>(FuzzLocation.values()));
         comboBoxPayloadPosition.setSelectedItem(intruderConfig.fuzzLocation());
         intruderParameterName.setText(intruderConfig.fuzzParameter());
+
+        ScannerConfig scannerConfig = burpConfig.scannerConfig();
+
+        checkBoxHeaderInsertionPoint.setSelected(scannerConfig.enableHeaderJWSInsertionPointLocation());
+        checkBoxHeaderInsertionPoint.addActionListener(e -> scannerParameterName.setEnabled(checkBoxHeaderInsertionPoint.isSelected()));
+
+        scannerParameterName.setEnabled(scannerConfig.enableHeaderJWSInsertionPointLocation());
+        scannerParameterName.setText(scannerConfig.insertionPointLocationParameterName());
     }
 
     /**
@@ -95,6 +105,10 @@ public class BurpConfigDialog extends AbstractDialog {
         IntruderConfig intruderConfig = burpConfig.intruderConfig();
         intruderConfig.setFuzzParameter(intruderParameterName.getText());
         intruderConfig.setFuzzLocation((FuzzLocation) comboBoxPayloadPosition.getSelectedItem());
+
+        ScannerConfig scannerConfig = burpConfig.scannerConfig();
+        scannerConfig.setEnableHeaderJWSInsertionPointLocation(checkBoxHeaderInsertionPoint.isSelected());
+        scannerConfig.setInsertionPointLocationParameterName(scannerParameterName.getText());
 
         dispose();
     }

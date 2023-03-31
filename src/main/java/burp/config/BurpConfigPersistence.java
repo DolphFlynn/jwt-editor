@@ -23,6 +23,7 @@ import burp.intruder.FuzzLocation;
 import burp.intruder.IntruderConfig;
 import burp.proxy.HighlightColor;
 import burp.proxy.ProxyConfig;
+import burp.scanner.ScannerConfig;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -36,6 +37,8 @@ public class BurpConfigPersistence {
     private static final String PROXY_HISTORY_HIGHLIGHT_COLOR_KEY = "proxy_history_highlight_color";
     private static final String INTRUDER_FUZZ_PARAMETER_TYPE = "intruder_payload_processor_fuzz_location";
     private static final String INTRUDER_FUZZ_PARAMETER_NAME = "intruder_payload_processor_parameter_name";
+    private static final String SCANNER_INSERTION_POINT_PROVIDER_ENABLED_KEY = "scanner_insertion_point_provider_enabled";
+    private static final String SCANNER_INSERTION_PARAMETER_NAME = "scanner_insertion_point_provider_parameter_name";
 
     private final Preferences preferences;
 
@@ -51,36 +54,45 @@ public class BurpConfigPersistence {
     public BurpConfig loadOrCreateNew() {
         String json = preferences.getString(BURP_SETTINGS_NAME);
 
-        // If parse fails, create a new Burp config
-        if (json != null) {
-            try {
-                JSONObject parsedObject = new JSONObject(json);
-                BurpConfig burpConfig = new BurpConfig();
-
-                if (parsedObject.has(PROXY_LISTENER_ENABLED_KEY) && parsedObject.has(PROXY_HISTORY_HIGHLIGHT_COLOR_KEY)) {
-                    ProxyConfig proxyConfig = burpConfig.proxyConfig();
-
-                    proxyConfig.setHighlightJWT((Boolean) parsedObject.get(PROXY_LISTENER_ENABLED_KEY));
-
-                    String highlightColorName = (String) parsedObject.get(PROXY_HISTORY_HIGHLIGHT_COLOR_KEY);
-                    proxyConfig.setHighlightColor(HighlightColor.from(highlightColorName));
-                }
-
-                if (parsedObject.has(INTRUDER_FUZZ_PARAMETER_TYPE) && parsedObject.has(INTRUDER_FUZZ_PARAMETER_NAME)) {
-                    IntruderConfig intruderConfig = burpConfig.intruderConfig();
-
-                    intruderConfig.setFuzzParameter((String) parsedObject.get(INTRUDER_FUZZ_PARAMETER_NAME));
-
-                    String fuzzLocationName = (String) parsedObject.get(INTRUDER_FUZZ_PARAMETER_TYPE);
-                    intruderConfig.setFuzzLocation(FuzzLocation.from(fuzzLocationName));
-                }
-
-                return burpConfig;
-            } catch (ClassCastException | JSONException ignored) {
-            }
+        if (json == null) {
+            return new BurpConfig();
         }
 
-        return new BurpConfig();
+        try {
+            JSONObject parsedObject = new JSONObject(json);
+            BurpConfig burpConfig = new BurpConfig();
+
+            if (parsedObject.has(PROXY_LISTENER_ENABLED_KEY) && parsedObject.has(PROXY_HISTORY_HIGHLIGHT_COLOR_KEY)) {
+                ProxyConfig proxyConfig = burpConfig.proxyConfig();
+
+                proxyConfig.setHighlightJWT((Boolean) parsedObject.get(PROXY_LISTENER_ENABLED_KEY));
+
+                String highlightColorName = (String) parsedObject.get(PROXY_HISTORY_HIGHLIGHT_COLOR_KEY);
+                proxyConfig.setHighlightColor(HighlightColor.from(highlightColorName));
+            }
+
+            if (parsedObject.has(INTRUDER_FUZZ_PARAMETER_TYPE) && parsedObject.has(INTRUDER_FUZZ_PARAMETER_NAME)) {
+                IntruderConfig intruderConfig = burpConfig.intruderConfig();
+
+                intruderConfig.setFuzzParameter((String) parsedObject.get(INTRUDER_FUZZ_PARAMETER_NAME));
+
+                String fuzzLocationName = (String) parsedObject.get(INTRUDER_FUZZ_PARAMETER_TYPE);
+                intruderConfig.setFuzzLocation(FuzzLocation.from(fuzzLocationName));
+            }
+
+            if (parsedObject.has(SCANNER_INSERTION_POINT_PROVIDER_ENABLED_KEY) && parsedObject.has(SCANNER_INSERTION_PARAMETER_NAME)) {
+                ScannerConfig scannerConfig = burpConfig.scannerConfig();
+
+                scannerConfig.setEnableHeaderJWSInsertionPointLocation((Boolean) parsedObject.get(SCANNER_INSERTION_POINT_PROVIDER_ENABLED_KEY));
+
+                String insertionPointParameterName = (String) parsedObject.get(SCANNER_INSERTION_PARAMETER_NAME);
+                scannerConfig.setInsertionPointLocationParameterName(insertionPointParameterName);
+            }
+
+            return burpConfig;
+        } catch (ClassCastException | JSONException ignored) {
+            return new BurpConfig();
+        }
     }
 
     /**
@@ -96,6 +108,8 @@ public class BurpConfigPersistence {
         burpConfigJson.put(PROXY_HISTORY_HIGHLIGHT_COLOR_KEY, model.proxyConfig().highlightColor().burpColor);
         burpConfigJson.put(INTRUDER_FUZZ_PARAMETER_NAME, model.intruderConfig().fuzzParameter());
         burpConfigJson.put(INTRUDER_FUZZ_PARAMETER_TYPE, model.intruderConfig().fuzzLocation());
+        burpConfigJson.put(SCANNER_INSERTION_POINT_PROVIDER_ENABLED_KEY, model.scannerConfig().enableHeaderJWSInsertionPointLocation());
+        burpConfigJson.put(SCANNER_INSERTION_PARAMETER_NAME, model.scannerConfig().insertionPointLocationParameterName());
 
         preferences.setString(BURP_SETTINGS_NAME, burpConfigJson.toString());
     }

@@ -36,8 +36,7 @@ import static burp.proxy.HighlightColor.RED;
 import static burp.proxy.ProxyConfig.DEFAULT_HIGHLIGHT_COLOR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 class BurpConfigPersistenceTest {
     private final Preferences callbacks = mock(Preferences.class);
@@ -55,7 +54,20 @@ class BurpConfigPersistenceTest {
         assertThat(burpConfig.intruderConfig()).isNotNull();
         assertThat(burpConfig.intruderConfig().fuzzParameter()).isEqualTo("name");
         assertThat(burpConfig.intruderConfig().fuzzLocation()).isEqualTo(PAYLOAD);
-        configPersistence.save(burpConfig);
+        assertThat(burpConfig.scannerConfig()).isNotNull();
+        assertThat(burpConfig.scannerConfig().enableHeaderJWSInsertionPointLocation()).isFalse();
+        assertThat(burpConfig.scannerConfig().insertionPointLocationParameterName()).isEqualTo("kid");
+    }
+
+    @Test
+    void givenDefaultConfig_whenSaved_thenJsonCorrect() {
+        String expectedJson = "{\"scanner_insertion_point_provider_enabled\":false,\"intruder_payload_processor_parameter_name\":\"name\",\"proxy_history_highlight_color\":\"GREEN\",\"proxy_listener_enabled\":true,\"scanner_insertion_point_provider_parameter_name\":\"kid\",\"intruder_payload_processor_fuzz_location\":\"PAYLOAD\"}";
+        BurpConfigPersistence configPersistence = new BurpConfigPersistence(callbacks);
+        System.out.println(expectedJson);
+
+        configPersistence.save(new BurpConfig());
+
+        verify(callbacks).setString(BURP_SETTINGS_NAME, expectedJson);
     }
 
     private static Stream<String> invalidConfigJson() {
@@ -86,6 +98,9 @@ class BurpConfigPersistenceTest {
         assertThat(burpConfig.intruderConfig()).isNotNull();
         assertThat(burpConfig.intruderConfig().fuzzParameter()).isEqualTo("name");
         assertThat(burpConfig.intruderConfig().fuzzLocation()).isEqualTo(PAYLOAD);
+        assertThat(burpConfig.scannerConfig()).isNotNull();
+        assertThat(burpConfig.scannerConfig().enableHeaderJWSInsertionPointLocation()).isFalse();
+        assertThat(burpConfig.scannerConfig().insertionPointLocationParameterName()).isEqualTo("kid");
     }
 
     private static Stream<String> invalidProxyConfigJson() {
@@ -236,8 +251,91 @@ class BurpConfigPersistenceTest {
     }
 
     @Test
-    void givenValidIntruderAndProxyConfig_whenLoadOrCreateCalled_thenAppropriateConfigReturned() {
-        String json = "{\"proxy_history_highlight_color\":\"cyan\",\"proxy_listener_enabled\":false,\"intruder_payload_processor_parameter_name\":\"iss\",\"intruder_payload_processor_fuzz_location\":\"header\"}";
+    void givenValidScannerConfig_butInvalidProxyConfig_whenLoadOrCreateCalled_thenAppropriateConfigReturned() {
+        String json = "{\"proxy_history_highlight_color\":\"cyan\",\"scanner_insertion_point_provider_enabled\": true,\"scanner_insertion_point_provider_parameter_name\": \"zip\"}";
+        BurpConfigPersistence configPersistence = new BurpConfigPersistence(callbacks);
+        when(callbacks.getString(BURP_SETTINGS_NAME)).thenReturn(json);
+
+        BurpConfig burpConfig = configPersistence.loadOrCreateNew();
+
+        assertThat(burpConfig).isNotNull();
+        assertThat(burpConfig.scannerConfig()).isNotNull();
+        assertThat(burpConfig.scannerConfig().enableHeaderJWSInsertionPointLocation()).isTrue();
+        assertThat(burpConfig.scannerConfig().insertionPointLocationParameterName()).isEqualTo("zip");
+    }
+
+    @Test
+    void givenValidScannerConfig_butInvalidIntruderConfig_whenLoadOrCreateCalled_thenAppropriateConfigReturned() {
+        String json = "{\"intruder_payload_processor_parameter_name\":\"iss\",\"scanner_insertion_point_provider_enabled\": true,\"scanner_insertion_point_provider_parameter_name\": \"zip\"}";
+        BurpConfigPersistence configPersistence = new BurpConfigPersistence(callbacks);
+        when(callbacks.getString(BURP_SETTINGS_NAME)).thenReturn(json);
+
+        BurpConfig burpConfig = configPersistence.loadOrCreateNew();
+
+        assertThat(burpConfig).isNotNull();
+        assertThat(burpConfig.scannerConfig()).isNotNull();
+        assertThat(burpConfig.scannerConfig().enableHeaderJWSInsertionPointLocation()).isTrue();
+        assertThat(burpConfig.scannerConfig().insertionPointLocationParameterName()).isEqualTo("zip");
+    }
+
+    private static Stream<String> invalidScannerConfigJson() {
+        return Stream.of(
+                "{\"intruder_payload_processor_parameter_name\":\"alg\",\"scanner_insertion_point_provider_enabled\":[]}",
+                "{\"intruder_payload_processor_parameter_name\":\"alg\"}",
+                "{\"scanner_insertion_point_provider_enabled\":true}",
+                "{\"intruder_payload_processor_parameter_name\":[],\"scanner_insertion_point_provider_enabled\":true}",
+                "{\"intruder_payload_processor_parameter_name\":{},\"scanner_insertion_point_provider_enabled\":true}",
+                "{\"intruder_payload_processor_parameter_name\":true,\"scanner_insertion_point_provider_enabled\":true}",
+                "{\"intruder_payload_processor_parameter_name\":25519,\"scanner_insertion_point_provider_enabled\":true}"
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidScannerConfigJson")
+    void givenInvalidSavedScannerConfig_whenLoadOrCreateCalled_thenDefaultScannerConfigReturned(String invalidJson) {
+        BurpConfigPersistence configPersistence = new BurpConfigPersistence(callbacks);
+        when(callbacks.getString(BURP_SETTINGS_NAME)).thenReturn(invalidJson);
+
+        BurpConfig burpConfig = configPersistence.loadOrCreateNew();
+
+        assertThat(burpConfig).isNotNull();
+        assertThat(burpConfig.scannerConfig()).isNotNull();
+        assertThat(burpConfig.scannerConfig().enableHeaderJWSInsertionPointLocation()).isFalse();
+        assertThat(burpConfig.scannerConfig().insertionPointLocationParameterName()).isEqualTo("kid");
+    }
+
+    private static Stream<Arguments> validScannerConfigJson() {
+        return Stream.of(
+                arguments(
+                        "{\"scanner_insertion_point_provider_enabled\": true,\"scanner_insertion_point_provider_parameter_name\": \"zip\"}",
+                        true,
+                        "zip"
+                ),
+                arguments(
+                        "{\"scanner_insertion_point_provider_enabled\": false,\"scanner_insertion_point_provider_parameter_name\": \"alg\"}",
+                        false,
+                        "alg"
+                )
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("validScannerConfigJson")
+    void givenValidScannerSavedConfig_whenLoadOrCreateCalled_thenAppropriateConfigReturned(String json, boolean insertionPointProviderEnabled, String insertionPointParameterName) {
+        BurpConfigPersistence configPersistence = new BurpConfigPersistence(callbacks);
+        when(callbacks.getString(BURP_SETTINGS_NAME)).thenReturn(json);
+
+        BurpConfig burpConfig = configPersistence.loadOrCreateNew();
+
+        assertThat(burpConfig).isNotNull();
+        assertThat(burpConfig.scannerConfig()).isNotNull();
+        assertThat(burpConfig.scannerConfig().enableHeaderJWSInsertionPointLocation()).isEqualTo(insertionPointProviderEnabled);
+        assertThat(burpConfig.scannerConfig().insertionPointLocationParameterName()).isEqualTo(insertionPointParameterName);
+    }
+
+    @Test
+    void givenValidConfig_whenLoadOrCreateCalled_thenAppropriateConfigReturned() {
+        String json = "{\"proxy_history_highlight_color\":\"cyan\",\"proxy_listener_enabled\":false,\"intruder_payload_processor_parameter_name\":\"iss\",\"intruder_payload_processor_fuzz_location\":\"header\",\"scanner_insertion_point_provider_enabled\": true,\"scanner_insertion_point_provider_parameter_name\": \"x5u\"}";
         BurpConfigPersistence configPersistence = new BurpConfigPersistence(callbacks);
         when(callbacks.getString(BURP_SETTINGS_NAME)).thenReturn(json);
 
@@ -250,5 +348,20 @@ class BurpConfigPersistenceTest {
         assertThat(burpConfig.intruderConfig()).isNotNull();
         assertThat(burpConfig.intruderConfig().fuzzLocation()).isEqualTo(HEADER);
         assertThat(burpConfig.intruderConfig().fuzzParameter()).isEqualTo("iss");
+        assertThat(burpConfig.scannerConfig()).isNotNull();
+        assertThat(burpConfig.scannerConfig().enableHeaderJWSInsertionPointLocation()).isTrue();
+        assertThat(burpConfig.scannerConfig().insertionPointLocationParameterName()).isEqualTo("x5u");
+    }
+
+    @Test
+    void givenValidConfig_whenRoundTripped_thenJsonIsCorrect() {
+        String json = "{\"scanner_insertion_point_provider_enabled\":true,\"intruder_payload_processor_parameter_name\":\"iss\",\"proxy_history_highlight_color\":\"CYAN\",\"proxy_listener_enabled\":false,\"scanner_insertion_point_provider_parameter_name\":\"x5u\",\"intruder_payload_processor_fuzz_location\":\"HEADER\"}";
+        BurpConfigPersistence configPersistence = new BurpConfigPersistence(callbacks);
+        when(callbacks.getString(BURP_SETTINGS_NAME)).thenReturn(json);
+
+        BurpConfig burpConfig = configPersistence.loadOrCreateNew();
+        configPersistence.save(burpConfig);
+
+        verify(callbacks).setString(BURP_SETTINGS_NAME, json);
     }
 }

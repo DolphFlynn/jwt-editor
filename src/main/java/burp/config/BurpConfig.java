@@ -20,10 +20,12 @@ package burp.config;
 
 import burp.intruder.IntruderConfig;
 import burp.proxy.ProxyConfig;
+import burp.scanner.ScannerConfig;
 
 public class BurpConfig {
     private final ProxyConfig proxyConfig = new ProxyConfig();
     private final IntruderConfig intruderConfig = new IntruderConfig();
+    private final ScannerConfig scannerConfig = new ScannerConfig();
 
     public ProxyConfig proxyConfig() {
         return proxyConfig;
@@ -31,5 +33,9 @@ public class BurpConfig {
 
     public IntruderConfig intruderConfig() {
         return intruderConfig;
+    }
+
+    public ScannerConfig scannerConfig() {
+        return scannerConfig;
     }
 }
