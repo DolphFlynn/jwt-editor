@@ -37,10 +37,12 @@ import static com.blackberry.jwteditor.view.rsta.jwt.JWTTokenizerConstants.TOKEN
 
 public class RstaFactory {
     private final DarkModeDetector darkModeDetector;
+    private final FontDetector fontDetector;
     private final Logging logging;
 
     public RstaFactory(UserInterface userInterface, Logging logging) {
         this.darkModeDetector = new DarkModeDetector(userInterface);
+        this.fontDetector = new FontDetector(userInterface);
         this.logging = logging;
 
         // Ensure Burp key events not captured - https://github.com/bobbylight/RSyntaxTextArea/issues/269#issuecomment-776329702
@@ -56,7 +58,7 @@ public class RstaFactory {
     }
 
     public RSyntaxTextArea buildDefaultTextArea() {
-        return new CustomizedRSyntaxTextArea(darkModeDetector, logging::logToError);
+        return new CustomizedRSyntaxTextArea(darkModeDetector, fontDetector, logging::logToError);
     }
 
     public RSyntaxTextArea buildSerializedJWTTextArea() {
@@ -74,6 +76,7 @@ public class RstaFactory {
 
         RSyntaxTextArea textArea = new CustomizedRSyntaxTextArea(
                 darkModeDetector,
+                fontDetector,
                 logging::logToError,
                 customTokenColors
         );

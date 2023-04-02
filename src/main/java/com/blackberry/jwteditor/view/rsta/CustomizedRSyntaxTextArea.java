@@ -35,21 +35,30 @@ class CustomizedRSyntaxTextArea extends RSyntaxTextArea {
     private static final String LIGHT_THEME = "/org/fife/ui/rsyntaxtextarea/themes/default.xml";
 
     private final DarkModeDetector darkModeDetector;
+    private final FontDetector fontDetector;
     private final Consumer<String> errorLogger;
     private final CustomTokenColors customTokenColors;
 
-    CustomizedRSyntaxTextArea(DarkModeDetector darkModeDetector, Consumer<String> errorLogger) {
-        this(darkModeDetector, errorLogger, customTokenColors().build());
+    CustomizedRSyntaxTextArea(
+            DarkModeDetector darkModeDetector,
+            FontDetector fontDetector,
+            Consumer<String> errorLogger) {
+        this(darkModeDetector, fontDetector, errorLogger, customTokenColors().build());
     }
 
-    CustomizedRSyntaxTextArea(DarkModeDetector darkModeDetector, Consumer<String> errorLogger, CustomTokenColors customTokenColors) {
+    CustomizedRSyntaxTextArea(
+            DarkModeDetector darkModeDetector,
+            FontDetector fontDetector,
+            Consumer<String> errorLogger,
+            CustomTokenColors customTokenColors) {
         this.darkModeDetector = darkModeDetector;
+        this.fontDetector = fontDetector;
         this.errorLogger = errorLogger;
         this.customTokenColors = customTokenColors;
 
         this.addHierarchyListener(e -> {
             if (e.getChangeFlags() == SHOWING_CHANGED && e.getComponent().isShowing()) {
-                applyTheme();
+                applyThemeAndFont();
             }
         });
 
@@ -70,13 +79,13 @@ class CustomizedRSyntaxTextArea extends RSyntaxTextArea {
     @Override
     public void setSyntaxEditingStyle(String styleKey) {
         super.setSyntaxEditingStyle(styleKey);
-        applyTheme();
+        applyThemeAndFont();
     }
 
     @Override
     public void updateUI() {
         super.updateUI();
-        applyTheme();
+        applyThemeAndFont();
     }
 
     @Override
@@ -86,8 +95,8 @@ class CustomizedRSyntaxTextArea extends RSyntaxTextArea {
                 .orElse(super.getForegroundForTokenType(type));
     }
 
-    private void applyTheme() {
-        if (errorLogger == null) {
+    private void applyThemeAndFont() {
+        if (errorLogger == null || fontDetector == null) {
             return;
         }
 
@@ -96,6 +105,9 @@ class CustomizedRSyntaxTextArea extends RSyntaxTextArea {
         try {
             Theme theme = load(getClass().getResourceAsStream(themeResource));
             theme.apply(this);
+
+            Font font = fontDetector.determineFont(); // this will not be the 'Appearance' font not the 'Message Display' font
+            setFont(font);
         } catch (IOException e) {
             errorLogger.accept(e.getMessage());
         }
