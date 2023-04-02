@@ -63,7 +63,6 @@ class BurpConfigPersistenceTest {
     void givenDefaultConfig_whenSaved_thenJsonCorrect() {
         String expectedJson = "{\"scanner_insertion_point_provider_enabled\":false,\"intruder_payload_processor_parameter_name\":\"name\",\"proxy_history_highlight_color\":\"GREEN\",\"proxy_listener_enabled\":true,\"scanner_insertion_point_provider_parameter_name\":\"kid\",\"intruder_payload_processor_fuzz_location\":\"PAYLOAD\"}";
         BurpConfigPersistence configPersistence = new BurpConfigPersistence(callbacks);
-        System.out.println(expectedJson);
 
         configPersistence.save(new BurpConfig());
 
