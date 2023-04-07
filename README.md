@@ -4,12 +4,13 @@ JWT Editor is a Burp Suite extension for editing, signing, verifying, encrypting
 
 It provides automatic detection and in-line editing of JWTs within HTTP requests/responses, signing and encrypting of tokens and automation of several well-known attacks against JWT implementations.
 
-It was written by Fraser Winterborn, formerly of BlackBerry Security Research Group. It is available within the PortSwigger [BApp store](https://portswigger.net/bappstore/26aaa5ded2f74beea19e2ed8345a93dd) and the corresponding source can be found at
+It was written by Fraser Winterborn, formerly of BlackBerry Security Research Group. The original version is available within the PortSwigger [BApp store](https://portswigger.net/bappstore/26aaa5ded2f74beea19e2ed8345a93dd) and the corresponding source can be found at
 [here](https://github.com/blackberry/jwt-editor).
 
 
 ## Modifications from Fraser Winterborn version
 * Payload processing rule to support fuzzing within JWS
+* Insertion point provider for JWS header parameters
 * JWT highlighting within websocket messages
 * Update to Java 17 and PortSwigger's new Montoya API
 * Add ability to enable/disable JWT highlighting within proxied messages and to change highlight color
