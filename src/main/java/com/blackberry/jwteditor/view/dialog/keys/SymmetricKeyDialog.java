@@ -75,19 +75,12 @@ public class SymmetricKeyDialog extends KeyDialog {
         spinnerKeySize.setModel(new SpinnerNumberModel(128, 0, null, 8));
 
         spinnerKeySize.addChangeListener(e -> {
-
-            // Round any manually entered values up to the nearest number of bytes
             int value = (int) spinnerKeySize.getValue();
 
-            // If 0 is set, force it to be rounded up to 8
-            if(value == 0){
-                value = 1;
-            }
-
-            int remainder = value % 8;
-
-            if(remainder != 0) {
-                spinnerKeySize.setValue(value + remainder);
+            // Round any manually entered values up to the nearest number of bytes
+            if (value == 0 || value % 8 > 0) {
+                int nextByteSize = ((value / 8) + 1) * 8;
+                spinnerKeySize.setValue(nextByteSize);
             }
         });
 
@@ -101,7 +94,7 @@ public class SymmetricKeyDialog extends KeyDialog {
         textAreaKeyInitialCurrentLineHighlightColor = textAreaKey.getCurrentLineHighlightColor();
 
         // Set the key id and key value fields if provided
-        if(jwk != null) {
+        if (jwk != null) {
             originalId = jwk.getKeyID();
             textAreaKey.setText(JSONUtils.prettyPrintJSON(jwk.toJSONString()));
             spinnerKeySize.setValue(jwk.size());
