@@ -9,9 +9,9 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>17</java.version>
-        <bouncycastle.version>1.70</bouncycastle.version>
-        <gui.designer.version>223.8214.52</gui.designer.version>
-        <extender.version>2023.2</extender.version>
+        <bouncycastle.version>1.72</bouncycastle.version>
+        <gui.designer.version>223.8214.59</gui.designer.version>
+        <extender.version>2023.3</extender.version>
     </properties>
 
     <repositories>
@@ -160,13 +160,13 @@
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk15on</artifactId>
+            <artifactId>bcprov-jdk18on</artifactId>
             <version>${bouncycastle.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
-            <artifactId>bcpkix-jdk15on</artifactId>
+            <artifactId>bcpkix-jdk18on</artifactId>
             <version>${bouncycastle.version}</version>
             <scope>provided</scope>
         </dependency>
@@ -180,19 +180,19 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>5.9.1</version>
+            <version>5.9.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
-            <version>3.23.1</version>
+            <version>3.24.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>4.10.0</version>
+            <version>5.2.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
