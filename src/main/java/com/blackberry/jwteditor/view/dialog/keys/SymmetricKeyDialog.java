@@ -27,6 +27,7 @@ import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.view.rsta.RstaFactory;
 import com.blackberry.jwteditor.view.utils.DocumentAdapter;
 import com.nimbusds.jose.jwk.OctetSequenceKey;
+import com.nimbusds.jose.util.Base64URL;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 
 import javax.swing.*;
@@ -37,6 +38,8 @@ import java.security.SecureRandom;
 import java.text.ParseException;
 import java.util.UUID;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 /**
  * "New Symmetric Key" dialog for Keys tab
  */
@@ -46,6 +49,7 @@ public class SymmetricKeyDialog extends KeyDialog {
     private final RstaFactory rstaFactory;
     private final Color textAreaKeyInitialBackgroundColor;
     private final Color textAreaKeyInitialCurrentLineHighlightColor;
+    private final SecureRandom rng;
 
     private JPanel contentPane;
     private JButton buttonOK;
@@ -54,6 +58,9 @@ public class SymmetricKeyDialog extends KeyDialog {
     private JButton buttonGenerate;
     private RSyntaxTextArea textAreaKey;
     private JLabel labelError;
+    private JRadioButton specifySecretRadioButton;
+    private JRadioButton randomSecretRadioButton;
+    private JTextField specificSecretTextField;
 
     private OctetSequenceKey jwk;
 
@@ -62,6 +69,8 @@ public class SymmetricKeyDialog extends KeyDialog {
 
         this.rstaFactory = rstaFactory;
         this.presenters = presenters;
+        this.rng = new SecureRandom();
+
         setContentPane(contentPane);
         getRootPane().setDefaultButton(buttonOK);
 
@@ -82,6 +91,16 @@ public class SymmetricKeyDialog extends KeyDialog {
                 int nextByteSize = ((value / 8) + 1) * 8;
                 spinnerKeySize.setValue(nextByteSize);
             }
+        });
+
+        randomSecretRadioButton.addItemListener(e -> {
+            specificSecretTextField.setEnabled(false);
+            spinnerKeySize.setEnabled(true);
+        });
+
+        specifySecretRadioButton.addItemListener(e -> {
+            specificSecretTextField.setEnabled(true);
+            spinnerKeySize.setEnabled(false);
         });
 
         // Attach event listeners for Generate button and text entry changing
@@ -113,18 +132,17 @@ public class SymmetricKeyDialog extends KeyDialog {
         jwk = null;
 
         // If there is a text in the text entry
-        if(textAreaKey.getText().length() > 0){
+        if (textAreaKey.getText().length() > 0) {
             try {
                 // Try to parse as a symmetric key JWK
                 OctetSequenceKey octetSequenceKey = OctetSequenceKey.parse(textAreaKey.getText());
 
                 // Check the JWK contains a 'kid' value, set form to error mode if not
-                if(octetSequenceKey.getKeyID() == null){
+                if (octetSequenceKey.getKeyID() == null) {
                     textAreaKey.setBackground(Color.PINK);
                     textAreaKey.setCurrentLineHighlightColor(Color.PINK);
                     labelError.setText(Utils.getResourceString("error_missing_kid"));
-                }
-                else {
+                } else {
                     // No errors, enable the OK button
                     buttonOK.setEnabled(true);
                     jwk = octetSequenceKey;
@@ -143,17 +161,23 @@ public class SymmetricKeyDialog extends KeyDialog {
      * Event handler for the generate button
      */
     private void generate() {
-        // Generate a random 'kid'
         String keyId = UUID.randomUUID().toString();
 
-        // Generate a new symmetric key based on the key size selected in the combobox
-        byte[] key = new byte[(int) spinnerKeySize.getValue() / 8];
-        SecureRandom rng = new SecureRandom();
-        rng.nextBytes(key);
+        int keySizeBits = (int) spinnerKeySize.getValue();
+        int keySizeBytes = keySizeBits / 8;
+        OctetSequenceKey octetSequenceKey;
 
-        // Create the OctetSequenceKey from the bytes
-        // Use the Builder directly to skip length checks - the spinner model enforces these
-        OctetSequenceKey octetSequenceKey = new OctetSequenceKey.Builder(key).keyID(keyId).build();
+        if (randomSecretRadioButton.isSelected()) {
+            // Generate a new symmetric key based on the key size selected in the combobox
+            byte[] key = new byte[keySizeBytes];
+            rng.nextBytes(key);
+
+            // Use the Builder directly to skip length checks - the spinner model enforces these
+            octetSequenceKey = new OctetSequenceKey.Builder(key).keyID(keyId).build();
+        } else {
+            Base64URL key = Base64URL.encode(specificSecretTextField.getText().getBytes(UTF_8));
+            octetSequenceKey = new OctetSequenceKey.Builder(key).keyID(keyId).build();
+        }
 
         // Set the text area contents to the JSON form of the newly generated key
         textAreaKey.setText(JSONUtils.prettyPrintJSON(octetSequenceKey.toJSONString()));
@@ -161,6 +185,7 @@ public class SymmetricKeyDialog extends KeyDialog {
 
     /**
      * Get the new/modified key resulting from the operations of this dialog
+     *
      * @return the new/modified JWK
      */
     public Key getKey() {
