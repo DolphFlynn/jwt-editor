@@ -51,6 +51,7 @@ public abstract class EditorView implements ExtensionProvidedEditor {
 
     private final RstaFactory rstaFactory;
     private final boolean editable;
+    private final HexCodeAreaFactory hexCodeAreaFactory;
 
     private int mode;
     private JTabbedPane tabbedPane;
@@ -84,9 +85,10 @@ public abstract class EditorView implements ExtensionProvidedEditor {
     private CodeArea codeAreaIV;
     private CodeArea codeAreaTag;
 
-    EditorView(PresenterStore presenters, RstaFactory rstaFactory, boolean editable) {
+    EditorView(PresenterStore presenters, RstaFactory rstaFactory, HexCodeAreaFactory hexAreaCodeFactory, boolean editable) {
         this.rstaFactory = rstaFactory;
         this.editable = editable;
+        this.hexCodeAreaFactory = hexAreaCodeFactory;
         this.presenter = new EditorPresenter(this, presenters);
 
         // Event handler for Header / JWS payload change events
@@ -471,26 +473,24 @@ public abstract class EditorView implements ExtensionProvidedEditor {
      * Custom view initialisation
      */
     private void createUIComponents() {
-        // Create CodeAreas for byte[] inputs. The form editor cannot handle these, so create manually
-
         panelSignature = new JPanel(new BorderLayout());
-        codeAreaSignature = HexCodeAreaFactory.build();
+        codeAreaSignature = hexCodeAreaFactory.build();
         panelSignature.add(codeAreaSignature);
 
         panelKey = new JPanel(new BorderLayout());
-        codeAreaEncryptedKey = HexCodeAreaFactory.build();
+        codeAreaEncryptedKey = hexCodeAreaFactory.build();
         panelKey.add(codeAreaEncryptedKey, BorderLayout.CENTER);
 
         panelCiphertext = new JPanel(new BorderLayout());
-        codeAreaCiphertext = HexCodeAreaFactory.build();
+        codeAreaCiphertext = hexCodeAreaFactory.build();
         panelCiphertext.add(codeAreaCiphertext, BorderLayout.CENTER);
 
         panelIV = new JPanel(new BorderLayout());
-        codeAreaIV = HexCodeAreaFactory.build();
+        codeAreaIV = hexCodeAreaFactory.build();
         panelIV.add(codeAreaIV, BorderLayout.CENTER);
 
         panelTag = new JPanel(new BorderLayout());
-        codeAreaTag = HexCodeAreaFactory.build();
+        codeAreaTag = hexCodeAreaFactory.build();
         panelTag.add(codeAreaTag, BorderLayout.CENTER);
 
         // Create the Attack popup menu

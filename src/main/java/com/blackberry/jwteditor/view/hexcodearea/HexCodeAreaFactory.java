@@ -18,17 +18,21 @@ limitations under the License.
 
 package com.blackberry.jwteditor.view.hexcodearea;
 
+import burp.api.montoya.logging.Logging;
 import org.exbin.deltahex.swing.CodeArea;
 import org.exbin.utils.binary_data.ByteArrayEditableData;
 
 import static org.exbin.deltahex.ViewMode.CODE_MATRIX;
 
 public class HexCodeAreaFactory {
-    private HexCodeAreaFactory() {
+    private final Logging logging;
+
+    public HexCodeAreaFactory(Logging logging) {
+        this.logging = logging;
     }
 
-    public static CodeArea build() {
-        CodeArea codeArea = new CodeArea();
+    public CodeArea build() {
+        CodeArea codeArea = new FontMetricsClearingCodeArea(logging);
 
         codeArea.setCommandHandler(new HexCodeAreaCommandHandler(codeArea));
         codeArea.setShowHeader(false);

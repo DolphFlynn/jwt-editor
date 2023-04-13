@@ -20,15 +20,17 @@ package com.blackberry.jwteditor.view.editor;
 
 import burp.api.montoya.http.message.HttpRequestResponse;
 import burp.api.montoya.http.message.responses.HttpResponse;
+import burp.api.montoya.logging.Logging;
 import burp.api.montoya.ui.editor.extension.ExtensionProvidedHttpResponseEditor;
 import com.blackberry.jwteditor.presenter.PresenterStore;
+import com.blackberry.jwteditor.view.hexcodearea.HexCodeAreaFactory;
 import com.blackberry.jwteditor.view.rsta.RstaFactory;
 
 import static burp.api.montoya.internal.ObjectFactoryLocator.FACTORY;
 
 public class ResponseEditorView extends EditorView implements ExtensionProvidedHttpResponseEditor {
-    public ResponseEditorView(PresenterStore presenters, RstaFactory rstaFactory, boolean editable) {
-        super(presenters, rstaFactory, editable);
+    public ResponseEditorView(PresenterStore presenters, RstaFactory rstaFactory, Logging logging, boolean editable) {
+        super(presenters, rstaFactory, new HexCodeAreaFactory(logging), editable);
     }
 
     @Override
