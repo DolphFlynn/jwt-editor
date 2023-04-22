@@ -79,19 +79,14 @@ class OctetSequenceKeyJWKKey extends AbstractJWKKey {
 
     @Override
     public JWSSigner getSigner() throws JOSEException {
-        byte[] key = octetSequenceKey.toSecretKey().getEncoded();
-
-        //nimbus does not allow keys < 256 bits, so we can just pad them with zeroes to the maximum length of 512 bits
-        //due to how HMAC works, padding a key with zeroes does not affect the signature, but allows us to bypass the nimbus check
-        return new MACSigner(padZeroes(key, 64));
+        byte[] key = padKeyIfNecessary(octetSequenceKey);
+        return new MACSigner(key);
     }
 
     @Override
     public JWSVerifier getVerifier() throws JOSEException {
-        byte[] key = octetSequenceKey.toSecretKey().getEncoded();
-        //nimbus does not allow keys < 256 bits, but so we can just pad them with zeroes to the maximum length of 512 bits
-        //due to how HMAC works, padding a key with zeroes does not affect the signature, but allows us to bypass the nimbus check
-        return new MACVerifier(padZeroes(key, 64));
+        byte[] key = padKeyIfNecessary(octetSequenceKey);
+        return new MACVerifier(key);
     }
 
     @Override
@@ -154,7 +149,11 @@ class OctetSequenceKeyJWKKey extends AbstractJWKKey {
         };
     }
 
-    private static byte[] padZeroes(byte[] key, int length) {
-        return key.length >= length ? key : Arrays.copyOf(key, length);
+    private static byte[] padKeyIfNecessary(OctetSequenceKey octetSequenceKey) {
+        byte[] key = octetSequenceKey.toByteArray();
+
+        // Nimbus does not allow keys < 256 bits, so we can just pad them with zeroes to the maximum length of 512 bits
+        // due to how HMAC works, padding a key with zeroes does not affect the signature, but allows us to bypass the nimbus check
+        return key.length >= 64 ? key : Arrays.copyOf(key, 64);
     }
 }

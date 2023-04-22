@@ -114,6 +114,20 @@ class SigningTests {
         assertThat(jws.verify(key, signingInfo)).isTrue();
     }
 
+    @Test
+    void givenEmptyOctetSequenceKey_whenSigningWithHs256_thenCanGenerateAndVerifySignature() throws Exception {
+        JWK jwk = OctetSequenceKey.parse("{\"kty\": \"oct\",\"k\": \"\"}");
+        JWKKey key = JWKKeyFactory.from(jwk);
+        JWSHeader signingInfo = new JWSHeader.Builder(HS256).build();
+
+        Base64URL header = signingInfo.toBase64URL();
+        Base64URL payload = TEST_JWS.getEncodedPayload();
+
+        JWS jws = JWSFactory.sign(key, header, payload, signingInfo);
+
+        assertThat(jws.verify(key, signingInfo)).isTrue();
+    }
+
     @ParameterizedTest
     @ValueSource(strings = {ED448Private, ED25519Private})
     void okpSigning(String pem) throws Exception {
