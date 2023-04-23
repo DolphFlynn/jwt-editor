@@ -5,21 +5,17 @@ import burp.api.montoya.core.Range;
 import burp.api.montoya.http.message.requests.HttpRequest;
 import burp.api.montoya.scanner.audit.insertionpoint.AuditInsertionPoint;
 import com.blackberry.jwteditor.model.jose.JWS;
-import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.util.Base64URL;
-import com.nimbusds.jose.util.JSONObjectUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.text.ParseException;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import static burp.api.montoya.core.Range.range;
 import static burp.api.montoya.http.message.requests.HttpRequest.httpRequest;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.singletonList;
-import static java.util.Collections.unmodifiableMap;
 
 class JWSHeaderInsertionPoint implements AuditInsertionPoint {
     private final HttpRequest baseRequest;
@@ -29,7 +25,7 @@ class JWSHeaderInsertionPoint implements AuditInsertionPoint {
     private final int startOffset;
     private final byte[] baseRequestPrefix;
     private final byte[] baseRequestPostfix;
-    private final Map<String, Object> headerJsonMap;
+    private final JSONObject headerJsonObject;
 
     JWSHeaderInsertionPoint(HttpRequest baseRequest, JWS jws, String headerParameterName, String encodedJWS) {
         this.baseRequest = baseRequest;
@@ -45,8 +41,8 @@ class JWSHeaderInsertionPoint implements AuditInsertionPoint {
         baseRequestPostfix = endOffset == baseRequestBytes.length() ? new byte[0] : baseRequestBytes.subArray(endOffset, baseRequestBytes.length()).getBytes();
 
         try {
-            headerJsonMap = unmodifiableMap(JSONObjectUtils.parse(jws.getHeader()));
-        } catch (ParseException e) {
+            headerJsonObject = new JSONObject(jws.getHeader());
+        } catch (JSONException e) {
             throw new IllegalStateException("Could not parse JWS header!", e);
         }
     }
@@ -88,9 +84,8 @@ class JWSHeaderInsertionPoint implements AuditInsertionPoint {
     }
 
     private byte[] buildWeaponizedJWS(ByteArray payload) throws ParseException {
-        Map<String, Object> updatedHeaderMap = headerJsonMap == null ? new HashMap<>() : new LinkedHashMap<>(headerJsonMap);
-        updatedHeaderMap.put(headerParameterName, payload.toString());
-        Base64URL headerBase64 = JWSHeader.parse(updatedHeaderMap).toBase64URL();
+        headerJsonObject.put(headerParameterName, payload.toString());
+        Base64URL headerBase64 = Base64URL.encode(headerJsonObject.toString());
 
         return "%s.%s.%s".formatted(headerBase64, jws.getEncodedPayload(), jws.getEncodedSignature()).getBytes(UTF_8);
     }

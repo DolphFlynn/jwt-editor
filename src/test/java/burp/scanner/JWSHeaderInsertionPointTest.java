@@ -27,6 +27,8 @@ import burp.api.montoya.http.FakeHttpRequest;
 import burp.api.montoya.http.message.HttpRequestResponse;
 import burp.api.montoya.http.message.requests.HttpRequest;
 import burp.api.montoya.scanner.audit.insertionpoint.AuditInsertionPoint;
+import com.blackberry.jwteditor.model.jose.JWS;
+import com.blackberry.jwteditor.model.jose.JWSFactory;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -48,7 +50,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MontoyaExtension.class)
 class JWSHeaderInsertionPointTest {
     private static final String TEST_JWS = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
-    private static final String WEAPONIZED_JWS = "eyJraWQiOiIuLlwvZXRjXC9wYXNzd2QiLCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
+    private static final String WEAPONIZED_JWS = "eyJraWQiOiIuLi9ldGMvcGFzc3dkIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
     private static final String PAYLOAD = "../etc/passwd";
 
     @BeforeAll
@@ -70,7 +72,7 @@ class JWSHeaderInsertionPointTest {
 
     @ParameterizedTest
     @MethodSource("baseRequestData")
-    void givenJWSInBaseRequest_whenRequestWithPayloadBuilt_thenIssueHighlightsCorrect(String baseRequest, String expectedAttackRequest) {
+    void givenJWSInBaseRequest_whenRequestWithPayloadBuilt_thenAttackRequestCorrect(String baseRequest, String expectedAttackRequest) {
         AuditInsertionPoint insertionPoint = insertionPointForData(baseRequest);
         ByteArray payloadBytes = ByteArray.byteArray(PAYLOAD);
 
@@ -78,6 +80,18 @@ class JWSHeaderInsertionPointTest {
         ByteArray attackRequest = httpRequest.toByteArray();
 
         assertThat(attackRequest.toString()).isEqualTo(expectedAttackRequest);
+    }
+
+    @Test
+    void givenJWSWithBackslash_whenPayloadInserted_thenHeaderCorrect() throws Exception {
+        AuditInsertionPoint insertionPoint = insertionPointForData("eyJraWQiOiIvZGV2L251bGwiLCJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.6mbgcHRELcZ3kLuiKcCit2ae2XNXBDcVXuS9yHydq2KCnvxgR7JLC1fzeJwv5a7KIOqoa780na3LNEhCaXPbLw");
+        ByteArray payloadBytes = ByteArray.byteArray(PAYLOAD);
+
+        HttpRequest httpRequest = insertionPoint.buildHttpRequestWithPayload(payloadBytes);
+        ByteArray attackRequest = httpRequest.toByteArray();
+
+        JWS attackJws = JWSFactory.parse(attackRequest.toString());
+        assertThat(attackJws.getHeader()).isEqualTo("{\"kid\":\"../etc/passwd\",\"typ\":\"JWT\",\"alg\":\"ES256\"}");
     }
 
     @Test
@@ -96,10 +110,10 @@ class JWSHeaderInsertionPointTest {
 
     static Stream<Arguments> highlightsData() {
         return Stream.of(
-                arguments(TEST_JWS, 0, 187),
-                arguments("012345678 " + TEST_JWS + " 9abcdef", 10, 197),
-                arguments(TEST_JWS + " 0123456789abcdef",0, 187),
-                arguments("0123456789abcdef " + TEST_JWS, 17, 204)
+                arguments(TEST_JWS, 0, 185),
+                arguments("012345678 " + TEST_JWS + " 9abcdef", 10, 195),
+                arguments(TEST_JWS + " 0123456789abcdef", 0, 185),
+                arguments("0123456789abcdef " + TEST_JWS, 17, 202)
         );
     }
 
