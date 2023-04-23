@@ -314,7 +314,7 @@ public abstract class EditorView implements ExtensionProvidedEditor {
      * Get the index of the currently selected JWS/JWE
      * @return selected JWS/JWE index
      */
-    public int getSelected() {
+    public int getSelectedJOSEObjectIndex() {
         return comboBoxJOSEObject.getSelectedIndex();
     }
 
@@ -322,7 +322,7 @@ public abstract class EditorView implements ExtensionProvidedEditor {
      * Set the index of the selected JWS/JWE
      * @param index JWS/JWE index to select
      */
-    public void setSelected(int index) {
+    public void setSelectedJOSEObjectIndex(int index) {
         comboBoxJOSEObject.setSelectedIndex(index);
     }
 

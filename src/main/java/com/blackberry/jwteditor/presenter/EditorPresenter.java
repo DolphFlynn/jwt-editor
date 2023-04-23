@@ -110,7 +110,7 @@ public class EditorPresenter extends Presenter {
         // Instruct the view to display the first JOSE object
         view.setJOSEObjects(joseObjectStrings);
         if(joseObjects.size() > 0){
-            view.setSelected(0);
+            view.setSelectedJOSEObjectIndex(0);
         }
     }
 
@@ -497,7 +497,7 @@ public class EditorPresenter extends Presenter {
         selectionChanging = true;
 
         // Get the JOSEObject pair corresponding to the selected dropdown entry index
-        MutableJOSEObject mutableJoseObject = mutableJoseObjects.get(view.getSelected());
+        MutableJOSEObject mutableJoseObject = mutableJoseObjects.get(view.getSelectedJOSEObjectIndex());
         JOSEObject joseObject = mutableJoseObject.getModified();
 
         // Change to JWE/JWS mode based on the newly selected JOSEObject
@@ -519,7 +519,7 @@ public class EditorPresenter extends Presenter {
      */
     public void componentChanged() {
         // Get the currently selected object
-        MutableJOSEObject mutableJoseObject = mutableJoseObjects.get(view.getSelected());
+        MutableJOSEObject mutableJoseObject = mutableJoseObjects.get(view.getSelectedJOSEObjectIndex());
 
         //Serialize the text/hex entries to a JWS/JWE in compact form, depending on the editor mode
         JOSEObject joseObject = view.getMode() == EditorView.TAB_JWS ? getJWS() : getJWE();
