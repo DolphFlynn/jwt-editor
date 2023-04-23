@@ -23,10 +23,9 @@ It was written by Fraser Winterborn, formerly of BlackBerry Security Research Gr
 * Minor bug fixes and enhancements
 
 ## Build Instructions
-* Ensure that Java JDK 17 or newer is installed 
-* Install [Apache Maven](https://maven.apache.org/) 
-* From root of project, run the command `mvn package`
-* This should place the JAR file `jwt-editor-1.1.0-jar-with-dependencies.jar` within the `target` directory
+* Ensure that Java JDK 17 or newer is installed
+* From root of project, run the command `./gradlew jar`
+* This should place the JAR file `jwt-editor-1.1.0.jar` within the `build/libs` directory
 * This can be loaded into Burp by navigating to the `Extensions` tab, `Installed` sub-tab, clicking `Add` and loading the JAR file
 * This BApp is using the newer Montoya API so it's best to use the latest version of Burp (try the earlier adopter channel if there are issues with the latest stable release)
 
