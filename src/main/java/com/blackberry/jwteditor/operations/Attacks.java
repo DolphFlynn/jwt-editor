@@ -34,12 +34,10 @@ import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.OctetSequenceKey;
 import com.nimbusds.jose.util.Base64URL;
-import com.nimbusds.jose.util.JSONObjectUtils;
 import org.json.JSONObject;
 
 import java.lang.reflect.Field;
 import java.text.ParseException;
-import java.util.Map;
 import java.util.Set;
 
 import static com.blackberry.jwteditor.model.jose.JWSFactory.jwsFromParts;
@@ -128,9 +126,9 @@ public class Attacks {
             throw new IllegalArgumentException("Invalid algorithm %s. Can only use NIST elliptic curve algorithms.".formatted(algorithm));
         }
 
-        Map<String, Object> headerJsonMap = JSONObjectUtils.parse(jws.getHeader());
-        headerJsonMap.put(ALGORITHM, algorithm.getName());
-        Base64URL headerBase64 = JWSHeader.parse(headerJsonMap).toBase64URL();
+        JSONObject headerJsonObject = new JSONObject(jws.getHeader());
+        headerJsonObject.put(ALGORITHM, algorithm.getName());
+        Base64URL headerBase64 = Base64URL.encode(headerJsonObject.toString());
 
         int zeroBytesLength = 1; // DER encoding cannot have leading zeros to pad signature to expected length and this is enforced
         int signatureLength = 6 + (2 * zeroBytesLength);

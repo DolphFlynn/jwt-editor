@@ -22,6 +22,7 @@ import com.blackberry.jwteditor.model.jose.JWS;
 import com.blackberry.jwteditor.model.jose.JWSFactory;
 import com.blackberry.jwteditor.operations.Attacks;
 import com.nimbusds.jose.JWSAlgorithm;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -49,12 +50,21 @@ class PsychicSignatureAttackTest {
 
     @ParameterizedTest
     @MethodSource("algorithmsAndExpectedJWTs")
-    void canSignJWSUsingEmptySymmetricKeys(JWSAlgorithm algorithm, String expectedJWT) throws Exception {
+    void givenJWS_whenSigningWithPsychicSignature_thenJWSIsCorrect(JWSAlgorithm algorithm, String expectedJWT) throws Exception {
         JWS jws = JWSFactory.parse(TEST_JWS);
 
         JWS attackJws = Attacks.signWithPsychicSignature(jws, algorithm);
 
         assertThat(attackJws.serialize()).isEqualTo(expectedJWT);
+    }
+
+    @Test
+    void givenJWSWithBackslash_whenSigningWithPsychicSignature_thenHeaderInvariant() throws Exception {
+        JWS jws = JWSFactory.parse("eyJraWQiOiIvZGV2L251bGwiLCJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.6mbgcHRELcZ3kLuiKcCit2ae2XNXBDcVXuS9yHydq2KCnvxgR7JLC1fzeJwv5a7KIOqoa780na3LNEhCaXPbLw");
+
+        JWS attackJws = Attacks.signWithPsychicSignature(jws, ES256);
+
+        assertThat(attackJws.getHeader()).isEqualTo(jws.getHeader());
     }
 
     private static Stream<JWSAlgorithm> unsupportedAlgorithms() {
@@ -68,7 +78,7 @@ class PsychicSignatureAttackTest {
 
     @ParameterizedTest
     @MethodSource("unsupportedAlgorithms")
-    void canSignJWSUsingEmptySymmetricKeys(JWSAlgorithm algorithm) throws Exception {
+    void givenJWS_whenSignPsychicSignatureAndInvalidAlgorithm_thenExceptionThrown(JWSAlgorithm algorithm) throws Exception {
         JWS jws = JWSFactory.parse(TEST_JWS);
 
         assertThrows(IllegalArgumentException.class, () -> Attacks.signWithPsychicSignature(jws, algorithm));
