@@ -22,6 +22,7 @@ import com.blackberry.jwteditor.model.jose.JWS;
 import com.blackberry.jwteditor.model.jose.JWSFactory;
 import com.blackberry.jwteditor.operations.Attacks;
 import com.nimbusds.jose.JWSAlgorithm;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -55,6 +56,15 @@ class EmptySymmetricKeyAttackTest {
         JWS attackJws = Attacks.signWithEmptyKey(jws, algorithm);
 
         assertThat(attackJws.serialize()).isEqualTo(expectedJWT);
+    }
+
+    @Test
+    void givenJWSWithBackslash_whenSignedWithEmptyKeyAndSameAlgorithm_thenHeaderInvariant() throws Exception {
+        JWS jws = JWSFactory.parse("eyJraWQiOiIvZGV2L251bGwiLCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.PsINWgUhM_MIthLdmb6OcMm5wMx4tuOnEdRj4W5RkxU");
+
+        JWS attackJws = Attacks.signWithEmptyKey(jws, HS256);
+
+        assertThat(attackJws.getHeader()).isEqualTo(jws.getHeader());
     }
 
     private static Stream<JWSAlgorithm> unsupportedAlgorithms() {

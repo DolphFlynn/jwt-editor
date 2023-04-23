@@ -35,6 +35,7 @@ import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.OctetSequenceKey;
 import com.nimbusds.jose.util.Base64URL;
 import com.nimbusds.jose.util.JSONObjectUtils;
+import org.json.JSONObject;
 
 import java.lang.reflect.Field;
 import java.text.ParseException;
@@ -111,9 +112,9 @@ public class Attacks {
             throw new IllegalArgumentException("Invalid algorithm %s. Can only use symmetric algorithms.".formatted(algorithm));
         }
 
-        Map<String, Object> headerJsonMap = JSONObjectUtils.parse(jws.getHeader());
-        headerJsonMap.put(ALGORITHM, algorithm.getName());
-        Base64URL headerBase64 = JWSHeader.parse(headerJsonMap).toBase64URL();
+        JSONObject headerJsonObject = new JSONObject(jws.getHeader());
+        headerJsonObject.put(ALGORITHM, algorithm.getName());
+        Base64URL headerBase64 = Base64URL.encode(headerJsonObject.toString());
 
         JWSHeader signingInfo = new JWSHeader.Builder(algorithm).type(JWT).build();
         Key key = JWKKeyFactory.from(new OctetSequenceKey.Builder(EMPTY_KEY).build());
