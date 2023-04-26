@@ -102,7 +102,7 @@ class JWSHeaderInsertionPointTest {
     }
 
     @Test
-    void ivenJWSInBaseRequest_thenBaseValueCorrect() {
+    void givenJWSInBaseRequest_thenBaseValueCorrect() {
         AuditInsertionPoint insertionPoint = insertionPointForData(TEST_JWS);
 
         assertThat(insertionPoint.baseValue()).isEqualTo(TEST_JWS);
