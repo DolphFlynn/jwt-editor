@@ -167,7 +167,7 @@ public class AsymmetricKeyDialog extends KeyDialog {
                 }
                 // If not, try to parse the PEM and convert to a JWK
                 else {
-                    tempJWK = mode.pemToECKey(key, textFieldKeyId.getText());
+                    tempJWK = mode.pemToJWK(key, textFieldKeyId.getText());
 
                     // Check the key id entry is set in PEM mode
                     if (textFieldKeyId.getText().length() == 0) {

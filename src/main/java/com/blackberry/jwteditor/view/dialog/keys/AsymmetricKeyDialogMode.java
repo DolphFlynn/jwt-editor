@@ -54,7 +54,7 @@ enum AsymmetricKeyDialogMode {
         return keyType;
     }
 
-    JWK pemToECKey(String pem, String keyId) throws PemException {
+    JWK pemToJWK(String pem, String keyId) throws PemException {
         return switch (this) {
             case EC -> PEMUtils.pemToECKey(pem, keyId);
             case RSA -> PEMUtils.pemToRSAKey(pem, keyId);
