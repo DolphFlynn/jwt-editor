@@ -46,7 +46,6 @@ public class ConfigView {
     private JCheckBox checkBoxHeaderInsertionPoint;
     private JTextField scannerParameterName;
     private JPanel proxyPanel;
-    private JPanel scannerPanel;
     private JLabel proxyLabel;
     private JLabel intruderLabel;
     private JLabel scannerLabel;
