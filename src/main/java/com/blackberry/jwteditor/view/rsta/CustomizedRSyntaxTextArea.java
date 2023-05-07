@@ -33,6 +33,7 @@ import static org.fife.ui.rsyntaxtextarea.Theme.load;
 class CustomizedRSyntaxTextArea extends RSyntaxTextArea {
     private static final String DARK_THEME = "/org/fife/ui/rsyntaxtextarea/themes/dark.xml";
     private static final String LIGHT_THEME = "/org/fife/ui/rsyntaxtextarea/themes/default.xml";
+    private static final double LINE_HEIGHT_SCALING_FACTOR = 1.15;
 
     private final DarkModeDetector darkModeDetector;
     private final FontDetector fontDetector;
@@ -96,6 +97,11 @@ class CustomizedRSyntaxTextArea extends RSyntaxTextArea {
                 .orElse(super.getForegroundForTokenType(type));
     }
 
+    @Override
+    public int getLineHeight() {
+        return (int) (super.getLineHeight() * LINE_HEIGHT_SCALING_FACTOR);
+    }
+
     private void applyThemeAndFont() {
         if (errorLogger == null || fontDetector == null) {
             return;
@@ -107,7 +113,7 @@ class CustomizedRSyntaxTextArea extends RSyntaxTextArea {
             Theme theme = load(getClass().getResourceAsStream(themeResource));
             theme.apply(this);
 
-            Font font = fontDetector.determineFont(); // this will not be the 'Appearance' font not the 'Message Display' font
+            Font font = fontDetector.determineFont(); // this will be the 'Appearance' font not the 'Message Display' font
             setFont(font);
         } catch (IOException e) {
             errorLogger.accept(e.getMessage());
