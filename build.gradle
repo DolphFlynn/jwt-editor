@@ -44,9 +44,9 @@ dependencies {
             "org.bouncycastle:bcprov-jdk18on:${bouncycastle_version}",
             "org.bouncycastle:bcpkix-jdk18on:${bouncycastle_version}",
             "net.portswigger.burp.extensions:montoya-api:${extender_version}",
-            'org.junit.jupiter:junit-jupiter:5.9.2',
+            'org.junit.jupiter:junit-jupiter:5.9.3',
             'org.assertj:assertj-core:3.24.2',
-            'org.mockito:mockito-core:5.2.0'
+            'org.mockito:mockito-core:5.3.1'
     )
 }
 
