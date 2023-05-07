@@ -19,7 +19,7 @@ import com.blackberry.jwteditor.model.persistence.BurpKeysModelPersistence;
 import com.blackberry.jwteditor.model.persistence.KeysModelPersistence;
 import com.blackberry.jwteditor.presenter.PresenterStore;
 import com.blackberry.jwteditor.utils.Utils;
-import com.blackberry.jwteditor.view.burp.BurpView;
+import com.blackberry.jwteditor.view.SuiteView;
 import com.blackberry.jwteditor.view.editor.RequestEditorView;
 import com.blackberry.jwteditor.view.editor.ResponseEditorView;
 import com.blackberry.jwteditor.view.rsta.RstaFactory;
@@ -43,24 +43,25 @@ public class JWTEditorExtension implements BurpExtension {
         BurpConfigPersistence burpConfigPersistence = new BurpConfigPersistence(preferences);
         BurpConfig burpConfig = burpConfigPersistence.loadOrCreateNew();
 
+        api.extension().registerUnloadingHandler(() -> burpConfigPersistence.save(burpConfig));
+
         UserInterface userInterface = api.userInterface();
         Window suiteWindow = userInterface.swingUtils().suiteFrame();
 
         RstaFactory rstaFactory = new RstaFactory(userInterface, api.logging());
         PresenterStore presenters = new PresenterStore();
 
-        BurpView burpView = new BurpView(
+        SuiteView suiteView = new SuiteView(
                 suiteWindow,
                 presenters,
                 keysModelPersistence,
                 keysModel,
                 rstaFactory,
-                burpConfigPersistence,
                 burpConfig,
                 userInterface
         );
 
-        userInterface.registerSuiteTab(burpView.getTabCaption(), burpView.getUiComponent());
+        userInterface.registerSuiteTab(suiteView.getTabCaption(), suiteView.getUiComponent());
 
         userInterface.registerHttpRequestEditorProvider(editorCreationContext ->
                 new RequestEditorView(
