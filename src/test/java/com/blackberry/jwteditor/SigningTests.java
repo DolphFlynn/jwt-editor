@@ -19,10 +19,10 @@ limitations under the License.
 package com.blackberry.jwteditor;
 
 import com.blackberry.jwteditor.model.jose.JWS;
+import com.blackberry.jwteditor.model.jose.JWSFactory;
+import com.blackberry.jwteditor.model.jose.JWSFactory.SigningUpdateMode;
 import com.blackberry.jwteditor.model.keys.JWKKey;
 import com.blackberry.jwteditor.model.keys.JWKKeyFactory;
-import com.blackberry.jwteditor.operations.Operations;
-import com.blackberry.jwteditor.operations.Operations.SigningUpdateMode;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.util.Base64URL;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,8 +34,8 @@ import utils.BouncyCastleExtension;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import static com.blackberry.jwteditor.model.jose.JWSFactory.SigningUpdateMode.*;
 import static com.blackberry.jwteditor.model.jose.JWSFactory.jwsFromParts;
-import static com.blackberry.jwteditor.operations.Operations.SigningUpdateMode.*;
 import static com.blackberry.jwteditor.utils.PEMUtils.pemToRSAKey;
 import static com.nimbusds.jose.HeaderParameterNames.KEY_ID;
 import static com.nimbusds.jose.JWSAlgorithm.RS256;
@@ -67,7 +67,12 @@ class SigningTests {
         json.put(KEY_ID, UPDATED_KID);
         JWKKey jwkKey = JWKKeyFactory.from(JWK.parse(json));
 
-        JWS updatedJWS = Operations.sign(TEST_JWS, jwkKey, RS256, mode);
+        JWS updatedJWS = JWSFactory.sign(
+                jwkKey,
+                RS256,
+                mode,
+                TEST_JWS
+        );
 
         assertThat(updatedJWS.serialize()).isEqualTo(expectedJWS);
     }

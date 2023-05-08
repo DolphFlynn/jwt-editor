@@ -20,10 +20,11 @@ package com.blackberry.jwteditor.view.dialog.operations;
 
 import com.blackberry.jwteditor.exceptions.SigningException;
 import com.blackberry.jwteditor.model.jose.JWS;
+import com.blackberry.jwteditor.model.jose.JWSFactory;
+import com.blackberry.jwteditor.model.jose.JWSFactory.SigningUpdateMode;
 import com.blackberry.jwteditor.model.keys.JWKKey;
 import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.operations.Attacks;
-import com.blackberry.jwteditor.operations.Operations;
 import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.view.dialog.AbstractDialog;
 import com.nimbusds.jose.JWSAlgorithm;
@@ -33,7 +34,7 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.List;
 
-import static com.blackberry.jwteditor.operations.Operations.SigningUpdateMode.*;
+import static com.blackberry.jwteditor.model.jose.JWSFactory.SigningUpdateMode.*;
 
 /**
  * Sign and Attack > Embedded JWK dialog from the Editor tab
@@ -129,7 +130,8 @@ public class SignDialog extends AbstractDialog {
         JWSAlgorithm selectedAlgorithm = (JWSAlgorithm) comboBoxSigningAlgorithm.getSelectedItem();
 
         // Get the header update mode based on the selected radio button, convert to the associated enum value
-        Operations.SigningUpdateMode signingUpdateMode;
+        SigningUpdateMode signingUpdateMode;
+
         if (radioButtonUpdateGenerateAlg.isSelected()) {
             signingUpdateMode = UPDATE_ALGORITHM_ONLY;
         } else if (radioButtonUpdateGenerateJWT.isSelected()) {
@@ -141,7 +143,7 @@ public class SignDialog extends AbstractDialog {
         // Perform a signing operation or the embedded JWK attack based on the dialog mode
         try {
             if (mode == Mode.NORMAL) {
-                jws = Operations.sign(jws, selectedKey, selectedAlgorithm, signingUpdateMode);
+                jws = JWSFactory.sign(selectedKey, selectedAlgorithm, signingUpdateMode, jws);
             } else if (mode == Mode.EMBED_JWK) {
                 jws = Attacks.embeddedJWK(jws, selectedKey, selectedAlgorithm);
             }
