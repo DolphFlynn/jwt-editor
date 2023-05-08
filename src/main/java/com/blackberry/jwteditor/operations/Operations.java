@@ -18,16 +18,10 @@ limitations under the License.
 
 package com.blackberry.jwteditor.operations;
 
-import com.blackberry.jwteditor.exceptions.EncryptionException;
 import com.blackberry.jwteditor.exceptions.SigningException;
-import com.blackberry.jwteditor.model.jose.JWE;
-import com.blackberry.jwteditor.model.jose.JWEFactory;
 import com.blackberry.jwteditor.model.jose.JWS;
 import com.blackberry.jwteditor.model.jose.JWSFactory;
 import com.blackberry.jwteditor.model.keys.JWKKey;
-import com.blackberry.jwteditor.model.keys.Key;
-import com.nimbusds.jose.EncryptionMethod;
-import com.nimbusds.jose.JWEAlgorithm;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.util.Base64URL;
@@ -98,19 +92,5 @@ public class Operations {
         Base64URL payload = jws.getEncodedPayload();
 
         return JWSFactory.sign(key, encodedHeader, payload, signingInfo);
-    }
-
-    /**
-     * Encrypt a JWS with a JWK
-     *
-     * @param jws the JWS to encrypt
-     * @param selectedKey the JWK to use for encryption
-     * @param selectedKek the key encryption algorithm
-     * @param selectedCek the content encryption algorithm
-     * @return the encrypted JWS as a JWE
-     * @throws EncryptionException if encryption fails
-     */
-    public static JWE encrypt(JWS jws, Key selectedKey, JWEAlgorithm selectedKek, EncryptionMethod selectedCek) throws EncryptionException {
-        return JWEFactory.encrypt(jws, selectedKey, selectedKek, selectedCek);
     }
 }

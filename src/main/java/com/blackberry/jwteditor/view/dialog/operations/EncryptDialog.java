@@ -20,9 +20,9 @@ package com.blackberry.jwteditor.view.dialog.operations;
 
 import com.blackberry.jwteditor.exceptions.EncryptionException;
 import com.blackberry.jwteditor.model.jose.JWE;
+import com.blackberry.jwteditor.model.jose.JWEFactory;
 import com.blackberry.jwteditor.model.jose.JWS;
 import com.blackberry.jwteditor.model.keys.Key;
-import com.blackberry.jwteditor.operations.Operations;
 import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.view.dialog.AbstractDialog;
 import com.nimbusds.jose.EncryptionMethod;
@@ -158,7 +158,7 @@ public class EncryptDialog extends AbstractDialog {
 
         // Try to encrypt, show a dialog if this fails
         try {
-            jwe = Operations.encrypt(jws, selectedKey, selectedKek, selectedCek);
+            jwe = JWEFactory.encrypt(jws, selectedKey, selectedKek, selectedCek);
             dispose();
         } catch (EncryptionException e) {
             JOptionPane.showMessageDialog(this, e.getMessage(), Utils.getResourceString("error_title_unable_to_encrypt"), JOptionPane.WARNING_MESSAGE);
