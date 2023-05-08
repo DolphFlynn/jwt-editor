@@ -28,6 +28,8 @@ import com.nimbusds.jose.util.Base64URL;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import static com.nimbusds.jose.HeaderParameterNames.*;
+
 /**
  * High-level operations on JWE/JWS
  */
@@ -36,61 +38,56 @@ public class Operations {
     public enum SigningUpdateMode {
         DO_NOT_MODIFY_HEADER,
         UPDATE_ALGORITHM_ONLY,
-        UPDATE_ALGORITHM_TYPE_AND_KID
+        UPDATE_ALGORITHM_TYPE_AND_KID;
+
+        Base64URL buildEncodedHeader(JWS jws, JWKKey key, JWSAlgorithm algorithm) {
+            return switch (this) {
+                case DO_NOT_MODIFY_HEADER -> jws.getEncodedHeader();
+
+                case UPDATE_ALGORITHM_ONLY -> {
+                    JSONObject jsonHeader = parseHeader(jws);
+                    jsonHeader.put(ALGORITHM, algorithm.getName());
+
+                    yield Base64URL.encode(jsonHeader.toString());
+                }
+
+                case UPDATE_ALGORITHM_TYPE_AND_KID -> {
+                    JSONObject jsonHeader = parseHeader(jws);
+                    jsonHeader.put(ALGORITHM, algorithm.getName());
+                    jsonHeader.put(TYPE, "JWT");
+                    jsonHeader.put(KEY_ID, key.getID());
+
+                    yield Base64URL.encode(jsonHeader.toString());
+                }
+            };
+        }
+
+        private static JSONObject parseHeader(JWS jws) {
+            try {
+                return new JSONObject(jws.getHeader());
+            } catch (JSONException e) {
+                return new JSONObject();
+            }
+        }
     }
 
     /**
      * Sign a JWS with a JWK
      *
-     * @param jws the JWS to sign
-     * @param key the JWK to sign the JWS with
-     * @param algorithm the algorithm to sign with
+     * @param jws               the JWS to sign
+     * @param key               the JWK to sign the JWS with
+     * @param algorithm         the algorithm to sign with
      * @param signingUpdateMode the header update mode
      * @return the signed JWS
      * @throws SigningException if signing fails
      */
     public static JWS sign(JWS jws, JWKKey key, JWSAlgorithm algorithm, SigningUpdateMode signingUpdateMode) throws SigningException {
-
         // Build a new JWS header with the algorithm to use for signing
-        JWSHeader signingInfo = new JWSHeader.Builder(algorithm).build();
-
-        Base64URL encodedHeader;
-        JSONObject jsonHeader;
-        switch(signingUpdateMode){
-            // Don't update the header
-            case DO_NOT_MODIFY_HEADER:
-                encodedHeader = jws.getEncodedHeader();
-                break;
-            // Update or insert the 'alg' field
-            case UPDATE_ALGORITHM_ONLY:
-                try {
-                    jsonHeader = new JSONObject(jws.getHeader());
-                }
-                catch (JSONException e) {
-                    jsonHeader = new JSONObject();
-                }
-                jsonHeader.put("alg", algorithm.getName()); //NON-NLS
-                encodedHeader = Base64URL.encode(jsonHeader.toString());
-                break;
-            // Update or insert 'alg', 'typ' and 'kid'
-            case UPDATE_ALGORITHM_TYPE_AND_KID:
-                try {
-                    jsonHeader = new JSONObject(jws.getHeader());
-                }
-                catch (JSONException e) {
-                    jsonHeader = new JSONObject();
-                }
-                jsonHeader.put("alg", algorithm.getName()); //NON-NLS
-                jsonHeader.put("typ", "JWT"); //NON-NLS
-                jsonHeader.put("kid", key.getID()); //NON-NLS
-                encodedHeader = Base64URL.encode(jsonHeader.toString());
-                break;
-            default:
-                throw new IllegalStateException("Unexpected value: " + signingUpdateMode);
-        }
-        // Do the signing operation
-        Base64URL payload = jws.getEncodedPayload();
-
-        return JWSFactory.sign(key, encodedHeader, payload, signingInfo);
+        return JWSFactory.sign(
+                key,
+                signingUpdateMode.buildEncodedHeader(jws, key, algorithm),
+                jws.getEncodedPayload(),
+                new JWSHeader.Builder(algorithm).build()
+        );
     }
 }
