@@ -23,7 +23,6 @@ import com.blackberry.jwteditor.model.jose.JWS;
 import com.blackberry.jwteditor.model.jose.JWSFactory;
 import com.blackberry.jwteditor.model.keys.JWKKey;
 import com.nimbusds.jose.JWSAlgorithm;
-import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.util.Base64URL;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -40,7 +39,7 @@ public class Operations {
         UPDATE_ALGORITHM_ONLY,
         UPDATE_ALGORITHM_TYPE_AND_KID;
 
-        Base64URL buildEncodedHeader(JWS jws, JWKKey key, JWSAlgorithm algorithm) {
+        Base64URL buildUpdatedHeader(JWS jws, JWKKey key, JWSAlgorithm algorithm) {
             return switch (this) {
                 case DO_NOT_MODIFY_HEADER -> jws.getEncodedHeader();
 
@@ -85,9 +84,9 @@ public class Operations {
         // Build a new JWS header with the algorithm to use for signing
         return JWSFactory.sign(
                 key,
-                signingUpdateMode.buildEncodedHeader(jws, key, algorithm),
-                jws.getEncodedPayload(),
-                new JWSHeader.Builder(algorithm).build()
+                algorithm,
+                signingUpdateMode.buildUpdatedHeader(jws, key, algorithm),
+                jws.getEncodedPayload()
         );
     }
 }

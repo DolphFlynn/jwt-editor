@@ -42,7 +42,6 @@ import java.util.Set;
 
 import static com.blackberry.jwteditor.model.jose.JWSFactory.jwsFromParts;
 import static com.nimbusds.jose.HeaderParameterNames.ALGORITHM;
-import static com.nimbusds.jose.JOSEObjectType.JWT;
 import static com.nimbusds.jose.JWSAlgorithm.*;
 
 /**
@@ -114,10 +113,9 @@ public class Attacks {
         headerJsonObject.put(ALGORITHM, algorithm.getName());
         Base64URL headerBase64 = Base64URL.encode(headerJsonObject.toString());
 
-        JWSHeader signingInfo = new JWSHeader.Builder(algorithm).type(JWT).build();
         Key key = JWKKeyFactory.from(new OctetSequenceKey.Builder(EMPTY_KEY).build());
 
-        return JWSFactory.sign(key, headerBase64, jws.getEncodedPayload(), signingInfo);
+        return JWSFactory.sign(key, algorithm, headerBase64, jws.getEncodedPayload());
     }
 
     //  CVE-2022-21449 => https://neilmadden.blog/2022/04/19/psychic-signatures-in-java/
