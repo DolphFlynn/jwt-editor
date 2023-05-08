@@ -34,9 +34,9 @@ import org.json.JSONObject;
 public class Operations {
 
     public enum SigningUpdateMode {
-        NONE,
-        ALG,
-        JWT
+        DO_NOT_MODIFY_HEADER,
+        UPDATE_ALGORITHM_ONLY,
+        UPDATE_ALGORITHM_TYPE_AND_KID
     }
 
     /**
@@ -58,11 +58,11 @@ public class Operations {
         JSONObject jsonHeader;
         switch(signingUpdateMode){
             // Don't update the header
-            case NONE:
+            case DO_NOT_MODIFY_HEADER:
                 encodedHeader = jws.getEncodedHeader();
                 break;
             // Update or insert the 'alg' field
-            case ALG:
+            case UPDATE_ALGORITHM_ONLY:
                 try {
                     jsonHeader = new JSONObject(jws.getHeader());
                 }
@@ -73,7 +73,7 @@ public class Operations {
                 encodedHeader = Base64URL.encode(jsonHeader.toString());
                 break;
             // Update or insert 'alg', 'typ' and 'kid'
-            case JWT:
+            case UPDATE_ALGORITHM_TYPE_AND_KID:
                 try {
                     jsonHeader = new JSONObject(jws.getHeader());
                 }

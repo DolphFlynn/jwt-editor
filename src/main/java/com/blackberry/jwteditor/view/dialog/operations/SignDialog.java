@@ -33,6 +33,8 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.List;
 
+import static com.blackberry.jwteditor.operations.Operations.SigningUpdateMode.*;
+
 /**
  * Sign and Attack > Embedded JWK dialog from the Editor tab
  */
@@ -129,11 +131,11 @@ public class SignDialog extends AbstractDialog {
         // Get the header update mode based on the selected radio button, convert to the associated enum value
         Operations.SigningUpdateMode signingUpdateMode;
         if (radioButtonUpdateGenerateAlg.isSelected()) {
-            signingUpdateMode = Operations.SigningUpdateMode.ALG;
+            signingUpdateMode = UPDATE_ALGORITHM_ONLY;
         } else if (radioButtonUpdateGenerateJWT.isSelected()) {
-            signingUpdateMode = Operations.SigningUpdateMode.JWT;
+            signingUpdateMode = UPDATE_ALGORITHM_TYPE_AND_KID;
         } else {
-            signingUpdateMode = Operations.SigningUpdateMode.NONE;
+            signingUpdateMode = DO_NOT_MODIFY_HEADER;
         }
 
         // Perform a signing operation or the embedded JWK attack based on the dialog mode
