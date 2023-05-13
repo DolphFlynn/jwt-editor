@@ -18,6 +18,7 @@ limitations under the License.
 
 package com.blackberry.jwteditor.view.rsta;
 
+import com.blackberry.jwteditor.view.utils.FontProvider;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.Theme;
 
@@ -36,24 +37,24 @@ class CustomizedRSyntaxTextArea extends RSyntaxTextArea {
     private static final double LINE_HEIGHT_SCALING_FACTOR = 1.15;
 
     private final DarkModeDetector darkModeDetector;
-    private final FontDetector fontDetector;
+    private final FontProvider fontProvider;
     private final Consumer<String> errorLogger;
     private final CustomTokenColors customTokenColors;
 
     CustomizedRSyntaxTextArea(
             DarkModeDetector darkModeDetector,
-            FontDetector fontDetector,
+            FontProvider fontProvider,
             Consumer<String> errorLogger) {
-        this(darkModeDetector, fontDetector, errorLogger, customTokenColors().build());
+        this(darkModeDetector, fontProvider, errorLogger, customTokenColors().build());
     }
 
     CustomizedRSyntaxTextArea(
             DarkModeDetector darkModeDetector,
-            FontDetector fontDetector,
+            FontProvider fontProvider,
             Consumer<String> errorLogger,
             CustomTokenColors customTokenColors) {
         this.darkModeDetector = darkModeDetector;
-        this.fontDetector = fontDetector;
+        this.fontProvider = fontProvider;
         this.errorLogger = errorLogger;
         this.customTokenColors = customTokenColors;
 
@@ -103,7 +104,7 @@ class CustomizedRSyntaxTextArea extends RSyntaxTextArea {
     }
 
     private void applyThemeAndFont() {
-        if (errorLogger == null || fontDetector == null) {
+        if (errorLogger == null || fontProvider == null) {
             return;
         }
 
@@ -113,7 +114,7 @@ class CustomizedRSyntaxTextArea extends RSyntaxTextArea {
             Theme theme = load(getClass().getResourceAsStream(themeResource));
             theme.apply(this);
 
-            Font font = fontDetector.determineFont();
+            Font font = fontProvider.editorFont();
             setFont(font);
         } catch (IOException e) {
             errorLogger.accept(e.getMessage());

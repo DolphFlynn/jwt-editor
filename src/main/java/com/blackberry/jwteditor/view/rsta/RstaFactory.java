@@ -22,6 +22,7 @@ import burp.api.montoya.logging.Logging;
 import burp.api.montoya.ui.UserInterface;
 import com.blackberry.jwteditor.view.rsta.jwt.JWTTokenMaker;
 import com.blackberry.jwteditor.view.rsta.jwt.JWTTokenizerConstants;
+import com.blackberry.jwteditor.view.utils.FontProvider;
 import org.fife.ui.rsyntaxtextarea.AbstractTokenMakerFactory;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.TokenMakerFactory;
@@ -37,12 +38,12 @@ import static com.blackberry.jwteditor.view.rsta.jwt.JWTTokenizerConstants.TOKEN
 
 public class RstaFactory {
     private final DarkModeDetector darkModeDetector;
-    private final FontDetector fontDetector;
+    private final FontProvider fontProvider;
     private final Logging logging;
 
     public RstaFactory(UserInterface userInterface, Logging logging) {
         this.darkModeDetector = new DarkModeDetector(userInterface);
-        this.fontDetector = new FontDetector(userInterface);
+        this.fontProvider = new FontProvider(userInterface);
         this.logging = logging;
 
         // Ensure Burp key events not captured - https://github.com/bobbylight/RSyntaxTextArea/issues/269#issuecomment-776329702
@@ -58,7 +59,7 @@ public class RstaFactory {
     }
 
     public RSyntaxTextArea buildDefaultTextArea() {
-        return new CustomizedRSyntaxTextArea(darkModeDetector, fontDetector, logging::logToError);
+        return new CustomizedRSyntaxTextArea(darkModeDetector, fontProvider, logging::logToError);
     }
 
     public RSyntaxTextArea buildSerializedJWTTextArea() {
@@ -76,7 +77,7 @@ public class RstaFactory {
 
         RSyntaxTextArea textArea = new CustomizedRSyntaxTextArea(
                 darkModeDetector,
-                fontDetector,
+                fontProvider,
                 logging::logToError,
                 customTokenColors
         );

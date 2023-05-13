@@ -22,6 +22,7 @@ import burp.api.montoya.http.HttpService;
 import burp.api.montoya.http.message.HttpRequestResponse;
 import burp.api.montoya.http.message.requests.HttpRequest;
 import burp.api.montoya.logging.Logging;
+import burp.api.montoya.ui.UserInterface;
 import burp.api.montoya.ui.editor.extension.ExtensionProvidedHttpRequestEditor;
 import com.blackberry.jwteditor.presenter.PresenterStore;
 import com.blackberry.jwteditor.view.hexcodearea.HexCodeAreaFactory;
@@ -32,8 +33,8 @@ import static burp.api.montoya.internal.ObjectFactoryLocator.FACTORY;
 public class RequestEditorView extends EditorView implements ExtensionProvidedHttpRequestEditor {
     private volatile HttpService httpService;
 
-    public RequestEditorView(PresenterStore presenters, RstaFactory rstaFactory, Logging logging, boolean editable) {
-        super(presenters, rstaFactory, new HexCodeAreaFactory(logging), editable);
+    public RequestEditorView(PresenterStore presenters, RstaFactory rstaFactory, Logging logging, UserInterface userInterface, boolean editable) {
+        super(presenters, rstaFactory, new HexCodeAreaFactory(logging, userInterface), editable);
     }
 
     @Override

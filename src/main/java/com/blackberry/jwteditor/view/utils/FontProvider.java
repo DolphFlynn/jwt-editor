@@ -16,20 +16,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.blackberry.jwteditor.view.rsta;
+package com.blackberry.jwteditor.view.utils;
 
 import burp.api.montoya.ui.UserInterface;
 
 import java.awt.*;
 
-class FontDetector {
+public class FontProvider {
     private final UserInterface userInterface;
 
-    FontDetector(UserInterface userInterface) {
+    public FontProvider(UserInterface userInterface) {
         this.userInterface = userInterface;
     }
 
-    Font determineFont() {
+    public Font editorFont() {
         return userInterface.currentEditorFont();
     }
 }

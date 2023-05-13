@@ -68,6 +68,7 @@ public class JWTEditorExtension implements BurpExtension {
                         presenters,
                         rstaFactory,
                         api.logging(),
+                        api.userInterface(),
                         editorCreationContext.editorMode() != READ_ONLY
                 )
         );
@@ -77,6 +78,7 @@ public class JWTEditorExtension implements BurpExtension {
                         presenters,
                         rstaFactory,
                         api.logging(),
+                        api.userInterface(),
                         editorCreationContext.editorMode() != READ_ONLY
                 )
         );
