@@ -128,6 +128,21 @@ public class FakeHttpRequest implements HttpRequest {
     }
 
     @Override
+    public HttpRequest withHeader(HttpHeader header) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public HttpRequest withHeader(String name, String value) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public HttpRequest withParameter(HttpParameter parameters) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public HttpRequest withAddedParameters(List<HttpParameter> parameters) {
         throw new UnsupportedOperationException();
     }
