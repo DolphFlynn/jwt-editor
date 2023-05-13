@@ -20,7 +20,6 @@ package com.blackberry.jwteditor.view.rsta;
 
 import burp.api.montoya.ui.UserInterface;
 
-import javax.swing.*;
 import java.awt.*;
 
 class FontDetector {
@@ -31,8 +30,6 @@ class FontDetector {
     }
 
     Font determineFont() {
-        JLabel label = new JLabel();
-        userInterface.applyThemeToComponent(label);
-        return label.getFont();
+        return userInterface.currentEditorFont();
     }
 }

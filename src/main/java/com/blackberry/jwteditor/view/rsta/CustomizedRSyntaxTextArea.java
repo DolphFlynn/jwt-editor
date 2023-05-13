@@ -113,7 +113,7 @@ class CustomizedRSyntaxTextArea extends RSyntaxTextArea {
             Theme theme = load(getClass().getResourceAsStream(themeResource));
             theme.apply(this);
 
-            Font font = fontDetector.determineFont(); // this will be the 'Appearance' font not the 'Message Display' font
+            Font font = fontDetector.determineFont();
             setFont(font);
         } catch (IOException e) {
             errorLogger.accept(e.getMessage());
