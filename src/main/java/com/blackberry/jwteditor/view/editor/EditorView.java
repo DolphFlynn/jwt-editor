@@ -25,6 +25,7 @@ import com.blackberry.jwteditor.presenter.PresenterStore;
 import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.view.hexcodearea.HexCodeAreaFactory;
 import com.blackberry.jwteditor.view.rsta.RstaFactory;
+import com.blackberry.jwteditor.view.utils.MaxLengthStringComboBoxModel;
 import org.exbin.deltahex.EditationAllowed;
 import org.exbin.deltahex.swing.CodeArea;
 import org.exbin.utils.binary_data.ByteArrayEditableData;
@@ -42,10 +43,10 @@ import static org.exbin.deltahex.EditationAllowed.READ_ONLY;
  * View class for the Editor tab
  */
 public abstract class EditorView implements ExtensionProvidedEditor {
-    public static final int MAX_JOSE_OBJECT_STRING_LENGTH = 55;
-
     public static final int TAB_JWS = 0;
     public static final int TAB_JWE = 1;
+
+    private static final int MAX_JOSE_OBJECT_STRING_LENGTH = 68;
 
     final EditorPresenter presenter;
 
@@ -307,7 +308,7 @@ public abstract class EditorView implements ExtensionProvidedEditor {
      * @param joseObjectStrings array of JWS/JWE to display
      */
     public void setJOSEObjects(String[] joseObjectStrings) {
-        comboBoxJOSEObject.setModel(new DefaultComboBoxModel<>(joseObjectStrings));
+        comboBoxJOSEObject.setModel(new MaxLengthStringComboBoxModel(MAX_JOSE_OBJECT_STRING_LENGTH, joseObjectStrings));
     }
 
     /**

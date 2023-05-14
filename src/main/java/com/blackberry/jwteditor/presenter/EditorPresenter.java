@@ -97,20 +97,15 @@ public class EditorPresenter extends Presenter {
         // Extract JOSE Objects from the text, build a change set and add them to the dropdown
         List<MutableJOSEObject> joseObjects = extractJOSEObjects(content);
         String[] joseObjectStrings = new String[joseObjects.size()];
-        for(int i = 0; i < joseObjects.size(); i++){
+        for (int i = 0; i < joseObjects.size(); i++) {
             mutableJoseObjects.add(joseObjects.get(i));
-
-            // Truncate the JOSE object for display
-            String serializedJWT = joseObjects.get(i).getOriginal();
-            if (serializedJWT.length() > EditorView.MAX_JOSE_OBJECT_STRING_LENGTH){
-                serializedJWT = String.format("%d - %s ...", i + 1, serializedJWT.substring(0, EditorView.MAX_JOSE_OBJECT_STRING_LENGTH)); //NON-NLS
-            }
-            joseObjectStrings[i] = serializedJWT;
+            joseObjectStrings[i] = String.format("%d - %s", i + 1, joseObjects.get(i).getOriginal());
         }
 
-        // Instruct the view to display the first JOSE object
         view.setJOSEObjects(joseObjectStrings);
-        if(joseObjects.size() > 0){
+
+        // Instruct the view to display the first JOSE object
+        if (joseObjects.size() > 0) {
             view.setSelectedJOSEObjectIndex(0);
         }
     }
