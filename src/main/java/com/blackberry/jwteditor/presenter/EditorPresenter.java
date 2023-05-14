@@ -30,7 +30,6 @@ import com.blackberry.jwteditor.view.dialog.MessageDialogFactory;
 import com.blackberry.jwteditor.view.dialog.operations.*;
 import com.blackberry.jwteditor.view.editor.EditorView;
 import com.nimbusds.jose.util.Base64URL;
-import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
 
 import java.nio.charset.StandardCharsets;
@@ -38,10 +37,8 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import static com.blackberry.jwteditor.model.jose.JOSEObjectFinder.containsJOSEObjects;
-import static com.blackberry.jwteditor.model.jose.JOSEObjectFinder.extractJOSEObjects;
 import static com.blackberry.jwteditor.model.jose.JWEFactory.jweFromParts;
 import static com.blackberry.jwteditor.model.jose.JWSFactory.jwsFromParts;
 
@@ -52,10 +49,9 @@ public class EditorPresenter extends Presenter {
 
     private final PresenterStore presenters;
     private final EditorView view;
-    private final List<MutableJOSEObject> mutableJoseObjects;
     private final MessageDialogFactory messageDialogFactory;
+    private final EditorModel model;
 
-    private String message;
     private boolean selectionChanging;
 
     /**
@@ -67,7 +63,7 @@ public class EditorPresenter extends Presenter {
     public EditorPresenter(EditorView view, PresenterStore presenters) {
         this.view = view;
         this.presenters = presenters;
-        this.mutableJoseObjects = new CopyOnWriteArrayList<>();
+        this.model = new EditorModel();
         this.messageDialogFactory = new MessageDialogFactory(view.uiComponent());
 
         presenters.register(this);
@@ -88,26 +84,9 @@ public class EditorPresenter extends Presenter {
      *
      * @param content text that may contain a serialized JWE/JWS
      */
-    public void setMessage(String content){
-
-        // Save the input text and clear existing JOSE objects
-        message = content;
-        mutableJoseObjects.clear();
-
-        // Extract JOSE Objects from the text, build a change set and add them to the dropdown
-        List<MutableJOSEObject> joseObjects = extractJOSEObjects(content);
-        String[] joseObjectStrings = new String[joseObjects.size()];
-        for (int i = 0; i < joseObjects.size(); i++) {
-            mutableJoseObjects.add(joseObjects.get(i));
-            joseObjectStrings[i] = String.format("%d - %s", i + 1, joseObjects.get(i).getOriginal());
-        }
-
-        view.setJOSEObjects(joseObjectStrings);
-
-        // Instruct the view to display the first JOSE object
-        if (joseObjects.size() > 0) {
-            view.setSelectedJOSEObjectIndex(0);
-        }
+    public void setMessage(String content) {
+        model.setMessage(content);
+        view.setJOSEObjects(model.getJOSEObjectStrings());
     }
 
     /**
@@ -446,26 +425,7 @@ public class EditorPresenter extends Presenter {
      * @return the altered message
      */
     public String getMessage() {
-        // Create two lists, one containing the original, the other containing the modified version at the same index
-        List<String> searchList = new ArrayList<>();
-        List<String> replacementList = new ArrayList<>();
-
-        //Add a replacement pair to the lists if the JOSEObjectPair has changed
-        for(MutableJOSEObject mutableJoseObject : mutableJoseObjects){
-            if(mutableJoseObject.changed()) {
-                searchList.add(mutableJoseObject.getOriginal());
-                replacementList.add(mutableJoseObject.getModified().serialize());
-            }
-        }
-
-        // Convert the lists to arrays
-        String[] search = new String[searchList.size()];
-        searchList.toArray(search);
-        String[] replacement = new String[replacementList.size()];
-        replacementList.toArray(replacement);
-
-        // Use the Apache Commons StringUtils library to do in-place replacement
-        return StringUtils.replaceEach(message, search, replacement);
+        return model.getMessage();
     }
 
     /**
@@ -474,7 +434,7 @@ public class EditorPresenter extends Presenter {
      * @return true if changes have been made in the editor
      */
     public boolean isModified() {
-        return mutableJoseObjects.stream().anyMatch(MutableJOSEObject::changed);
+        return model.isModified();
     }
 
     /**
@@ -485,11 +445,11 @@ public class EditorPresenter extends Presenter {
         selectionChanging = true;
 
         // Get the JOSEObject pair corresponding to the selected dropdown entry index
-        MutableJOSEObject mutableJoseObject = mutableJoseObjects.get(view.getSelectedJOSEObjectIndex());
+        MutableJOSEObject mutableJoseObject = model.getJOSEObject(view.getSelectedJOSEObjectIndex());
         JOSEObject joseObject = mutableJoseObject.getModified();
 
         // Change to JWE/JWS mode based on the newly selected JOSEObject
-        if(joseObject instanceof JWS){
+        if (joseObject instanceof JWS){
             view.setJWSMode();
             setJWS((JWS) joseObject);
         }
@@ -507,7 +467,7 @@ public class EditorPresenter extends Presenter {
      */
     public void componentChanged() {
         // Get the currently selected object
-        MutableJOSEObject mutableJoseObject = mutableJoseObjects.get(view.getSelectedJOSEObjectIndex());
+        MutableJOSEObject mutableJoseObject = model.getJOSEObject(view.getSelectedJOSEObjectIndex());
 
         //Serialize the text/hex entries to a JWS/JWE in compact form, depending on the editor mode
         JOSEObject joseObject = view.getMode() == EditorView.TAB_JWS ? getJWS() : getJWE();

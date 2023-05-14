@@ -35,6 +35,7 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
+import java.util.List;
 
 import static org.exbin.deltahex.EditationAllowed.ALLOWED;
 import static org.exbin.deltahex.EditationAllowed.READ_ONLY;
@@ -307,8 +308,12 @@ public abstract class EditorView implements ExtensionProvidedEditor {
      * Set the JWS/JWEs in the UI dropdown
      * @param joseObjectStrings array of JWS/JWE to display
      */
-    public void setJOSEObjects(String[] joseObjectStrings) {
+    public void setJOSEObjects(List<String> joseObjectStrings) {
         comboBoxJOSEObject.setModel(new MaxLengthStringComboBoxModel(MAX_JOSE_OBJECT_STRING_LENGTH, joseObjectStrings));
+
+        if (joseObjectStrings.size() > 0) {
+            comboBoxJOSEObject.setSelectedIndex(0);
+        }
     }
 
     /**
@@ -317,14 +322,6 @@ public abstract class EditorView implements ExtensionProvidedEditor {
      */
     public int getSelectedJOSEObjectIndex() {
         return comboBoxJOSEObject.getSelectedIndex();
-    }
-
-    /**
-     * Set the index of the selected JWS/JWE
-     * @param index JWS/JWE index to select
-     */
-    public void setSelectedJOSEObjectIndex(int index) {
-        comboBoxJOSEObject.setSelectedIndex(index);
     }
 
     /**

@@ -19,14 +19,13 @@ limitations under the License.
 package com.blackberry.jwteditor.view.utils;
 
 import javax.swing.*;
-
-import static java.util.Arrays.stream;
+import java.util.List;
 
 public class MaxLengthStringComboBoxModel extends DefaultComboBoxModel<String> {
     private static final String FORMAT_STRING = "%s ...";
 
-    public MaxLengthStringComboBoxModel(int maxLength, String[] items) {
-        super(stream(items).map(item -> truncateIfRequired(maxLength, item)).toArray(String[]::new));
+    public MaxLengthStringComboBoxModel(int maxLength, List<String> items) {
+        super(items.stream().map(item -> truncateIfRequired(maxLength, item)).toArray(String[]::new));
     }
 
     private static String truncateIfRequired(int maxLength, String item) {
