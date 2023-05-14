@@ -26,24 +26,24 @@ import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.model.keys.KeyRing;
 import com.blackberry.jwteditor.utils.JSONUtils;
 import com.blackberry.jwteditor.utils.Utils;
+import com.blackberry.jwteditor.view.dialog.MessageDialogFactory;
 import com.blackberry.jwteditor.view.dialog.operations.*;
 import com.blackberry.jwteditor.view.editor.EditorView;
 import com.nimbusds.jose.util.Base64URL;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
 
-import javax.swing.*;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import static com.blackberry.jwteditor.model.jose.JOSEObjectFinder.containsJOSEObjects;
 import static com.blackberry.jwteditor.model.jose.JOSEObjectFinder.extractJOSEObjects;
 import static com.blackberry.jwteditor.model.jose.JWEFactory.jweFromParts;
 import static com.blackberry.jwteditor.model.jose.JWSFactory.jwsFromParts;
-import static javax.swing.JOptionPane.WARNING_MESSAGE;
 
 /**
  * Presenter class for the Editor tab
@@ -52,8 +52,8 @@ public class EditorPresenter extends Presenter {
 
     private final PresenterStore presenters;
     private final EditorView view;
-
     private final List<MutableJOSEObject> mutableJoseObjects;
+    private final MessageDialogFactory messageDialogFactory;
 
     private String message;
     private boolean selectionChanging;
@@ -67,9 +67,10 @@ public class EditorPresenter extends Presenter {
     public EditorPresenter(EditorView view, PresenterStore presenters) {
         this.view = view;
         this.presenters = presenters;
-        presenters.register(this);
+        this.mutableJoseObjects = new CopyOnWriteArrayList<>();
+        this.messageDialogFactory = new MessageDialogFactory(view.uiComponent());
 
-        mutableJoseObjects = new ArrayList<>();
+        presenters.register(this);
     }
 
     /**
@@ -120,7 +121,7 @@ public class EditorPresenter extends Presenter {
      */
     private void setJWS(JWS jws){
 
-        // Check if the header survives pretty printing and compaction without changes (i.e it was compact when deserialized)
+        // Check if the header survives pretty printing and compaction without changes (i.e. it was compact when deserialized)
         String header = jws.getHeader();
         try {
             String prettyPrintedJSON = JSONUtils.prettyPrintJSON(header);
@@ -139,7 +140,7 @@ public class EditorPresenter extends Presenter {
             view.setJWSHeader(header);
         }
 
-        // Check if the payload survives pretty printing and compaction without changes (i.e it was compact when deserialized)
+        // Check if the payload survives pretty printing and compaction without changes (i.e. it was compact when deserialized)
         String payload = jws.getPayload();
         try {
             String prettyPrintedJSON = JSONUtils.prettyPrintJSON(payload);
@@ -281,7 +282,7 @@ public class EditorPresenter extends Presenter {
         }
 
         if(attackKeys.size() == 0) {
-            JOptionPane.showMessageDialog(view.uiComponent(), Utils.getResourceString("error_no_signing_keys"), Utils.getResourceString("error_title_no_signing_keys"), WARNING_MESSAGE);
+            messageDialogFactory.showWarningDialog("error_title_no_signing_keys", "error_no_signing_keys");
             return;
         }
 
@@ -350,7 +351,7 @@ public class EditorPresenter extends Presenter {
 
         // Check there are signing keys in the keystore
         if (keysPresenter.getSigningKeys().size() == 0) {
-            JOptionPane.showMessageDialog(view.uiComponent(), Utils.getResourceString("error_no_signing_keys"), Utils.getResourceString("error_title_no_signing_keys"), WARNING_MESSAGE);
+            messageDialogFactory.showWarningDialog("error_title_no_signing_keys", "error_no_signing_keys");
             return;
         }
 
@@ -369,28 +370,20 @@ public class EditorPresenter extends Presenter {
      */
     public void onVerifyClicked() {
         List<Key> keys = ((KeysPresenter) presenters.get(KeysPresenter.class)).getVerificationKeys();
-        String titleKey;
-        String message;
 
         // Check there are verification keys in the keystore
         if (keys.isEmpty()) {
-            titleKey = "error_title_no_verification_keys";
-            message = Utils.getResourceString("error_no_verification_keys");
-        } else {
-            titleKey = "editor_view_message_title_verification";
-            KeyRing keyRing = new KeyRing(keys);
-
-            message = keyRing.findVerifyingKey(getJWS())
-                    .map(key -> Utils.getResourceString("editor_view_message_verified").formatted(key.getID()))
-                    .orElseGet(() -> Utils.getResourceString("editor_view_message_not_verified"));
+            messageDialogFactory.showWarningDialog("error_title_no_verification_keys", "error_no_verification_keys");
+            return;
         }
 
-        JOptionPane.showMessageDialog(
-                view.uiComponent(),
-                message,
-                Utils.getResourceString(titleKey),
-                WARNING_MESSAGE
-        );
+        KeyRing keyRing = new KeyRing(keys);
+        Optional<Key> key = keyRing.findVerifyingKey(getJWS());
+
+        String messageKey = key.isPresent() ? "editor_view_message_verified" : "editor_view_message_not_verified";
+        Object[] args = key.map(value -> new String[]{value.getID()}).orElseGet(() -> new String[0]);
+
+        messageDialogFactory.showWarningDialog("editor_view_message_title_verification", messageKey, args);
     }
 
     /**
@@ -400,8 +393,8 @@ public class EditorPresenter extends Presenter {
         KeysPresenter keysPresenter = (KeysPresenter) presenters.get(KeysPresenter.class);
 
         // Check there are encryption keys in the keystore
-        if(keysPresenter.getEncryptionKeys().size() == 0) {
-            JOptionPane.showMessageDialog(view.uiComponent(), Utils.getResourceString("error_no_encryption_keys"), Utils.getResourceString("error_title_no_encryption_keys"), WARNING_MESSAGE);
+        if (keysPresenter.getEncryptionKeys().size() == 0) {
+            messageDialogFactory.showWarningDialog("error_title_no_encryption_keys", "error_no_encryption_keys");
             return;
         }
 
@@ -424,7 +417,7 @@ public class EditorPresenter extends Presenter {
 
         // Check there are decryption keys in the keystore
         if (keysPresenter.getDecryptionKeys().isEmpty()) {
-            JOptionPane.showMessageDialog(view.uiComponent(), Utils.getResourceString("error_no_decryption_keys"), Utils.getResourceString("error_title_no_decryption_keys"), WARNING_MESSAGE);
+            messageDialogFactory.showWarningDialog("error_title_no_decryption_keys", "error_no_decryption_keys");
             return;
         }
 
@@ -438,10 +431,10 @@ public class EditorPresenter extends Presenter {
                 view.setJWSMode();
                 setJWS(jws.get());
             } else {
-                JOptionPane.showMessageDialog(view.uiComponent(), Utils.getResourceString("error_decryption_all_keys_failed"), Utils.getResourceString("error_title_unable_to_decrypt"), WARNING_MESSAGE);
+                messageDialogFactory.showWarningDialog("error_title_unable_to_decrypt", "error_decryption_all_keys_failed");
             }
         } catch (ParseException e) {
-            JOptionPane.showMessageDialog(view.uiComponent(), Utils.getResourceString("error_decryption_invalid_header"), Utils.getResourceString("error_title_unable_to_decrypt"), WARNING_MESSAGE);
+            messageDialogFactory.showWarningDialog("error_title_unable_to_decrypt", "error_decryption_invalid_header");
         }
     }
 
@@ -470,7 +463,7 @@ public class EditorPresenter extends Presenter {
             }
         }
 
-        // Conver the lists to arrays
+        // Convert the lists to arrays
         String[] search = new String[searchList.size()];
         searchList.toArray(search);
         String[] replacement = new String[replacementList.size()];
@@ -536,8 +529,8 @@ public class EditorPresenter extends Presenter {
         try {
             view.setJWEHeader(JSONUtils.prettyPrintJSON(view.getJWEHeader()));
         }
-        catch (JSONException e){
-            JOptionPane.showMessageDialog(view.uiComponent(), Utils.getResourceString("error_format_json"), Utils.getResourceString("error_title_unable_to_format_json"), JOptionPane.ERROR_MESSAGE);
+        catch (JSONException e) {
+            messageDialogFactory.showErrorDialog("error_title_unable_to_format_json", "error_format_json");
         }
     }
 
@@ -548,8 +541,8 @@ public class EditorPresenter extends Presenter {
         try {
             view.setJWSHeader(JSONUtils.prettyPrintJSON(view.getJWSHeader()));
         }
-        catch (JSONException e){
-            JOptionPane.showMessageDialog(view.uiComponent(), Utils.getResourceString("error_format_json"), Utils.getResourceString("error_title_unable_to_format_json"), JOptionPane.ERROR_MESSAGE);
+        catch (JSONException e) {
+            messageDialogFactory.showErrorDialog("error_title_unable_to_format_json", "error_format_json");
         }
     }
 
@@ -560,8 +553,8 @@ public class EditorPresenter extends Presenter {
         try {
             view.setPayload(JSONUtils.prettyPrintJSON(view.getPayload()));
         }
-        catch (JSONException e){
-            JOptionPane.showMessageDialog(view.uiComponent(), Utils.getResourceString("error_format_json"), Utils.getResourceString("error_title_unable_to_format_json"), JOptionPane.ERROR_MESSAGE);
+        catch (JSONException e) {
+            messageDialogFactory.showErrorDialog("error_title_unable_to_format_json", "error_format_json");
         }
     }
 }
