@@ -32,11 +32,14 @@ import org.exbin.utils.binary_data.ByteArrayEditableData;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 
 import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.border.LineBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.util.List;
 
+import static java.awt.Color.RED;
 import static org.exbin.deltahex.EditationAllowed.ALLOWED;
 import static org.exbin.deltahex.EditationAllowed.READ_ONLY;
 
@@ -284,16 +287,11 @@ public abstract class EditorView implements ExtensionProvidedEditor {
         return Utils.getCodeAreaData(codeAreaSignature);
     }
 
-    /**
-     * Set the serialised JWS/JWE in the UI
-     * @param text serialised JWE/JWS
-     * @param highlight should the text box be highlighted (changed)
-     */
-    public void setSerialized(String text, boolean highlight) {
+    public void setSerialized(String text, boolean textModified) {
         textAreaSerialized.setText(text);
 
-        Color foreground = highlight ? Color.RED : Color.BLACK;
-        textAreaSerialized.setForeground(foreground);
+        Border serializedTextAreaBorder = textModified ? new LineBorder(RED, 1) : null;
+        textAreaSerialized.setBorder(serializedTextAreaBorder);
     }
 
     /**
