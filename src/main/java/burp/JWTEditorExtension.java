@@ -27,6 +27,7 @@ import com.blackberry.jwteditor.view.rsta.RstaFactory;
 import java.awt.*;
 
 import static burp.api.montoya.core.BurpSuiteEdition.COMMUNITY_EDITION;
+import static burp.api.montoya.core.BurpSuiteEdition.PROFESSIONAL;
 import static burp.api.montoya.ui.editor.extension.EditorMode.READ_ONLY;
 
 @SuppressWarnings("unused")
@@ -51,6 +52,8 @@ public class JWTEditorExtension implements BurpExtension {
         RstaFactory rstaFactory = new RstaFactory(userInterface, api.logging());
         PresenterStore presenters = new PresenterStore();
 
+        boolean isProVersion = api.burpSuite().version().edition() == PROFESSIONAL;
+
         SuiteView suiteView = new SuiteView(
                 suiteWindow,
                 presenters,
@@ -58,7 +61,8 @@ public class JWTEditorExtension implements BurpExtension {
                 keysModel,
                 rstaFactory,
                 burpConfig,
-                userInterface
+                userInterface,
+                isProVersion
         );
 
         userInterface.registerSuiteTab(suiteView.getTabCaption(), suiteView.getUiComponent());

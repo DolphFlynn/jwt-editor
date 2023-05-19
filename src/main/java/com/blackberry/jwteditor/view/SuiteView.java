@@ -42,6 +42,7 @@ public class SuiteView {
     private final RstaFactory rstaFactory;
     private final BurpConfig burpConfig;
     private final UserInterface userInterface;
+    private final boolean isProVersion;
 
     private JPanel panel;
     private JLabel configurationButton;
@@ -55,7 +56,8 @@ public class SuiteView {
             KeysModel keysModel,
             RstaFactory rstaFactory,
             BurpConfig burpConfig,
-            UserInterface userInterface) {
+            UserInterface userInterface,
+            boolean isProVersion) {
         this.parent = parent;
         this.presenters = presenters;
         this.keysModelPersistence = keysModelPersistence;
@@ -63,6 +65,7 @@ public class SuiteView {
         this.rstaFactory = rstaFactory;
         this.burpConfig = burpConfig;
         this.userInterface = userInterface;
+        this.isProVersion = isProVersion;
     }
 
     /**
@@ -92,6 +95,6 @@ public class SuiteView {
                 keysModel,
                 rstaFactory
         );
-        configView = new ConfigView(burpConfig, userInterface);
+        configView = new ConfigView(burpConfig, userInterface, isProVersion);
     }
 }

@@ -52,7 +52,7 @@ public class ConfigView {
     private JPanel intruderPanel;
     private JLabel spacerLabel;
 
-    public ConfigView(BurpConfig burpConfig, UserInterface userInterface) {
+    public ConfigView(BurpConfig burpConfig, UserInterface userInterface, boolean isProVersion) {
         ProxyConfig proxyConfig = burpConfig.proxyConfig();
 
         checkBoxHighlightJWT.setSelected(proxyConfig.highlightJWT());
@@ -79,6 +79,7 @@ public class ConfigView {
 
         ScannerConfig scannerConfig = burpConfig.scannerConfig();
 
+        checkBoxHeaderInsertionPoint.setEnabled(isProVersion);
         checkBoxHeaderInsertionPoint.setSelected(scannerConfig.enableHeaderJWSInsertionPointLocation());
         checkBoxHeaderInsertionPoint.addActionListener(e -> {
             scannerConfig.setEnableHeaderJWSInsertionPointLocation(checkBoxHeaderInsertionPoint.isSelected());
