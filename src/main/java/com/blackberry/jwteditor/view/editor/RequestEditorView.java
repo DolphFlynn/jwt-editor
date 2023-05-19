@@ -18,6 +18,7 @@ limitations under the License.
 
 package com.blackberry.jwteditor.view.editor;
 
+import burp.api.montoya.collaborator.CollaboratorPayloadGenerator;
 import burp.api.montoya.http.HttpService;
 import burp.api.montoya.http.message.HttpRequestResponse;
 import burp.api.montoya.http.message.requests.HttpRequest;
@@ -33,8 +34,22 @@ import static burp.api.montoya.internal.ObjectFactoryLocator.FACTORY;
 public class RequestEditorView extends EditorView implements ExtensionProvidedHttpRequestEditor {
     private volatile HttpService httpService;
 
-    public RequestEditorView(PresenterStore presenters, RstaFactory rstaFactory, Logging logging, UserInterface userInterface, boolean editable) {
-        super(presenters, rstaFactory, new HexCodeAreaFactory(logging, userInterface), editable);
+    public RequestEditorView(
+            PresenterStore presenters,
+            RstaFactory rstaFactory,
+            Logging logging,
+            UserInterface userInterface,
+            CollaboratorPayloadGenerator collaboratorPayloadGenerator,
+            boolean editable,
+            boolean isProVersion) {
+        super(
+                presenters,
+                rstaFactory,
+                new HexCodeAreaFactory(logging, userInterface),
+                collaboratorPayloadGenerator,
+                editable,
+                isProVersion
+        );
     }
 
     @Override

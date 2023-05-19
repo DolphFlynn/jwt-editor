@@ -18,6 +18,7 @@ limitations under the License.
 
 package com.blackberry.jwteditor.presenter;
 
+import burp.api.montoya.collaborator.CollaboratorPayloadGenerator;
 import com.blackberry.jwteditor.model.jose.JOSEObject;
 import com.blackberry.jwteditor.model.jose.JWE;
 import com.blackberry.jwteditor.model.jose.JWS;
@@ -49,19 +50,15 @@ public class EditorPresenter extends Presenter {
 
     private final PresenterStore presenters;
     private final EditorView view;
+    private final CollaboratorPayloadGenerator collaboratorPayloadGenerator;
     private final MessageDialogFactory messageDialogFactory;
     private final EditorModel model;
 
     private boolean selectionChanging;
 
-    /**
-     * Construct a new editor presenter from a view
-     *
-     * @param view the view to associate to this presenter
-     * @param presenters the shared presenter store
-     */
-    public EditorPresenter(EditorView view, PresenterStore presenters) {
+    public EditorPresenter(EditorView view, CollaboratorPayloadGenerator collaboratorPayloadGenerator, PresenterStore presenters) {
         this.view = view;
+        this.collaboratorPayloadGenerator = collaboratorPayloadGenerator;
         this.presenters = presenters;
         this.model = new EditorModel();
         this.messageDialogFactory = new MessageDialogFactory(view.uiComponent());
@@ -305,6 +302,22 @@ public class EditorPresenter extends Presenter {
 
         if (signedJWS != null) {
             setJWS(signedJWS);
+        }
+    }
+
+    public void onAttackEmbedCollaboratorPayloadClicked() {
+        EmbedCollaboratorPayloadDialog collaboratorPayloadDialog = new EmbedCollaboratorPayloadDialog(
+                view.window(),
+                getJWS(),
+                collaboratorPayloadGenerator
+        );
+
+        collaboratorPayloadDialog.display();
+
+        JWS updatedJWS = collaboratorPayloadDialog.getJWS();
+
+        if (updatedJWS != null) {
+            setJWS(updatedJWS);
         }
     }
 

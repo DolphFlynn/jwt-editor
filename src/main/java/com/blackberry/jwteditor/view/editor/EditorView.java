@@ -18,6 +18,7 @@ limitations under the License.
 
 package com.blackberry.jwteditor.view.editor;
 
+import burp.api.montoya.collaborator.CollaboratorPayloadGenerator;
 import burp.api.montoya.ui.Selection;
 import burp.api.montoya.ui.editor.extension.ExtensionProvidedEditor;
 import com.blackberry.jwteditor.presenter.EditorPresenter;
@@ -57,6 +58,7 @@ public abstract class EditorView implements ExtensionProvidedEditor {
     private final RstaFactory rstaFactory;
     private final boolean editable;
     private final HexCodeAreaFactory hexCodeAreaFactory;
+    private final boolean isProVersion;
 
     private int mode;
     private JTabbedPane tabbedPane;
@@ -90,11 +92,18 @@ public abstract class EditorView implements ExtensionProvidedEditor {
     private CodeArea codeAreaIV;
     private CodeArea codeAreaTag;
 
-    EditorView(PresenterStore presenters, RstaFactory rstaFactory, HexCodeAreaFactory hexAreaCodeFactory, boolean editable) {
+    EditorView(
+            PresenterStore presenters,
+            RstaFactory rstaFactory,
+            HexCodeAreaFactory hexAreaCodeFactory,
+            CollaboratorPayloadGenerator collaboratorPayloadGenerator,
+            boolean editable,
+            boolean isProVersion) {
         this.rstaFactory = rstaFactory;
         this.editable = editable;
         this.hexCodeAreaFactory = hexAreaCodeFactory;
-        this.presenter = new EditorPresenter(this, presenters);
+        this.isProVersion = isProVersion;
+        this.presenter = new EditorPresenter(this, collaboratorPayloadGenerator, presenters);
 
         // Event handler for Header / JWS payload change events
         DocumentListener documentListener = new DocumentListener() {
@@ -496,6 +505,7 @@ public abstract class EditorView implements ExtensionProvidedEditor {
         JMenuItem menuItemAttackKeyConfusion = new JMenuItem(Utils.getResourceString("editor_view_button_attack_key_confusion"));
         JMenuItem menuItemAttackSignEmptyKey = new JMenuItem(Utils.getResourceString("editor_view_button_attack_sign_empty_key"));
         JMenuItem menuItemAttackSignPsychicSignature = new JMenuItem(Utils.getResourceString("editor_view_button_attack_sign_psychic_signature"));
+        JMenuItem menuItemAttackEmbedCollaboratorPayload = new JMenuItem(Utils.getResourceString("editor_view_button_attack_embed_collaborator_payload"));
 
         // Attach the event handlers to the popup menu click events
         menuItemAttackEmbedJWK.addActionListener(e -> presenter.onAttackEmbedJWKClicked());
@@ -503,6 +513,9 @@ public abstract class EditorView implements ExtensionProvidedEditor {
         menuItemAttackSignNone.addActionListener(e -> presenter.onAttackSignNoneClicked());
         menuItemAttackSignEmptyKey.addActionListener(e -> presenter.onAttackSignEmptyKeyClicked());
         menuItemAttackSignPsychicSignature.addActionListener(e -> presenter.onAttackPsychicSignatureClicked());
+        menuItemAttackEmbedCollaboratorPayload.addActionListener(e -> presenter.onAttackEmbedCollaboratorPayloadClicked());
+
+        menuItemAttackEmbedCollaboratorPayload.setEnabled(isProVersion);
 
         // Add the buttons to the popup menu
         popupMenuAttack.add(menuItemAttackEmbedJWK);
@@ -510,6 +523,7 @@ public abstract class EditorView implements ExtensionProvidedEditor {
         popupMenuAttack.add(menuItemAttackKeyConfusion);
         popupMenuAttack.add(menuItemAttackSignEmptyKey);
         popupMenuAttack.add(menuItemAttackSignPsychicSignature);
+        popupMenuAttack.add(menuItemAttackEmbedCollaboratorPayload);
 
         // Associate the popup menu to the Attack button
         buttonAttack = new JButton();

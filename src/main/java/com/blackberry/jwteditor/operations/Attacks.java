@@ -172,4 +172,12 @@ public class Attacks {
 
         return JWSFactory.sign(key, header, payload, jwsHeader);
     }
+
+    public static JWS embedCollaboratorPayload(JWS jws, String location, String payload) {
+        JSONObject headerJsonObject = new JSONObject(jws.getHeader());
+        headerJsonObject.put(location, payload);
+        Base64URL headerBase64 = Base64URL.encode(headerJsonObject.toString());
+
+        return jwsFromParts(headerBase64, jws.getEncodedPayload(), jws.getEncodedSignature());
+    }
 }
