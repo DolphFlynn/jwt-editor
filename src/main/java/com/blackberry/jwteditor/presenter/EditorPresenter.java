@@ -178,7 +178,7 @@ public class EditorPresenter extends Presenter {
      */
     private void setJWE(JWE jwe){
 
-        // Check if the header survives pretty printing and compaction without changes (i.e it was compact when deserialized)
+        // Check if the header survives pretty printing and compaction without changes (i.e. it was compact when deserialized)
         String header = jwe.getHeader();
         try {
             String prettyPrintedJSON = JSONUtils.prettyPrintJSON(header);
