@@ -494,22 +494,22 @@ public abstract class EditorView implements ExtensionProvidedEditor {
         JMenuItem menuItemAttackEmbedJWK = new JMenuItem(Utils.getResourceString("editor_view_button_attack_embed_jwk"));
         JMenuItem menuItemAttackSignNone = new JMenuItem(Utils.getResourceString("editor_view_button_attack_sign_none"));
         JMenuItem menuItemAttackKeyConfusion = new JMenuItem(Utils.getResourceString("editor_view_button_attack_key_confusion"));
-        JMenuItem menuItemAttachSignEmptyKey = new JMenuItem(Utils.getResourceString("editor_view_button_attack_sign_empty_key"));
-        JMenuItem menuItemAttachSignPsychicSignature = new JMenuItem(Utils.getResourceString("editor_view_button_attack_sign_psychic_signature"));
+        JMenuItem menuItemAttackSignEmptyKey = new JMenuItem(Utils.getResourceString("editor_view_button_attack_sign_empty_key"));
+        JMenuItem menuItemAttackSignPsychicSignature = new JMenuItem(Utils.getResourceString("editor_view_button_attack_sign_psychic_signature"));
 
         // Attach the event handlers to the popup menu click events
         menuItemAttackEmbedJWK.addActionListener(e -> presenter.onAttackEmbedJWKClicked());
         menuItemAttackKeyConfusion.addActionListener(e -> presenter.onAttackKeyConfusionClicked());
         menuItemAttackSignNone.addActionListener(e -> presenter.onAttackSignNoneClicked());
-        menuItemAttachSignEmptyKey.addActionListener(e -> presenter.onAttackSignEmptyKeyClicked());
-        menuItemAttachSignPsychicSignature.addActionListener(e -> presenter.onAttackPsychicSignatureClicked());
+        menuItemAttackSignEmptyKey.addActionListener(e -> presenter.onAttackSignEmptyKeyClicked());
+        menuItemAttackSignPsychicSignature.addActionListener(e -> presenter.onAttackPsychicSignatureClicked());
 
         // Add the buttons to the popup menu
         popupMenuAttack.add(menuItemAttackEmbedJWK);
         popupMenuAttack.add(menuItemAttackSignNone);
         popupMenuAttack.add(menuItemAttackKeyConfusion);
-        popupMenuAttack.add(menuItemAttachSignEmptyKey);
-        popupMenuAttack.add(menuItemAttachSignPsychicSignature);
+        popupMenuAttack.add(menuItemAttackSignEmptyKey);
+        popupMenuAttack.add(menuItemAttackSignPsychicSignature);
 
         // Associate the popup menu to the Attack button
         buttonAttack = new JButton();
