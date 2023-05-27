@@ -20,7 +20,6 @@ package com.blackberry.jwteditor.view.hexcodearea;
 
 import com.blackberry.jwteditor.utils.Utils;
 import com.nimbusds.jose.util.Base64URL;
-import org.apache.commons.codec.DecoderException;
 import org.exbin.deltahex.EditationMode;
 import org.exbin.deltahex.swing.CodeArea;
 import org.exbin.deltahex.swing.CodeAreaCaret;
@@ -33,8 +32,8 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 
-import static org.apache.commons.codec.binary.Hex.decodeHex;
-import static org.apache.commons.codec.binary.Hex.encodeHex;
+import static com.blackberry.jwteditor.utils.HexUtils.decodeHex;
+import static com.blackberry.jwteditor.utils.HexUtils.encodeHex;
 
 /**
  * Class to handle copy and paste from a CodeArea to/from hexadecimal strings
@@ -70,7 +69,7 @@ class HexCodeAreaCommandHandler extends DefaultCodeAreaCommandHandler {
     @Override
     public void copy() {
         byte[] data = Utils.getCodeAreaData(codeArea);
-        Utils.copyToClipboard(String.valueOf(encodeHex(data)));
+        Utils.copyToClipboard(encodeHex(data));
     }
 
     /**
@@ -80,14 +79,14 @@ class HexCodeAreaCommandHandler extends DefaultCodeAreaCommandHandler {
     public void cut() {
         byte[] data = Utils.getCodeAreaData(codeArea);
         super.cut();
-        Utils.copyToClipboard(String.valueOf(encodeHex(data)));
+        Utils.copyToClipboard(encodeHex(data));
     }
 
     /**
      * Paste an array of bytes into the CodeArea
      * @param bytes bytes to paste
      */
-    private void pasteByteArray(byte[] bytes){
+    private void pasteByteArray(byte[] bytes) {
         CodeAreaCaret caret = codeArea.getCaret();
         long dataPosition = caret.getDataPosition();
         int length = bytes.length;
@@ -97,12 +96,12 @@ class HexCodeAreaCommandHandler extends DefaultCodeAreaCommandHandler {
                 toRemove = this.codeArea.getDataSize() - dataPosition;
             }
 
-            ((EditableBinaryData)this.codeArea.getData()).remove(dataPosition, toRemove);
+            ((EditableBinaryData) this.codeArea.getData()).remove(dataPosition, toRemove);
         }
 
-        ((EditableBinaryData)this.codeArea.getData()).insert(this.codeArea.getDataPosition(), bytes);
+        ((EditableBinaryData) this.codeArea.getData()).insert(this.codeArea.getDataPosition(), bytes);
         this.codeArea.notifyDataChanged();
-        caret.setCaretPosition(caret.getDataPosition() + (long)length);
+        caret.setCaretPosition(caret.getDataPosition() + (long) length);
         caret.setCodeOffset(0);
         this.codeArea.updateScrollBars();
         this.codeArea.notifyCaretMoved();
@@ -116,20 +115,18 @@ class HexCodeAreaCommandHandler extends DefaultCodeAreaCommandHandler {
     public void paste() {
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         try {
-            if(clipboard.isDataFlavorAvailable(DataFlavor.stringFlavor)){
+            if (clipboard.isDataFlavorAvailable(DataFlavor.stringFlavor)) {
                 String clipboardData = (String) clipboard.getData(DataFlavor.stringFlavor);
 
-                if(Utils.isHex(clipboardData)){
-                    pasteByteArray(decodeHex(clipboardData.toCharArray()));
-                }
-                else if(Utils.isBase64URL(clipboardData)){
+                if (Utils.isHex(clipboardData)) {
+                    pasteByteArray(decodeHex(clipboardData));
+                } else if (Utils.isBase64URL(clipboardData)) {
                     pasteByteArray(Base64URL.from(clipboardData).decode());
-                }
-                else {
+                } else {
                     super.paste();
                 }
             }
-        } catch (UnsupportedFlavorException | IOException | DecoderException e) {
+        } catch (UnsupportedFlavorException | IOException e) {
             super.paste();
         }
     }
