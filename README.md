@@ -4,8 +4,7 @@ JWT Editor is a Burp Suite extension for editing, signing, verifying, encrypting
 
 It provides automatic detection and in-line editing of JWTs within HTTP requests/responses, signing and encrypting of tokens and automation of several well-known attacks against JWT implementations.
 
-It was written by Fraser Winterborn, formerly of BlackBerry Security Research Group. The original version is available within the PortSwigger [BApp store](https://portswigger.net/bappstore/26aaa5ded2f74beea19e2ed8345a93dd) and the corresponding source can be found at
-[here](https://github.com/blackberry/jwt-editor).
+It was written originally by Fraser Winterborn, formerly of BlackBerry Security Research Group. The original source code can be found [here](https://github.com/blackberry/jwt-editor).
 
 
 ## Modifications from Fraser Winterborn version
@@ -26,7 +25,7 @@ It was written by Fraser Winterborn, formerly of BlackBerry Security Research Gr
 ## Build Instructions
 * Ensure that Java JDK 17 or newer is installed
 * From root of project, run the command `./gradlew jar`
-* This should place the JAR file `jwt-editor-1.1.0.jar` within the `build/libs` directory
+* This should place the JAR file `jwt-editor-1.2.0.jar` within the `build/libs` directory
 * This can be loaded into Burp by navigating to the `Extensions` tab, `Installed` sub-tab, clicking `Add` and loading the JAR file
 * This BApp is using the newer Montoya API so it's best to use the latest version of Burp (try the earlier adopter channel if there are issues with the latest stable release)
 
