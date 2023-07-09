@@ -27,6 +27,7 @@ import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.operations.Attacks;
 import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.view.dialog.AbstractDialog;
+import com.blackberry.jwteditor.view.utils.ErrorLoggingActionListenerFactory;
 import com.nimbusds.jose.JWSAlgorithm;
 
 import javax.swing.*;
@@ -35,6 +36,7 @@ import java.awt.event.KeyEvent;
 import java.util.List;
 
 import static com.blackberry.jwteditor.model.jose.JWSFactory.SigningUpdateMode.*;
+import static javax.swing.JOptionPane.WARNING_MESSAGE;
 
 /**
  * Sign and Attack > Embedded JWK dialog from the Editor tab
@@ -65,15 +67,12 @@ public class SignDialog extends AbstractDialog {
     private final Mode mode;
     private JWS jws;
 
-
-    /**
-     * Show the signing dialog
-     *
-     * @param signingKeys the signing keys available
-     * @param jws         the content to sign
-     * @param mode        whether the dialog should be used for normal signing, or the embedded JWK attack
-     */
-    public SignDialog(Window parent, List<Key> signingKeys, JWS jws, Mode mode) {
+    public SignDialog(
+            Window parent,
+            ErrorLoggingActionListenerFactory actionListenerFactory,
+            List<Key> signingKeys,
+            JWS jws,
+            Mode mode) {
         super(parent, mode.titleResourceId);
         this.jws = jws;
         this.mode = mode;
@@ -81,11 +80,15 @@ public class SignDialog extends AbstractDialog {
         setContentPane(contentPane);
         getRootPane().setDefaultButton(buttonOK);
 
-        buttonOK.addActionListener(e -> onOK());
+        buttonOK.addActionListener(actionListenerFactory.from(e -> onOK()));
         buttonCancel.addActionListener(e -> onCancel());
 
         // call onCancel() on ESCAPE
-        contentPane.registerKeyboardAction(e -> onCancel(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        contentPane.registerKeyboardAction(
+                e -> onCancel(),
+                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
+        );
 
         // Convert the signingKeys from a List to an Array
         Key[] signingKeysArray = new Key[signingKeys.size()];
@@ -120,9 +123,6 @@ public class SignDialog extends AbstractDialog {
         return jws;
     }
 
-    /**
-     * Handler for OK button pressed. Sign the editor content with the selected parameters
-     */
     @SuppressWarnings("ConstantConditions")
     private void onOK() {
         // Get the selected signing key and algorithm
@@ -149,9 +149,14 @@ public class SignDialog extends AbstractDialog {
             }
         } catch (SigningException | NoSuchFieldException | IllegalAccessException e) {
             jws = null;
-            JOptionPane.showMessageDialog(this, e.getMessage(), Utils.getResourceString("error_title_unable_to_sign"), JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(
+                    this,
+                    e.getMessage(),
+                    Utils.getResourceString("error_title_unable_to_sign"),
+                    WARNING_MESSAGE
+            );
+        } finally {
+            dispose();
         }
-
-        dispose();
     }
 }

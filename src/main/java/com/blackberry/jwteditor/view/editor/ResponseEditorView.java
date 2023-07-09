@@ -27,6 +27,7 @@ import burp.api.montoya.ui.editor.extension.ExtensionProvidedHttpResponseEditor;
 import com.blackberry.jwteditor.presenter.PresenterStore;
 import com.blackberry.jwteditor.view.hexcodearea.HexCodeAreaFactory;
 import com.blackberry.jwteditor.view.rsta.RstaFactory;
+import com.blackberry.jwteditor.view.utils.ErrorLoggingActionListenerFactory;
 
 import static burp.api.montoya.internal.ObjectFactoryLocator.FACTORY;
 
@@ -45,6 +46,7 @@ public class ResponseEditorView extends EditorView implements ExtensionProvidedH
                 rstaFactory,
                 new HexCodeAreaFactory(logging, userInterface),
                 collaboratorPayloadGenerator,
+                new ErrorLoggingActionListenerFactory(logging),
                 editable,
                 isProVersion
         );

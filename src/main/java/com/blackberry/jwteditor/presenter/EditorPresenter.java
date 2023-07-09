@@ -30,6 +30,7 @@ import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.view.dialog.MessageDialogFactory;
 import com.blackberry.jwteditor.view.dialog.operations.*;
 import com.blackberry.jwteditor.view.editor.EditorView;
+import com.blackberry.jwteditor.view.utils.ErrorLoggingActionListenerFactory;
 import com.nimbusds.jose.util.Base64URL;
 import org.json.JSONException;
 
@@ -51,14 +52,20 @@ public class EditorPresenter extends Presenter {
     private final PresenterStore presenters;
     private final EditorView view;
     private final CollaboratorPayloadGenerator collaboratorPayloadGenerator;
+    private final ErrorLoggingActionListenerFactory actionListenerFactory;
     private final MessageDialogFactory messageDialogFactory;
     private final EditorModel model;
 
     private boolean selectionChanging;
 
-    public EditorPresenter(EditorView view, CollaboratorPayloadGenerator collaboratorPayloadGenerator, PresenterStore presenters) {
+    public EditorPresenter(
+            EditorView view,
+            CollaboratorPayloadGenerator collaboratorPayloadGenerator,
+            ErrorLoggingActionListenerFactory actionListenerFactory,
+            PresenterStore presenters) {
         this.view = view;
         this.collaboratorPayloadGenerator = collaboratorPayloadGenerator;
+        this.actionListenerFactory = actionListenerFactory;
         this.presenters = presenters;
         this.model = new EditorModel();
         this.messageDialogFactory = new MessageDialogFactory(view.uiComponent());
@@ -342,7 +349,13 @@ public class EditorPresenter extends Presenter {
             return;
         }
 
-        SignDialog signDialog = new SignDialog(view.window(), keysPresenter.getSigningKeys(), getJWS(), mode);
+        SignDialog signDialog = new SignDialog(
+                view.window(),
+                actionListenerFactory,
+                keysPresenter.getSigningKeys(),
+                getJWS(),
+                mode
+        );
         signDialog.display();
 
         // If a JWS was created by the dialog, replace the contents of the editor

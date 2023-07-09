@@ -26,6 +26,7 @@ import com.blackberry.jwteditor.presenter.PresenterStore;
 import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.view.hexcodearea.HexCodeAreaFactory;
 import com.blackberry.jwteditor.view.rsta.RstaFactory;
+import com.blackberry.jwteditor.view.utils.ErrorLoggingActionListenerFactory;
 import com.blackberry.jwteditor.view.utils.MaxLengthStringComboBoxModel;
 import org.exbin.deltahex.EditationAllowed;
 import org.exbin.deltahex.swing.CodeArea;
@@ -97,13 +98,14 @@ public abstract class EditorView implements ExtensionProvidedEditor {
             RstaFactory rstaFactory,
             HexCodeAreaFactory hexAreaCodeFactory,
             CollaboratorPayloadGenerator collaboratorPayloadGenerator,
+            ErrorLoggingActionListenerFactory actionListenerFactory,
             boolean editable,
             boolean isProVersion) {
         this.rstaFactory = rstaFactory;
         this.editable = editable;
         this.hexCodeAreaFactory = hexAreaCodeFactory;
         this.isProVersion = isProVersion;
-        this.presenter = new EditorPresenter(this, collaboratorPayloadGenerator, presenters);
+        this.presenter = new EditorPresenter(this, collaboratorPayloadGenerator, actionListenerFactory, presenters);
 
         // Event handler for Header / JWS payload change events
         DocumentListener documentListener = new DocumentListener() {
