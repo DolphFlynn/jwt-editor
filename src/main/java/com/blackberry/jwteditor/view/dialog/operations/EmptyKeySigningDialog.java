@@ -23,6 +23,7 @@ import com.blackberry.jwteditor.model.jose.JWS;
 import com.blackberry.jwteditor.operations.Attacks;
 import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.view.dialog.AbstractDialog;
+import com.blackberry.jwteditor.view.utils.ErrorLoggingActionListenerFactory;
 import com.nimbusds.jose.JWSAlgorithm;
 
 import javax.swing.*;
@@ -41,14 +42,14 @@ public class EmptyKeySigningDialog extends AbstractDialog {
     private JComboBox<JWSAlgorithm> comboBoxAlgorithm;
     private JWS jws;
 
-    public EmptyKeySigningDialog(Window parent, JWS jws) {
+    public EmptyKeySigningDialog(Window parent, ErrorLoggingActionListenerFactory actionListenerFactory, JWS jws) {
         super(parent, "empty_key_signing_dialog_title");
         this.jws = jws;
 
         setContentPane(contentPane);
         getRootPane().setDefaultButton(buttonOK);
 
-        buttonOK.addActionListener(e -> onOK());
+        buttonOK.addActionListener(actionListenerFactory.from(e -> onOK()));
         buttonCancel.addActionListener(e -> onCancel());
 
         // call onCancel() on ESCAPE
@@ -79,8 +80,8 @@ public class EmptyKeySigningDialog extends AbstractDialog {
                     Utils.getResourceString("error_title_unable_to_sign"),
                     JOptionPane.WARNING_MESSAGE
             );
+        } finally {
+            dispose();
         }
-
-        dispose();
     }
 }

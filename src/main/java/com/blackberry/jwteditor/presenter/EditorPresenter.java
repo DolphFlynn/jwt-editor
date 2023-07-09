@@ -253,19 +253,24 @@ public class EditorPresenter extends Presenter {
 
         // Get a list of verification capable public keys
         List<Key> verificationKeys = keysPresenter.getVerificationKeys();
-        for(Key signingKey: verificationKeys) {
-            if(signingKey.isPublic() && signingKey.hasPEM()){
+        for (Key signingKey : verificationKeys) {
+            if (signingKey.isPublic() && signingKey.hasPEM()) {
                 attackKeys.add(signingKey);
             }
         }
 
-        if(attackKeys.size() == 0) {
+        if (attackKeys.size() == 0) {
             messageDialogFactory.showWarningDialog("error_title_no_signing_keys", "error_no_signing_keys");
             return;
         }
 
         // Create the key confusion attack dialog with the JWS currently in the editor fields
-        KeyConfusionAttackDialog keyConfusionAttackDialog = new KeyConfusionAttackDialog(view.window(), verificationKeys, getJWS());
+        KeyConfusionAttackDialog keyConfusionAttackDialog = new KeyConfusionAttackDialog(
+                view.window(),
+                actionListenerFactory,
+                verificationKeys,
+                getJWS()
+        );
         keyConfusionAttackDialog.display();
 
         // Set the result as the JWS in the editor if the attack succeeds
@@ -291,7 +296,7 @@ public class EditorPresenter extends Presenter {
     }
 
     public void onAttackSignEmptyKeyClicked() {
-        EmptyKeySigningDialog signingDialog = new EmptyKeySigningDialog(view.window(), getJWS());
+        EmptyKeySigningDialog signingDialog = new EmptyKeySigningDialog(view.window(), actionListenerFactory, getJWS());
         signingDialog.display();
 
         JWS signedJWS = signingDialog.getJWS();

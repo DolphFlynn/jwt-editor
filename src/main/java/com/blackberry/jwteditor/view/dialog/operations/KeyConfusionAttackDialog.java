@@ -27,6 +27,7 @@ import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.operations.Attacks;
 import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.view.dialog.AbstractDialog;
+import com.blackberry.jwteditor.view.utils.ErrorLoggingActionListenerFactory;
 import com.nimbusds.jose.JWSAlgorithm;
 
 import javax.swing.*;
@@ -47,23 +48,26 @@ public class KeyConfusionAttackDialog extends AbstractDialog {
 
     private JWS jws;
 
-    /**
-     * Show the HMAC Key Confusion attack dialog
-     * @param signingKeys the signing keys available
-     * @param jws the content to sign
-     */
-    public KeyConfusionAttackDialog(Window parent, List<Key> signingKeys, JWS jws) {
+    public KeyConfusionAttackDialog(
+            Window parent,
+            ErrorLoggingActionListenerFactory actionListenerFactory,
+            List<Key> signingKeys,
+            JWS jws) {
         super(parent, "key_confusion_attack_dialog_title");
         this.jws = jws;
 
         setContentPane(contentPane);
         getRootPane().setDefaultButton(buttonOK);
 
-        buttonOK.addActionListener(e -> onOK());
+        buttonOK.addActionListener(actionListenerFactory.from(e -> onOK()));
         buttonCancel.addActionListener(e -> onCancel());
 
         // call onCancel() on ESCAPE
-        contentPane.registerKeyboardAction(e -> onCancel(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        contentPane.registerKeyboardAction(
+                e -> onCancel(),
+                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
+        );
 
         // Convert appropriate signingKeys List to an Array
         Key[] signingKeysArray = signingKeys
@@ -81,9 +85,6 @@ public class KeyConfusionAttackDialog extends AbstractDialog {
         comboBoxSigningKey.setSelectedIndex(0);
     }
 
-    /**
-     * Handler for OK button press - perform the attack
-     */
     @SuppressWarnings("ConstantConditions")
     private void onOK() {
         // Get the selected key and algorithm
@@ -96,9 +97,9 @@ public class KeyConfusionAttackDialog extends AbstractDialog {
         } catch (SigningException | PemException | UnsupportedKeyException e) {
             jws = null;
             JOptionPane.showMessageDialog(this, e.getMessage(), Utils.getResourceString("error_title_unable_to_sign"), JOptionPane.WARNING_MESSAGE);
+        } finally {
+            dispose();
         }
-
-        dispose();
     }
 
     /**
