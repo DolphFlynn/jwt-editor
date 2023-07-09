@@ -391,10 +391,7 @@ public class EditorPresenter extends Presenter {
         messageDialogFactory.showWarningDialog("editor_view_message_title_verification", messageKey, args);
     }
 
-    /**
-     * Handle click events from the Encrypt button
-     */
-    public void onEncryptClicked(){
+    public void onEncryptClicked() {
         KeysPresenter keysPresenter = (KeysPresenter) presenters.get(KeysPresenter.class);
 
         // Check there are encryption keys in the keystore
@@ -403,7 +400,12 @@ public class EditorPresenter extends Presenter {
             return;
         }
 
-        EncryptDialog encryptDialog = new EncryptDialog(view.window(), getJWS(), keysPresenter.getEncryptionKeys());
+        EncryptDialog encryptDialog = new EncryptDialog(
+                view.window(),
+                actionListenerFactory,
+                getJWS(),
+                keysPresenter.getEncryptionKeys()
+        );
         encryptDialog.display();
 
         // If a JWE was created by the dialog, replace the contents of the editor and change to JWE mode

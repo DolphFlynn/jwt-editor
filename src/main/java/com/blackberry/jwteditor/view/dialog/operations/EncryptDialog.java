@@ -25,6 +25,7 @@ import com.blackberry.jwteditor.model.jose.JWS;
 import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.view.dialog.AbstractDialog;
+import com.blackberry.jwteditor.view.utils.ErrorLoggingActionListenerFactory;
 import com.nimbusds.jose.EncryptionMethod;
 import com.nimbusds.jose.JWEAlgorithm;
 
@@ -47,20 +48,18 @@ public class EncryptDialog extends AbstractDialog {
     private final JWS jws;
     private JWE jwe;
 
-    /**
-     * Show the encryption dialog
-     *
-     * @param jws            the JWS to sign
-     * @param encryptionKeys the available encryption keys
-     */
-    public EncryptDialog(Window parent, JWS jws, List<Key> encryptionKeys) {
+    public EncryptDialog(
+            Window parent,
+            ErrorLoggingActionListenerFactory actionListenerFactory,
+            JWS jws,
+            List<Key> encryptionKeys) {
         super(parent, "encrypt_dialog_title");
         this.jws = jws;
 
         setContentPane(contentPane);
         getRootPane().setDefaultButton(buttonOK);
 
-        buttonOK.addActionListener(e -> onOK());
+        buttonOK.addActionListener(actionListenerFactory.from(e -> onOK()));
         buttonCancel.addActionListener(e -> onCancel());
 
         // call onCancel() on ESCAPE
@@ -159,9 +158,10 @@ public class EncryptDialog extends AbstractDialog {
         // Try to encrypt, show a dialog if this fails
         try {
             jwe = JWEFactory.encrypt(jws, selectedKey, selectedKek, selectedCek);
-            dispose();
         } catch (EncryptionException e) {
             JOptionPane.showMessageDialog(this, e.getMessage(), Utils.getResourceString("error_title_unable_to_encrypt"), JOptionPane.WARNING_MESSAGE);
+        } finally {
+            dispose();
         }
     }
 
