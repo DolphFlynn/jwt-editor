@@ -2,7 +2,7 @@
 
 JWT Editor is a Burp Suite extension for editing, signing, verifying, encrypting and decrypting JSON Web Tokens (JWTs).
 
-It provides automatic detection and in-line editing of JWTs within HTTP requests/responses, signing and encrypting of tokens and automation of several well-known attacks against JWT implementations.
+It provides automatic detection and in-line editing of JWTs within HTTP requests/responses and WebSocket messages, signing and encrypting of tokens and automation of several well-known attacks against JWT implementations.
 
 It was written originally by Fraser Winterborn, formerly of BlackBerry Security Research Group. The original source code can be found [here](https://github.com/blackberry/jwt-editor).
 
