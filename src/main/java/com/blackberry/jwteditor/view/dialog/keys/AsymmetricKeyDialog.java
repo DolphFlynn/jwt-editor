@@ -71,15 +71,11 @@ public class AsymmetricKeyDialog extends KeyDialog {
             RstaFactory rstaFactory,
             AsymmetricKeyDialogMode mode,
             JWK jwk) {
-        super(parent, mode.resourceTitleId());
+        super(parent, mode.resourceTitleId(), jwk == null ? null : jwk.getKeyID(), presenters);
+
         this.mode = mode;
         this.rstaFactory = rstaFactory;
         this.jwk = jwk;
-        this.presenters = presenters;
-
-        if (jwk != null) {
-            originalId = jwk.getKeyID();
-        }
 
         setContentPane(contentPane);
         getRootPane().setDefaultButton(buttonOK);
@@ -145,7 +141,7 @@ public class AsymmetricKeyDialog extends KeyDialog {
 
         boolean keyError = false;
         boolean keyIDError = false;
-        if (key.length() == 0) {
+        if (key.isEmpty()) {
             // Disable OK if the text entry is empty
             setFormEnabled(false);
         } else {
@@ -170,7 +166,7 @@ public class AsymmetricKeyDialog extends KeyDialog {
                     tempJWK = mode.pemToJWK(key, textFieldKeyId.getText());
 
                     // Check the key id entry is set in PEM mode
-                    if (textFieldKeyId.getText().length() == 0) {
+                    if (textFieldKeyId.getText().isEmpty()) {
                         keyIDError = true;
                         labelError.setText(Utils.getResourceString("error_missing_kid"));
                     }
@@ -185,7 +181,7 @@ public class AsymmetricKeyDialog extends KeyDialog {
             } catch (ParseException | IllegalArgumentException | PemException e) {
                 // Set the error state if any parse errors are encountered
                 keyError = true;
-                if (textFieldKeyId.getText().length() == 0) {
+                if (textFieldKeyId.getText().isEmpty()) {
                     keyIDError = true;
                 }
                 labelError.setText(Utils.getResourceString("error_invalid_key"));
