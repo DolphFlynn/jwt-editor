@@ -77,18 +77,16 @@ public abstract class KeyDialog extends JDialog {
         KeysPresenter keyPresenter = (KeysPresenter) presenters.get(KeysPresenter.class);
         Key newKey = getKey();
 
+        boolean checkForKeyIdClash = originalId == null || !newKey.getID().equals(originalId);
+
         // Handle overwrites if a key already exists with the same kid
-        if (keyPresenter.keyExists(newKey.getID())) {
-            // If the new and original key ids match, then this is an update
-            if (originalId != null && !originalId.equals(newKey.getID())) {
-                // Otherwise, saving the key could overwrite an existing kid, so show a dialog to confirm
-                if (showConfirmDialog(
-                        this,
-                        Utils.getResourceString("keys_confirm_overwrite"),
-                        Utils.getResourceString("keys_confirm_overwrite_title"),
-                        OK_CANCEL_OPTION) != OK_OPTION) {
-                    return;
-                }
+        if (checkForKeyIdClash && keyPresenter.keyExists(newKey.getID())) {
+            if (showConfirmDialog(
+                    this,
+                    Utils.getResourceString("keys_confirm_overwrite"),
+                    Utils.getResourceString("keys_confirm_overwrite_title"),
+                    OK_CANCEL_OPTION) != OK_OPTION) {
+                return;
             }
         }
 
