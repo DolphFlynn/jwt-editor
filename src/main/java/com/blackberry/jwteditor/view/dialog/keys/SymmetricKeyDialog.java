@@ -132,7 +132,7 @@ public class SymmetricKeyDialog extends KeyDialog {
         jwk = null;
 
         // If there is a text in the text entry
-        if (textAreaKey.getText().length() > 0) {
+        if (!textAreaKey.getText().isEmpty()) {
             try {
                 // Try to parse as a symmetric key JWK
                 OctetSequenceKey octetSequenceKey = OctetSequenceKey.parse(textAreaKey.getText());

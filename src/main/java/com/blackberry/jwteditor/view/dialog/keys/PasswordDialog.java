@@ -99,7 +99,7 @@ public class PasswordDialog extends KeyDialog {
      */
     private void checkInput() {
         // Check that the password and key id values are set, enable/disable OK based on the result
-        buttonOK.setEnabled(textFieldKeyId.getText().length() > 0 && textFieldPassword.getText().length() > 0);
+        buttonOK.setEnabled(!textFieldKeyId.getText().isEmpty() && !textFieldPassword.getText().isEmpty());
     }
 
     /**
