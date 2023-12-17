@@ -71,15 +71,11 @@ public class AsymmetricKeyDialog extends KeyDialog {
             RstaFactory rstaFactory,
             AsymmetricKeyDialogMode mode,
             JWK jwk) {
-        super(parent, mode.resourceTitleId());
+        super(parent, mode.resourceTitleId(), jwk == null ? null : jwk.getKeyID(), presenters);
+
         this.mode = mode;
         this.rstaFactory = rstaFactory;
         this.jwk = jwk;
-        this.presenters = presenters;
-
-        if (jwk != null) {
-            originalId = jwk.getKeyID();
-        }
 
         setContentPane(contentPane);
         getRootPane().setDefaultButton(buttonOK);

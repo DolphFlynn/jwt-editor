@@ -65,10 +65,9 @@ public class SymmetricKeyDialog extends KeyDialog {
     private OctetSequenceKey jwk;
 
     public SymmetricKeyDialog(Window parent, PresenterStore presenters, RstaFactory rstaFactory, OctetSequenceKey jwk) {
-        super(parent, TITLE_RESOURCE_ID);
+        super(parent, TITLE_RESOURCE_ID, jwk == null ? null : jwk.getKeyID(), presenters);
 
         this.rstaFactory = rstaFactory;
-        this.presenters = presenters;
         this.rng = new SecureRandom();
 
         setContentPane(contentPane);
@@ -114,7 +113,6 @@ public class SymmetricKeyDialog extends KeyDialog {
 
         // Set the key id and key value fields if provided
         if (jwk != null) {
-            originalId = jwk.getKeyID();
             textAreaKey.setText(JSONUtils.prettyPrintJSON(jwk.toJSONString()));
             spinnerKeySize.setValue(jwk.size());
         }

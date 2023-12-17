@@ -34,12 +34,14 @@ import static javax.swing.JOptionPane.*;
  * Abstract class to be extended by dialogs for key editing/generation on the Keys tab
  */
 public abstract class KeyDialog extends JDialog {
+    private final String originalId;
+    private final PresenterStore presenters;
 
-    protected PresenterStore presenters;
-    protected String originalId;
-
-    public KeyDialog(Window parent, String titleResourceId) {
+    public KeyDialog(Window parent, String titleResourceId, String originalId, PresenterStore presenters) {
         super(parent);
+
+        this.originalId = originalId;
+        this.presenters = presenters;
 
         setModal(true);
         setTitle(Utils.getResourceString(titleResourceId));
