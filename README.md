@@ -4,23 +4,37 @@ JWT Editor is a Burp Suite extension for editing, signing, verifying, encrypting
 
 It provides automatic detection and in-line editing of JWTs within HTTP requests/responses and WebSocket messages, signing and encrypting of tokens and automation of several well-known attacks against JWT implementations.
 
-It was written originally by Fraser Winterborn, formerly of BlackBerry Security Research Group. The original source code can be found [here](https://github.com/blackberry/jwt-editor).
+
+## Changelog
+
+**2.1  2024-XX-XX**
+- Fix bug allowing keys with duplicate IDs.
 
 
-## Modifications from Fraser Winterborn version
-* Payload processing rule to support fuzzing within JWS
-* Insertion point provider for JWS header parameters
-* JWT highlighting within websocket messages
-* Update to Java 17 and PortSwigger's new Montoya API
-* Add ability to enable/disable JWT highlighting within proxied messages and to change highlight color
-* Add ability to inject Collaborator payloads into x5u and jku headers
-* Fix issue where invalid JWS's not recognised
-* Add ability to export keys as a JWK set
-* Add ability to sign with empty keys (CVE-2019-20933)
-* Add ability to sign with psychic signatures (CVE-2022-21449)
-* Color sections of serialized JWT differently 
-* Remove standalone mode
-* Minor bug fixes and enhancements
+**2.0.2 2023-12-13**
+- Fix memory leaks when deleting tabs contains JWTs.
+
+
+**2.0.1  2023-10-30**
+- Generate valid URL's when embedding Collaborator payloads within *x5u* and *jku* headers.
+
+
+**2.0.0  2023-07-08**
+
+Forked from [Fraser Winterborn](https://uk.linkedin.com/in/fraser-winterborn-198b8a129)'s version (original [repository](https://github.com/blackberry/jwt-editor)).
+* Payload processing rule to support fuzzing within JWS.
+* Insertion point provider for JWS header parameters.
+* JWT highlighting within websocket messages.
+* Update to Java 17 and PortSwigger's new Montoya API.
+* Add ability to enable/disable JWT highlighting within proxied messages and to change highlight color.
+* Add ability to inject Collaborator payloads into x5u and jku headers.
+* Fix issue where invalid JWS's not recognised.
+* Add ability to export keys as a JWK set.
+* Add ability to sign with empty keys (CVE-2019-20933).
+* Add ability to sign with psychic signatures (CVE-2022-21449).
+* Color sections of serialized JWT differently. 
+* Remove standalone mode.
+* Minor bug fixes and enhancements.
 
 ## Build Instructions
 * Ensure that Java JDK 17 or newer is installed
