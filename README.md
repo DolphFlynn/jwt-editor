@@ -36,7 +36,12 @@ Forked from [Fraser Winterborn](https://uk.linkedin.com/in/fraser-winterborn-198
 * Remove standalone mode.
 * Minor bug fixes and enhancements.
 
-## Build Instructions
+## Loading JWT Editor
+The easiest way of obtaining *JWT Editor* is via Burp's [BAppStore](https://portswigger.net/bappstore/26aaa5ded2f74beea19e2ed8345a93dd).
+See Burp's [documentation](https://portswigger.net/burp/documentation/desktop/extensions/installing-extensions) for additional details.
+
+## Build JWT Editor
+Alternatively, *JWT Editor* can be built from source.
 * Ensure that Java JDK 17 or newer is installed
 * From root of project, run the command `./gradlew jar`
 * This should place the JAR file `jwt-editor-2.0.2.jar` within the `build/libs` directory
