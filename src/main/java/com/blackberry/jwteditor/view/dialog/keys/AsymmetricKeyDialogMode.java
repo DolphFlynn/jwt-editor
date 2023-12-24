@@ -31,7 +31,6 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.Provider;
 import java.security.Security;
-import java.util.UUID;
 
 enum AsymmetricKeyDialogMode {
     EC(KeyType.EC, "keys_new_title_ec", Curve.P_256, Curve.P_256, Curve.SECP256K1, Curve.P_384, Curve.P_521),
@@ -78,8 +77,7 @@ enum AsymmetricKeyDialogMode {
         };
     }
 
-    JWK generateNewKey(Object parameters) throws KeyStoreException, JOSEException {
-        String kid = UUID.randomUUID().toString();
+    JWK generateNewKey(String keyId, Object keyParameter) throws KeyStoreException, JOSEException {
 
         Provider provider = Security.getProvider(BouncyCastleProvider.PROVIDER_NAME);
 
@@ -87,9 +85,9 @@ enum AsymmetricKeyDialogMode {
         KeyStore keyStore = provider == null ? null : KeyStore.getInstance(KeyStore.getDefaultType(), provider);
 
         return switch (this) {
-            case EC -> new ECKeyGenerator((Curve) parameters).keyStore(keyStore).keyID(kid).generate();
-            case RSA -> new RSAKeyGenerator((Integer) parameters, true).keyStore(keyStore).keyID(kid).generate();
-            case OKP -> new OKPGenerator((Curve) parameters).keyStore(keyStore).keyID(kid).generate();
+            case EC -> new ECKeyGenerator((Curve) keyParameter).keyStore(keyStore).keyID(keyId).generate();
+            case RSA -> new RSAKeyGenerator((Integer) keyParameter, true).keyStore(keyStore).keyID(keyId).generate();
+            case OKP -> new OKPGenerator((Curve) keyParameter).keyStore(keyStore).keyID(keyId).generate();
         };
     }
 
