@@ -25,7 +25,7 @@ import com.blackberry.jwteditor.presenter.PresenterStore;
 import com.blackberry.jwteditor.utils.JSONUtils;
 import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.view.rsta.RstaFactory;
-import com.blackberry.jwteditor.view.utils.DocumentAdapter;
+import com.blackberry.jwteditor.view.utils.DebouncingDocumentAdapter;
 import com.nimbusds.jose.jwk.OctetSequenceKey;
 import com.nimbusds.jose.util.Base64URL;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
@@ -33,16 +33,14 @@ import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import javax.swing.*;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
-import java.awt.event.KeyEvent;
 import java.security.SecureRandom;
 import java.text.ParseException;
 import java.util.UUID;
 
+import static java.awt.event.KeyEvent.VK_ESCAPE;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static javax.swing.JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT;
 
-/**
- * "New Symmetric Key" dialog for Keys tab
- */
 public class SymmetricKeyDialog extends KeyDialog {
     private static final String TITLE_RESOURCE_ID = "keys_new_title_symmetric";
 
@@ -61,6 +59,7 @@ public class SymmetricKeyDialog extends KeyDialog {
     private JRadioButton specifySecretRadioButton;
     private JRadioButton randomSecretRadioButton;
     private JTextField specificSecretTextField;
+    private JTextField textFieldKeyId;
 
     private OctetSequenceKey jwk;
 
@@ -74,11 +73,14 @@ public class SymmetricKeyDialog extends KeyDialog {
         getRootPane().setDefaultButton(buttonOK);
 
         buttonOK.addActionListener(e -> onOK());
-
         buttonCancel.addActionListener(e -> onCancel());
 
         // call onCancel() on ESCAPE
-        contentPane.registerKeyboardAction(e -> onCancel(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        contentPane.registerKeyboardAction(
+                e -> onCancel(),
+                KeyStroke.getKeyStroke(VK_ESCAPE, 0),
+                WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
+        );
 
         spinnerKeySize.setModel(new SpinnerNumberModel(128, 0, null, 8));
 
@@ -103,9 +105,9 @@ public class SymmetricKeyDialog extends KeyDialog {
         });
 
         // Attach event listeners for Generate button and text entry changing
-        buttonGenerate.addActionListener(e -> generate());
+        buttonGenerate.addActionListener(e -> generateKey());
 
-        DocumentListener documentListener = new DocumentAdapter(e -> checkInput());
+        DocumentListener documentListener = new DebouncingDocumentAdapter(e -> parseJson());
         textAreaKey.getDocument().addDocumentListener(documentListener);
 
         textAreaKeyInitialBackgroundColor = textAreaKey.getBackground();
@@ -115,13 +117,11 @@ public class SymmetricKeyDialog extends KeyDialog {
         if (jwk != null) {
             textAreaKey.setText(JSONUtils.prettyPrintJSON(jwk.toJSONString()));
             spinnerKeySize.setValue(jwk.size());
+            textFieldKeyId.setText(jwk.getKeyID());
         }
     }
 
-    /**
-     * Event handler called when form input changes
-     */
-    private void checkInput() {
+    private void parseJson() {
         // Clear the error state. Disable OK while parsing
         textAreaKey.setBackground(textAreaKeyInitialBackgroundColor);
         textAreaKey.setCurrentLineHighlightColor(textAreaKeyInitialCurrentLineHighlightColor);
@@ -155,11 +155,10 @@ public class SymmetricKeyDialog extends KeyDialog {
         }
     }
 
-    /**
-     * Event handler for the generate button
-     */
-    private void generate() {
-        String keyId = UUID.randomUUID().toString();
+    private void generateKey() {
+        String keyId = textFieldKeyId.getText().isBlank()
+                ? UUID.randomUUID().toString()
+                : textFieldKeyId.getText().trim();
 
         int keySizeBits = (int) spinnerKeySize.getValue();
         int keySizeBytes = keySizeBits / 8;
@@ -179,6 +178,7 @@ public class SymmetricKeyDialog extends KeyDialog {
 
         // Set the text area contents to the JSON form of the newly generated key
         textAreaKey.setText(JSONUtils.prettyPrintJSON(octetSequenceKey.toJSONString()));
+        textFieldKeyId.setText(keyId);
     }
 
     /**
