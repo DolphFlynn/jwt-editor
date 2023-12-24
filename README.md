@@ -9,6 +9,7 @@ It provides automatic detection and in-line editing of JWTs within HTTP requests
 
 **2.1  2024-XX-XX**
 - Fix bug allowing keys with duplicate IDs.
+- Allow key IDs to be set before keys generated.
 
 
 **2.0.2 2023-12-13**
