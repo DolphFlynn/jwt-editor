@@ -1,8 +1,9 @@
 # JWT Editor
 
-JWT Editor is a Burp Suite extension for editing, signing, verifying, encrypting and decrypting JSON Web Tokens (JWTs).
-
-It provides automatic detection and in-line editing of JWTs within HTTP requests/responses and WebSocket messages, signing and encrypting of tokens and automation of several well-known attacks against JWT implementations.
+*JWT Editor* is a Burp extension which aims to be a Swiss Army Knife for manipulating JSON Web Tokens (JWTs) within Burp Suite.
+It provides detection of JWTs within both HTTP and WebSocket messages and allows for their editing,
+signing, verifying, encrypting and decrypting. 
+Additionally it facilitates several well-known attacks against JWT implementations.
 
 
 ## Changelog
@@ -13,14 +14,14 @@ It provides automatic detection and in-line editing of JWTs within HTTP requests
 
 
 **2.0.2 2023-12-13**
-- Fix memory leaks when deleting tabs contains JWTs.
+- Fix memory leaks when deleting tabs containing JWTs.
 
 
 **2.0.1  2023-10-30**
 - Generate valid URL's when embedding Collaborator payloads within *x5u* and *jku* headers.
 
 
-**2.0.0  2023-07-08**
+**2.0  2023-07-08**
 
 Forked from [Fraser Winterborn](https://uk.linkedin.com/in/fraser-winterborn-198b8a129)'s version (original [repository](https://github.com/blackberry/jwt-editor)).
 * Payload processing rule to support fuzzing within JWS.
@@ -45,7 +46,7 @@ See Burp's [documentation](https://portswigger.net/burp/documentation/desktop/ex
 Alternatively, *JWT Editor* can be built from source.
 * Ensure that Java JDK 17 or newer is installed
 * From root of project, run the command `./gradlew jar`
-* This should place the JAR file `jwt-editor-2.0.2.jar` within the `build/libs` directory
+* This should place the JAR file `jwt-editor-2.1.jar` within the `build/libs` directory
 * This can be loaded into Burp by navigating to the `Extensions` tab, `Installed` sub-tab, clicking `Add` and loading the JAR file
 * This BApp is using the newer Montoya API so it's best to use the latest version of Burp (try the earlier adopter channel if there are issues with the latest stable release)
 
@@ -204,3 +205,7 @@ The tool implements this attack using the steps outlined at https://www.nccgroup
 ## Embedded JWK
 
 JWS defines a 'jwk' field within the Header which is used for the ECDH-ES algorithms as a method of transporting the public key to the recipient. However, this field has been mistakenly used by library implementations as a source of the key for signature verification. By creating a new key, embedding the key for verification within the header, and then signing the JWS Payload, an attacker is able to produce arbitrary JWT payloads.
+
+## References
+* PortSwigger's JWT [Learning Material](https://portswigger.net/web-security/jwt) and associated [labs](https://portswigger.net/web-security/all-labs#jwt).
+* BlackBerry's [blog post](https://blogs.blackberry.com/en/2022/09/secure-json-web-tokens-free-tool-from-blackberry-product-security) for the original release.
