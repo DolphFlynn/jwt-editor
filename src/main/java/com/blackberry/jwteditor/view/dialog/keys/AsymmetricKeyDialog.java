@@ -62,6 +62,7 @@ public class AsymmetricKeyDialog extends KeyDialog {
     private JRadioButton radioButtonPEM;
     private JLabel labelError;
     private JTextField textFieldKeyId;
+    private JLabel keySizeLabel;
 
     private JWK jwk;
 
@@ -90,6 +91,7 @@ public class AsymmetricKeyDialog extends KeyDialog {
                 WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
         );
 
+        keySizeLabel.setText(Utils.getResourceString(mode.resourceLabelId()));
         comboBoxKeySize.setModel(new DefaultComboBoxModel<>(mode.keyOptions()));
         comboBoxKeySize.setSelectedItem(mode.selectedKeyOption(jwk));
 
