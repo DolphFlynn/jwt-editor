@@ -18,6 +18,7 @@ limitations under the License.
 
 package com.blackberry.jwteditor.view.config;
 
+import burp.api.montoya.logging.Logging;
 import burp.api.montoya.ui.UserInterface;
 import burp.config.BurpConfig;
 import burp.intruder.FuzzLocation;
@@ -26,7 +27,9 @@ import burp.proxy.HighlightColor;
 import burp.proxy.ProxyConfig;
 import burp.scanner.ScannerConfig;
 
+import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.model.keys.KeysModel;
+import com.blackberry.jwteditor.model.keys.KeysModelListener;
 import com.blackberry.jwteditor.view.utils.DocumentAdapter;
 import static com.blackberry.jwteditor.utils.Constants.INTRUDER_NO_SIGNING_KEY_ID_LABEL;
 
@@ -35,6 +38,7 @@ import javax.swing.*;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.awt.*;
+import java.util.Arrays;
 
 import static java.awt.Font.BOLD;
 
@@ -42,7 +46,7 @@ import static java.awt.Font.BOLD;
 /**
  *  Config panel
  */
-public class ConfigView {
+public class ConfigView implements KeysModelListener {
     private JPanel mainPanel;
     private JCheckBox checkBoxHighlightJWT;
     private JLabel labelHighlightColor;
@@ -59,9 +63,12 @@ public class ConfigView {
     private JLabel scannerLabel;
     private JPanel intruderPanel;
     private JLabel spacerLabel;
+    private KeysModel keysModel;
 
     public ConfigView(BurpConfig burpConfig, UserInterface userInterface, boolean isProVersion, KeysModel keysModel) {
         ProxyConfig proxyConfig = burpConfig.proxyConfig();
+        this.keysModel = keysModel;
+        keysModel.addKeyModelListener(this);
 
         checkBoxHighlightJWT.setSelected(proxyConfig.highlightJWT());
         checkBoxHighlightJWT.addActionListener(e -> {
@@ -85,10 +92,7 @@ public class ConfigView {
         comboBoxPayloadPosition.setSelectedItem(intruderConfig.fuzzLocation());
         comboBoxPayloadPosition.addActionListener(e -> intruderConfig.setFuzzLocation((FuzzLocation) comboBoxPayloadPosition.getSelectedItem()));
 
-        String[] noSigningKey = {INTRUDER_NO_SIGNING_KEY_ID_LABEL};
-        String[] signingKeyIds = keysModel.getSigningKeys().stream().map(key -> key.getID()).toArray(String[]::new);
-        String[] items = ArrayUtils.addAll(noSigningKey, signingKeyIds);
-        comboBoxIntruderSigningKeyId.setModel(new DefaultComboBoxModel<>(items));
+        this.updateSigningKeyList();
         comboBoxIntruderSigningKeyId.setSelectedItem(intruderConfig.signingKeyId());
         comboBoxIntruderSigningKeyId.addActionListener(e -> intruderConfig.setSigningKeyId((String) comboBoxIntruderSigningKeyId.getSelectedItem()));
 
@@ -115,6 +119,22 @@ public class ConfigView {
         comboBoxHighlightColor.setRenderer(new HighlightComboRenderer());
     }
 
+    public void updateSigningKeyList() {
+        String[] noSigningKey = {INTRUDER_NO_SIGNING_KEY_ID_LABEL};
+        String[] signingKeyIds = this.keysModel.getSigningKeys().stream().map(key -> key.getID()).toArray(String[]::new);
+        String[] items = ArrayUtils.addAll(noSigningKey, signingKeyIds);
+
+        String currentSelection = (String) comboBoxIntruderSigningKeyId.getSelectedItem();
+        boolean resetSelection = currentSelection != null && !Arrays.stream(items).anyMatch(currentSelection::equals);
+
+        comboBoxIntruderSigningKeyId.setModel(new DefaultComboBoxModel<>(items));
+        if (resetSelection) {
+            comboBoxIntruderSigningKeyId.setSelectedItem(INTRUDER_NO_SIGNING_KEY_ID_LABEL);
+        } else {
+            comboBoxIntruderSigningKeyId.setSelectedItem(currentSelection);
+        }
+    }
+
     /**
      * Custom list cell renderer to color rows of combo box drop down list.
      */
@@ -130,5 +150,19 @@ public class ConfigView {
 
             return label;
         }
+    }
+
+    public void notifyKeyInserted(Key key) {
+        this.updateSigningKeyList();
+    }
+
+    @Override
+    public void notifyKeyDeleted(int rowIndex) {
+        this.updateSigningKeyList();
+    }
+
+    @Override
+    public void notifyKeyDeleted(Key key) {
+        this.updateSigningKeyList();
     }
 }
