@@ -43,6 +43,7 @@ public class ConfigView {
     private JLabel labelHighlightJWT;
     private JTextField intruderParameterName;
     private JComboBox comboBoxPayloadPosition;
+    private JTextField intruderSigningKeyId;
     private JCheckBox checkBoxHeaderInsertionPoint;
     private JTextField scannerParameterName;
     private JPanel proxyPanel;
@@ -76,6 +77,12 @@ public class ConfigView {
         comboBoxPayloadPosition.setModel(new DefaultComboBoxModel<>(FuzzLocation.values()));
         comboBoxPayloadPosition.setSelectedItem(intruderConfig.fuzzLocation());
         comboBoxPayloadPosition.addActionListener(e -> intruderConfig.setFuzzLocation((FuzzLocation) comboBoxPayloadPosition.getSelectedItem()));
+
+        // TODO: Make dropdown menu
+        intruderSigningKeyId.setText(intruderConfig.signingKeyId()); // 2
+        intruderSigningKeyId.getDocument().addDocumentListener(
+            new DocumentAdapter(e -> intruderConfig.setSigningKeyId(intruderSigningKeyId.getText()))
+        );
 
         ScannerConfig scannerConfig = burpConfig.scannerConfig();
 
