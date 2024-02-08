@@ -25,12 +25,19 @@ import burp.intruder.IntruderConfig;
 import burp.proxy.HighlightColor;
 import burp.proxy.ProxyConfig;
 import burp.scanner.ScannerConfig;
+
+import com.blackberry.jwteditor.model.keys.KeysModel;
 import com.blackberry.jwteditor.view.utils.DocumentAdapter;
+import static com.blackberry.jwteditor.utils.Constants.INTRUDER_NO_SIGNING_KEY_ID_LABEL;
 
 import javax.swing.*;
+
+import org.apache.commons.lang3.ArrayUtils;
+
 import java.awt.*;
 
 import static java.awt.Font.BOLD;
+
 
 /**
  *  Config panel
@@ -43,7 +50,7 @@ public class ConfigView {
     private JLabel labelHighlightJWT;
     private JTextField intruderParameterName;
     private JComboBox comboBoxPayloadPosition;
-    private JTextField intruderSigningKeyId;
+    private JComboBox comboBoxIntruderSigningKeyId;
     private JCheckBox checkBoxHeaderInsertionPoint;
     private JTextField scannerParameterName;
     private JPanel proxyPanel;
@@ -53,7 +60,7 @@ public class ConfigView {
     private JPanel intruderPanel;
     private JLabel spacerLabel;
 
-    public ConfigView(BurpConfig burpConfig, UserInterface userInterface, boolean isProVersion) {
+    public ConfigView(BurpConfig burpConfig, UserInterface userInterface, boolean isProVersion, KeysModel keysModel) {
         ProxyConfig proxyConfig = burpConfig.proxyConfig();
 
         checkBoxHighlightJWT.setSelected(proxyConfig.highlightJWT());
@@ -78,11 +85,12 @@ public class ConfigView {
         comboBoxPayloadPosition.setSelectedItem(intruderConfig.fuzzLocation());
         comboBoxPayloadPosition.addActionListener(e -> intruderConfig.setFuzzLocation((FuzzLocation) comboBoxPayloadPosition.getSelectedItem()));
 
-        // TODO: Make dropdown menu
-        intruderSigningKeyId.setText(intruderConfig.signingKeyId()); // 2
-        intruderSigningKeyId.getDocument().addDocumentListener(
-            new DocumentAdapter(e -> intruderConfig.setSigningKeyId(intruderSigningKeyId.getText()))
-        );
+        String[] noSigningKey = {INTRUDER_NO_SIGNING_KEY_ID_LABEL};
+        String[] signingKeyIds = keysModel.getSigningKeys().stream().map(key -> key.getID()).toArray(String[]::new);
+        String[] items = ArrayUtils.addAll(noSigningKey, signingKeyIds);
+        comboBoxIntruderSigningKeyId.setModel(new DefaultComboBoxModel<>(items));
+        comboBoxIntruderSigningKeyId.setSelectedItem(intruderConfig.signingKeyId());
+        comboBoxIntruderSigningKeyId.addActionListener(e -> intruderConfig.setSigningKeyId((String) comboBoxIntruderSigningKeyId.getSelectedItem()));
 
         ScannerConfig scannerConfig = burpConfig.scannerConfig();
 
