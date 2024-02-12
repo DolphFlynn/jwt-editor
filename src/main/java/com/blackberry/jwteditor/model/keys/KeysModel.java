@@ -38,11 +38,11 @@ public class KeysModel {
     private final Map<String, Key> keys;
     private final Object lock;
 
-    private List<KeysModelListener> modelListeners;
+    private final List<KeysModelListener> modelListeners;
 
     public KeysModel() {
         this.keys = new LinkedHashMap<>();
-        this.modelListeners = new ArrayList<KeysModelListener>();
+        this.modelListeners = new ArrayList<>();
         this.lock = new Object();
     }
 

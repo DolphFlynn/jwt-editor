@@ -25,7 +25,6 @@ import com.blackberry.jwteditor.view.editor.ResponseEditorView;
 import com.blackberry.jwteditor.view.rsta.RstaFactory;
 
 import java.awt.*;
-import java.util.Optional;
 
 import static burp.api.montoya.core.BurpSuiteEdition.COMMUNITY_EDITION;
 import static burp.api.montoya.core.BurpSuiteEdition.PROFESSIONAL;
@@ -106,7 +105,7 @@ public class JWTEditorExtension implements BurpExtension {
         );
 
         Intruder intruder = api.intruder();
-        intruder.registerPayloadProcessor(new JWSPayloadProcessor(burpConfig.intruderConfig(), Optional.of(api.logging()), Optional.of(keysModel)));
+        intruder.registerPayloadProcessor(new JWSPayloadProcessor(burpConfig.intruderConfig(), api.logging(), keysModel));
 
         if (api.burpSuite().version().edition() != COMMUNITY_EDITION) {
             api.scanner().registerInsertionPointProvider(new JWSHeaderInsertionPointProvider(burpConfig.scannerConfig()));
