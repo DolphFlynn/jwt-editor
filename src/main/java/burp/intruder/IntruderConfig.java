@@ -19,6 +19,8 @@ limitations under the License.
 package burp.intruder;
 
 import static burp.intruder.FuzzLocation.PAYLOAD;
+import static com.blackberry.jwteditor.utils.Constants.INTRUDER_NO_SIGNING_KEY_ID_LABEL;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 public class IntruderConfig {
     private String fuzzParameter;
@@ -53,6 +55,7 @@ public class IntruderConfig {
 
     public void setSigningKeyId(String signingKeyId) {
         this.signingKeyId = signingKeyId;
+        this.resign = resign && isSigningKeyIdValid();
     }
 
     public boolean resign() {
@@ -60,6 +63,10 @@ public class IntruderConfig {
     }
 
     public void setResign(boolean resign) {
-        this.resign = resign;
+        this.resign = resign && isSigningKeyIdValid();
+    }
+
+    private boolean isSigningKeyIdValid() {
+        return !INTRUDER_NO_SIGNING_KEY_ID_LABEL.equals(signingKeyId) && isNotEmpty(signingKeyId);
     }
 }

@@ -240,11 +240,11 @@ class BurpConfigPersistenceTest {
                         null
                 ),
                 arguments(
-                        "{\"intruder_payload_processor_fuzz_location\":\"header\",\"intruder_payload_processor_parameter_name\":\"sub\",\"intruder_payload_processor_resign\":true}",
+                        "{\"intruder_payload_processor_fuzz_location\":\"header\",\"intruder_payload_processor_parameter_name\":\"sub\",\"intruder_payload_processor_resign\":true, \"intruder_payload_processor_signing_key_id\": \"uuid\"}",
                         HEADER,
                         "sub",
                         true,
-                        null
+                        "uuid"
                 ),
                 arguments(
                         "{\"intruder_payload_processor_fuzz_location\":\"header\",\"intruder_payload_processor_parameter_name\":\"sub\",\"intruder_payload_processor_signing_key_id\":\"131da5fb-8484-4717-b0d2-b79925978596\"}",
