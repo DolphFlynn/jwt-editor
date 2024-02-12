@@ -5,7 +5,6 @@ import burp.api.montoya.intruder.PayloadData;
 import burp.api.montoya.intruder.PayloadProcessingResult;
 import burp.api.montoya.intruder.PayloadProcessor;
 import burp.api.montoya.logging.Logging;
-
 import com.blackberry.jwteditor.exceptions.SigningException;
 import com.blackberry.jwteditor.model.jose.JOSEObject;
 import com.blackberry.jwteditor.model.jose.JWS;
@@ -22,11 +21,11 @@ import static com.blackberry.jwteditor.model.jose.JOSEObjectFinder.parseJOSEObje
 import static com.blackberry.jwteditor.utils.Constants.INTRUDER_NO_SIGNING_KEY_ID_LABEL;
 
 public class JWSPayloadProcessor implements PayloadProcessor {
-    Optional<Logging> logging;
+    private final Logging logging;
     private final IntruderConfig intruderConfig;
-    private final Optional<KeysModel> keysModel;
+    private final KeysModel keysModel;
 
-    public JWSPayloadProcessor(IntruderConfig intruderConfig, Optional<Logging> logging, Optional<KeysModel> keysModel) {
+    public JWSPayloadProcessor(IntruderConfig intruderConfig, Logging logging, KeysModel keysModel) {
         this.logging = logging;
         this.intruderConfig = intruderConfig;
         this.keysModel = keysModel;
@@ -53,7 +52,7 @@ public class JWSPayloadProcessor implements PayloadProcessor {
                         ? Base64URL.encode(targetJson.toString())
                         : jws.getEncodedPayload();
 
-                JWS updatedJws = this.createJWS(updatedHeader, updatedPayload, jws.getEncodedSignature());
+                JWS updatedJws = createJWS(updatedHeader, updatedPayload, jws.getEncodedSignature());
                 baseValue = ByteArray.byteArray(updatedJws.serialize());
             }
         }
@@ -61,28 +60,26 @@ public class JWSPayloadProcessor implements PayloadProcessor {
         return PayloadProcessingResult.usePayload(baseValue);
     }
 
+    private Optional<Key> loadKey() {
+        String keyId = intruderConfig.signingKeyId();
+
+        // only try to load key if the input value is non-empty
+        if (keyId == INTRUDER_NO_SIGNING_KEY_ID_LABEL || keyId == null || keyId.trim().isEmpty()) {
+            return Optional.empty();
+        }
+
+        Key key = keysModel.getKey(intruderConfig.signingKeyId());
+
+        if (key == null) {
+            logging.logToError("Key with ID " + intruderConfig.signingKeyId() + " not found.");
+        }
+
+        return Optional.ofNullable(key);
+    }
+
     @Override
     public String displayName() {
         return "JWS payload processor";
-    }
-
-    private Optional<Key> loadKey() {
-        if (keysModel.isPresent()) {
-            String keyId = intruderConfig.signingKeyId();
-            // only try to load key if the input value is non-empty
-            if (keyId.trim().length() > 0 && keyId != INTRUDER_NO_SIGNING_KEY_ID_LABEL) {
-                Key key = keysModel.get().getKey(intruderConfig.signingKeyId());
-                if (key != null) {
-                    return Optional.of(key);
-                } else {
-                    this.logging.ifPresent(log -> log.logToError("Key with ID " + intruderConfig.signingKeyId() + " not found"));
-                }
-            }
-        } else {
-            this.logging.ifPresent(log -> log.logToOutput("No keysModel available. Will not be able to sign JWS"));
-        }
-
-        return Optional.empty();
     }
 
     // Creates a JWS object from the given attributes. Signs the JWS if possible (i.e., available key selected in Intruder settings)
@@ -93,7 +90,7 @@ public class JWSPayloadProcessor implements PayloadProcessor {
             try {
                 result = Optional.of(JWSFactory.sign(key, key.getSigningAlgorithms()[0], header, payload));
             } catch (SigningException ex) {
-                this.logging.ifPresent(log -> log.logToError("Failed to sign JWS: " + ex));
+                logging.logToError("Failed to sign JWS: " + ex);
             }
 
             return result;

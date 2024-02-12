@@ -17,6 +17,9 @@ Additionally it facilitates several well-known attacks against JWT implementatio
 
 ## Changelog
 
+**2.2**
+- Allow resigning of JWS tokens during fuzzing (Thanks to [@BafDyce](https://github.com/BafDyce)).
+
 **2.1.1 2024-01-22**
 - Use split panes to improve JWT editor with small screens or large font sizes (Thanks to [@eldstal](https://github.com/eldstal)).
 

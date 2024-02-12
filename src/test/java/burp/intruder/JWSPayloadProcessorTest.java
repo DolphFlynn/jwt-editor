@@ -8,17 +8,15 @@ import burp.api.montoya.internal.ObjectFactoryLocator;
 import burp.api.montoya.intruder.FakePayloadProcessingResult;
 import burp.api.montoya.intruder.PayloadData;
 import burp.api.montoya.intruder.PayloadProcessingResult;
-import burp.api.montoya.logging.Logging;
-
+import com.blackberry.jwteditor.model.keys.KeysModel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.stubbing.Answer;
 
-import com.blackberry.jwteditor.model.keys.KeysModel;
-
 import static burp.api.montoya.intruder.FakePayloadData.payloadData;
 import static burp.api.montoya.intruder.PayloadProcessingAction.USE_PAYLOAD;
+import static burp.api.montoya.logging.StubLogging.LOGGING;
 import static burp.intruder.FuzzLocation.HEADER;
 import static burp.intruder.FuzzLocation.PAYLOAD;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -26,10 +24,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
-import java.util.Optional;
-
 @ExtendWith(MontoyaExtension.class)
-class JWTPayloadProcessorTest {
+class JWSPayloadProcessorTest {
+
     @BeforeEach
     void configureMocks() {
         MontoyaObjectFactory factory = ObjectFactoryLocator.FACTORY;
@@ -45,9 +42,8 @@ class JWTPayloadProcessorTest {
     void givenBaseValueNotJWS_whenPayloadProcessed_thenPayloadLeftUnchanged() {
         String baseValue = "isogeny";
         PayloadData payloadData = payloadData().withBaseValue(baseValue).build();
-        Optional<Logging> emptyLogging = Optional.empty();
-        Optional<KeysModel> emptyKeysModel = Optional.empty();
-        JWSPayloadProcessor processor = new JWSPayloadProcessor(intruderConfig("role", PAYLOAD), emptyLogging, emptyKeysModel);
+        KeysModel keysModel = new KeysModel();
+        JWSPayloadProcessor processor = new JWSPayloadProcessor(intruderConfig("role", PAYLOAD), LOGGING, keysModel);
 
         PayloadProcessingResult result = processor.processPayload(payloadData);
 
@@ -59,9 +55,8 @@ class JWTPayloadProcessorTest {
     void givenBaseValueJWSAndFuzzParameterNotPresent_whenPayloadProcessed_thenPayloadLeftUnchanged() {
         String baseValue = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
         PayloadData payloadData = payloadData().withBaseValue(baseValue).build();
-        Optional<Logging> emptyLogging = Optional.empty();
-        Optional<KeysModel> emptyKeysModel = Optional.empty();
-        JWSPayloadProcessor processor = new JWSPayloadProcessor(intruderConfig("role", PAYLOAD), emptyLogging, emptyKeysModel);
+        KeysModel keysModel = new KeysModel();
+        JWSPayloadProcessor processor = new JWSPayloadProcessor(intruderConfig("role", PAYLOAD), LOGGING, keysModel);
 
         PayloadProcessingResult result = processor.processPayload(payloadData);
 
@@ -73,9 +68,8 @@ class JWTPayloadProcessorTest {
     void givenBaseValueJWSAndFuzzParameterPresentInWrongContext_whenPayloadProcessed_thenPayloadLeftUnchanged() {
         String baseValue = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
         PayloadData payloadData = payloadData().withBaseValue(baseValue).build();
-        Optional<Logging> emptyLogging = Optional.empty();
-        Optional<KeysModel> emptyKeysModel = Optional.empty();
-        JWSPayloadProcessor processor = new JWSPayloadProcessor(intruderConfig("alg", PAYLOAD), emptyLogging, emptyKeysModel);
+        KeysModel keysModel = new KeysModel();
+        JWSPayloadProcessor processor = new JWSPayloadProcessor(intruderConfig("alg", PAYLOAD), LOGGING, keysModel);
 
         PayloadProcessingResult result = processor.processPayload(payloadData);
 
@@ -87,9 +81,8 @@ class JWTPayloadProcessorTest {
     void givenBaseValueJWSAndFuzzParameterPresentInHeader_whenPayloadProcessed_thenPayloadModified() {
         String baseValue = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
         PayloadData payloadData = payloadData().withBaseValue(baseValue).withCurrentPayload("RS256").build();
-        Optional<Logging> emptyLogging = Optional.empty();
-        Optional<KeysModel> emptyKeysModel = Optional.empty();
-        JWSPayloadProcessor processor = new JWSPayloadProcessor(intruderConfig("alg", HEADER), emptyLogging, emptyKeysModel);
+        KeysModel keysModel = new KeysModel();
+        JWSPayloadProcessor processor = new JWSPayloadProcessor(intruderConfig("alg", HEADER), LOGGING, keysModel);
 
         PayloadProcessingResult result = processor.processPayload(payloadData);
 
@@ -101,9 +94,8 @@ class JWTPayloadProcessorTest {
     void givenBaseValueJWSAndFuzzParameterPresentInPayload_whenPayloadProcessed_thenPayloadModified() {
         String baseValue = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
         PayloadData payloadData = payloadData().withBaseValue(baseValue).withCurrentPayload("emanon").build();
-        Optional<Logging> emptyLogging = Optional.empty();
-        Optional<KeysModel> emptyKeysModel = Optional.empty();
-        JWSPayloadProcessor processor = new JWSPayloadProcessor(intruderConfig("name", PAYLOAD), emptyLogging, emptyKeysModel);
+        KeysModel keysModel = new KeysModel();
+        JWSPayloadProcessor processor = new JWSPayloadProcessor(intruderConfig("name", PAYLOAD), LOGGING, keysModel);
 
         PayloadProcessingResult result = processor.processPayload(payloadData);
 
