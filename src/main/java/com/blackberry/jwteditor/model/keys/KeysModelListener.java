@@ -20,4 +20,27 @@ public interface KeysModelListener {
         public void notifyKeyDeleted(Key key) {
         }
     }
+
+    class SimpleKeyModelListener implements KeysModelListener {
+        private final Runnable action;
+
+        public SimpleKeyModelListener(Runnable action) {
+            this.action = action;
+        }
+
+        @Override
+        public void notifyKeyInserted(Key key) {
+            action.run();
+        }
+
+        @Override
+        public void notifyKeyDeleted(int rowIndex) {
+            action.run();
+        }
+
+        @Override
+        public void notifyKeyDeleted(Key key) {
+            action.run();
+        }
+    }
 }
