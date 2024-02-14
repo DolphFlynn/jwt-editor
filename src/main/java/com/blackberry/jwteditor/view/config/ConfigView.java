@@ -27,7 +27,7 @@ import burp.proxy.ProxyConfig;
 import burp.scanner.ScannerConfig;
 import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.model.keys.KeysModel;
-import com.blackberry.jwteditor.model.keys.KeysModelListener.SimpleKeyModelListener;
+import com.blackberry.jwteditor.model.keys.KeysModelListener.SimpleKeysModelListener;
 import com.blackberry.jwteditor.view.utils.DocumentAdapter;
 
 import javax.swing.*;
@@ -89,7 +89,7 @@ public class ConfigView {
         updateSigningKeyList();
         comboBoxIntruderSigningKeyId.addActionListener(e -> intruderConfig.setSigningKeyId((String) comboBoxIntruderSigningKeyId.getSelectedItem()));
         resignIntruderJWS.addActionListener(e -> intruderConfig.setResign(resignIntruderJWS.isSelected()));
-        keysModel.addKeyModelListener(new SimpleKeyModelListener(this::updateSigningKeyList));
+        keysModel.addKeyModelListener(new SimpleKeysModelListener(this::updateSigningKeyList));
 
         ScannerConfig scannerConfig = burpConfig.scannerConfig();
 

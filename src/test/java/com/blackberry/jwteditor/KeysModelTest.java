@@ -19,7 +19,7 @@ limitations under the License.
 package com.blackberry.jwteditor;
 
 import com.blackberry.jwteditor.model.keys.KeysModel;
-import com.blackberry.jwteditor.model.keys.KeysModelListener.InertKeyModelListener;
+import com.blackberry.jwteditor.model.keys.KeysModelListener.InertKeysModelListener;
 import com.blackberry.jwteditor.model.keys.PasswordKey;
 import org.junit.jupiter.api.Test;
 
@@ -111,7 +111,7 @@ class KeysModelTest {
                 .withKey(new PasswordKey("testKeyId", "secret", 8, 1337))
                 .withKey(new PasswordKey("another", "shrubbery", 8, 1337))
                 .build();
-        model.addKeyModelListener(new InertKeyModelListener() {
+        model.addKeyModelListener(new InertKeysModelListener() {
             @Override
             public void notifyKeyDeleted(int rowIndex) {
                 noOfListenerInvocations.incrementAndGet();

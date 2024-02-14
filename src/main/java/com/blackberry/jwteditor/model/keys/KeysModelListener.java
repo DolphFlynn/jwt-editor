@@ -7,7 +7,7 @@ public interface KeysModelListener {
 
     void notifyKeyDeleted(Key key);
 
-    class InertKeyModelListener implements KeysModelListener {
+    class InertKeysModelListener implements KeysModelListener {
         @Override
         public void notifyKeyInserted(Key key) {
         }
@@ -21,10 +21,10 @@ public interface KeysModelListener {
         }
     }
 
-    class SimpleKeyModelListener implements KeysModelListener {
+    class SimpleKeysModelListener implements KeysModelListener {
         private final Runnable action;
 
-        public SimpleKeyModelListener(Runnable action) {
+        public SimpleKeysModelListener(Runnable action) {
             this.action = action;
         }
 
