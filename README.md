@@ -152,7 +152,7 @@ This option is automatically enabled if it is detected that the original JWT did
 *JWT Editor* can be built from source.
 * Ensure that Java JDK 17 or newer is installed
 * From root of project, run the command `./gradlew jar`
-* This should place the JAR file `jwt-editor-2.1.1.jar` within the `build/libs` directory
+* This should place the JAR file `jwt-editor-2.2.jar` within the `build/libs` directory
 * This can be loaded into Burp Suite by navigating to the `Extensions` tab, `Installed` sub-tab, clicking `Add` and loading the JAR file
 * This BApp is using the newer Montoya API so it's best to use the latest version of Burp Suite (try the earlier adopter channel if there are issues with the latest stable release)
 

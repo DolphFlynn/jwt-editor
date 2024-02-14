@@ -19,7 +19,6 @@ limitations under the License.
 package burp.intruder;
 
 import static burp.intruder.FuzzLocation.PAYLOAD;
-import static com.blackberry.jwteditor.utils.Constants.INTRUDER_NO_SIGNING_KEY_ID_LABEL;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 public class IntruderConfig {
@@ -67,6 +66,6 @@ public class IntruderConfig {
     }
 
     private boolean isSigningKeyIdValid() {
-        return !INTRUDER_NO_SIGNING_KEY_ID_LABEL.equals(signingKeyId) && isNotEmpty(signingKeyId);
+        return isNotEmpty(signingKeyId);
     }
 }

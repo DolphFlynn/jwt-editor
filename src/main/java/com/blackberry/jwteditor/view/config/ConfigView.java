@@ -18,7 +18,6 @@ limitations under the License.
 
 package com.blackberry.jwteditor.view.config;
 
-import burp.api.montoya.logging.Logging;
 import burp.api.montoya.ui.UserInterface;
 import burp.config.BurpConfig;
 import burp.intruder.FuzzLocation;
@@ -26,27 +25,22 @@ import burp.intruder.IntruderConfig;
 import burp.proxy.HighlightColor;
 import burp.proxy.ProxyConfig;
 import burp.scanner.ScannerConfig;
-
 import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.model.keys.KeysModel;
 import com.blackberry.jwteditor.model.keys.KeysModelListener;
 import com.blackberry.jwteditor.view.utils.DocumentAdapter;
-import static com.blackberry.jwteditor.utils.Constants.INTRUDER_NO_SIGNING_KEY_ID_LABEL;
 
 import javax.swing.*;
-
-import org.apache.commons.lang3.ArrayUtils;
-
 import java.awt.*;
-import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 import static java.awt.Font.BOLD;
 
 
-/**
- *  Config panel
- */
 public class ConfigView implements KeysModelListener {
+    private final IntruderConfig intruderConfig;
+
     private JPanel mainPanel;
     private JCheckBox checkBoxHighlightJWT;
     private JLabel labelHighlightColor;
@@ -63,11 +57,14 @@ public class ConfigView implements KeysModelListener {
     private JLabel scannerLabel;
     private JPanel intruderPanel;
     private JLabel spacerLabel;
+    private JCheckBox resignIntruderJWS;
     private KeysModel keysModel;
 
     public ConfigView(BurpConfig burpConfig, UserInterface userInterface, boolean isProVersion, KeysModel keysModel) {
-        ProxyConfig proxyConfig = burpConfig.proxyConfig();
         this.keysModel = keysModel;
+        this.intruderConfig = burpConfig.intruderConfig();
+
+        ProxyConfig proxyConfig = burpConfig.proxyConfig();
         keysModel.addKeyModelListener(this);
 
         checkBoxHighlightJWT.setSelected(proxyConfig.highlightJWT());
@@ -81,8 +78,6 @@ public class ConfigView implements KeysModelListener {
         comboBoxHighlightColor.setEnabled(proxyConfig.highlightJWT());
         comboBoxHighlightColor.addActionListener(e -> proxyConfig.setHighlightColor((HighlightColor) comboBoxHighlightColor.getSelectedItem()));
 
-        IntruderConfig intruderConfig = burpConfig.intruderConfig();
-
         intruderParameterName.setText(intruderConfig.fuzzParameter());
         intruderParameterName.getDocument().addDocumentListener(
                 new DocumentAdapter(e -> intruderConfig.setFuzzParameter(intruderParameterName.getText()))
@@ -93,8 +88,8 @@ public class ConfigView implements KeysModelListener {
         comboBoxPayloadPosition.addActionListener(e -> intruderConfig.setFuzzLocation((FuzzLocation) comboBoxPayloadPosition.getSelectedItem()));
 
         this.updateSigningKeyList();
-        comboBoxIntruderSigningKeyId.setSelectedItem(intruderConfig.signingKeyId());
         comboBoxIntruderSigningKeyId.addActionListener(e -> intruderConfig.setSigningKeyId((String) comboBoxIntruderSigningKeyId.getSelectedItem()));
+        resignIntruderJWS.addActionListener(e -> intruderConfig.setResign(resignIntruderJWS.isSelected()));
 
         ScannerConfig scannerConfig = burpConfig.scannerConfig();
 
@@ -120,18 +115,33 @@ public class ConfigView implements KeysModelListener {
     }
 
     public void updateSigningKeyList() {
-        String[] noSigningKey = {INTRUDER_NO_SIGNING_KEY_ID_LABEL};
-        String[] signingKeyIds = this.keysModel.getSigningKeys().stream().map(key -> key.getID()).toArray(String[]::new);
-        String[] items = ArrayUtils.addAll(noSigningKey, signingKeyIds);
+        List<Key> signingKeys = keysModel.getSigningKeys();
+        String[] signingKeyIds = signingKeys.stream().map(Key::getID).toArray(String[]::new);
+        String selectedSigningId = intruderConfig.signingKeyId();
 
-        String currentSelection = (String) comboBoxIntruderSigningKeyId.getSelectedItem();
-        boolean resetSelection = currentSelection != null && !Arrays.stream(items).anyMatch(currentSelection::equals);
+        comboBoxIntruderSigningKeyId.setModel(new DefaultComboBoxModel<>(signingKeyIds));
 
-        comboBoxIntruderSigningKeyId.setModel(new DefaultComboBoxModel<>(items));
-        if (resetSelection) {
-            comboBoxIntruderSigningKeyId.setSelectedItem(INTRUDER_NO_SIGNING_KEY_ID_LABEL);
+        if (signingKeys.isEmpty()) {
+            resignIntruderJWS.setSelected(false);
+            resignIntruderJWS.setEnabled(false);
+            comboBoxIntruderSigningKeyId.setEnabled(false);
+            intruderConfig.setResign(false);
+            intruderConfig.setSigningKeyId(null);
         } else {
-            comboBoxIntruderSigningKeyId.setSelectedItem(currentSelection);
+            resignIntruderJWS.setEnabled(true);
+            comboBoxIntruderSigningKeyId.setEnabled(true);
+
+            Optional<Key> selectedKey = signingKeys.stream()
+                    .filter(k -> k.getID().equals(selectedSigningId))
+                    .findFirst();
+
+            if (selectedKey.isPresent()) {
+                resignIntruderJWS.setSelected(intruderConfig.resign());
+                comboBoxIntruderSigningKeyId.setSelectedItem(selectedKey.get());
+            } else {
+                resignIntruderJWS.setSelected(false);
+                comboBoxIntruderSigningKeyId.setSelectedIndex(0);
+            }
         }
     }
 
