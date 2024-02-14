@@ -18,7 +18,7 @@ import java.util.Optional;
 
 import static burp.intruder.FuzzLocation.PAYLOAD;
 import static com.blackberry.jwteditor.model.jose.JOSEObjectFinder.parseJOSEObject;
-import static com.blackberry.jwteditor.utils.Constants.INTRUDER_NO_SIGNING_KEY_ID_LABEL;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 public class JWSPayloadProcessor implements PayloadProcessor {
     private final Logging logging;
@@ -63,8 +63,7 @@ public class JWSPayloadProcessor implements PayloadProcessor {
     private Optional<Key> loadKey() {
         String keyId = intruderConfig.signingKeyId();
 
-        // only try to load key if the input value is non-empty
-        if (keyId == INTRUDER_NO_SIGNING_KEY_ID_LABEL || keyId == null || keyId.trim().isEmpty()) {
+        if (isNotEmpty(keyId)) {
             return Optional.empty();
         }
 
