@@ -29,6 +29,7 @@ import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.model.keys.KeysModel;
 import com.blackberry.jwteditor.model.keys.KeysModelListener.SimpleKeysModelListener;
 import com.blackberry.jwteditor.view.utils.DocumentAdapter;
+import com.nimbusds.jose.JWSAlgorithm;
 
 import javax.swing.*;
 import java.awt.*;
@@ -40,6 +41,7 @@ import static java.awt.Font.BOLD;
 
 public class ConfigView {
     private final IntruderConfig intruderConfig;
+    private final KeysModel keysModel;
 
     private JPanel mainPanel;
     private JCheckBox checkBoxHighlightJWT;
@@ -58,7 +60,7 @@ public class ConfigView {
     private JPanel intruderPanel;
     private JLabel spacerLabel;
     private JCheckBox resignIntruderJWS;
-    private KeysModel keysModel;
+    private JComboBox comboBoxIntruderSigningAlg;
 
     public ConfigView(BurpConfig burpConfig, UserInterface userInterface, boolean isProVersion, KeysModel keysModel) {
         this.keysModel = keysModel;
@@ -87,7 +89,15 @@ public class ConfigView {
         comboBoxPayloadPosition.addActionListener(e -> intruderConfig.setFuzzLocation((FuzzLocation) comboBoxPayloadPosition.getSelectedItem()));
 
         updateSigningKeyList();
-        comboBoxIntruderSigningKeyId.addActionListener(e -> intruderConfig.setSigningKeyId((String) comboBoxIntruderSigningKeyId.getSelectedItem()));
+        comboBoxIntruderSigningKeyId.addActionListener(e -> {
+            String newSigningKeyId = (String) comboBoxIntruderSigningKeyId.getSelectedItem();
+
+            if (!intruderConfig.signingKeyId().equals(newSigningKeyId)) {
+                intruderConfig.setSigningKeyId(newSigningKeyId);
+                updateSigningAlgorithmList();
+            }
+        });
+        comboBoxIntruderSigningAlg.addActionListener(e -> intruderConfig.setSigningAlgorithm((JWSAlgorithm) comboBoxIntruderSigningAlg.getSelectedItem()));
         resignIntruderJWS.addActionListener(e -> intruderConfig.setResign(resignIntruderJWS.isSelected()));
         keysModel.addKeyModelListener(new SimpleKeysModelListener(this::updateSigningKeyList));
 
@@ -117,31 +127,61 @@ public class ConfigView {
     private void updateSigningKeyList() {
         List<Key> signingKeys = keysModel.getSigningKeys();
         String[] signingKeyIds = signingKeys.stream().map(Key::getID).toArray(String[]::new);
-        String selectedSigningId = intruderConfig.signingKeyId();
+        String modelSelectedSigningId = intruderConfig.signingKeyId();
 
+        String viewSelectedKeyId = (String) comboBoxIntruderSigningKeyId.getSelectedItem();
         comboBoxIntruderSigningKeyId.setModel(new DefaultComboBoxModel<>(signingKeyIds));
 
         if (signingKeys.isEmpty()) {
             resignIntruderJWS.setSelected(false);
             resignIntruderJWS.setEnabled(false);
             comboBoxIntruderSigningKeyId.setEnabled(false);
+            comboBoxIntruderSigningAlg.setEnabled(false);
             intruderConfig.setResign(false);
             intruderConfig.setSigningKeyId(null);
         } else {
             resignIntruderJWS.setEnabled(true);
             comboBoxIntruderSigningKeyId.setEnabled(true);
+            comboBoxIntruderSigningAlg.setEnabled(true);
 
             Optional<Key> selectedKey = signingKeys.stream()
-                    .filter(k -> k.getID().equals(selectedSigningId))
+                    .filter(k -> k.getID().equals(modelSelectedSigningId))
                     .findFirst();
 
+
             if (selectedKey.isPresent()) {
+                Key key = selectedKey.get();
+
                 resignIntruderJWS.setSelected(intruderConfig.resign());
-                comboBoxIntruderSigningKeyId.setSelectedItem(selectedKey.get());
+                comboBoxIntruderSigningKeyId.setSelectedItem(key.getID());
+
+                if (!modelSelectedSigningId.equals(viewSelectedKeyId)) {
+                    comboBoxIntruderSigningAlg.setModel(new DefaultComboBoxModel(key.getSigningAlgorithms()));
+                    comboBoxIntruderSigningAlg.setSelectedIndex(0);
+                }
             } else {
                 resignIntruderJWS.setSelected(false);
                 comboBoxIntruderSigningKeyId.setSelectedIndex(0);
+
+                Key key = signingKeys.get(0);
+                comboBoxIntruderSigningAlg.setModel(new DefaultComboBoxModel(key.getSigningAlgorithms()));
             }
+        }
+    }
+
+    private void updateSigningAlgorithmList() {
+        Key key = keysModel.getSigningKeys().stream()
+                .filter(k -> k.getID().equals(intruderConfig.signingKeyId()))
+                .findFirst()
+                .orElseThrow();
+
+        JWSAlgorithm[] signingAlgorithms = key.getSigningAlgorithms();
+        comboBoxIntruderSigningAlg.setModel(new DefaultComboBoxModel(signingAlgorithms));
+
+        if (signingAlgorithms.length > 0) {
+            JWSAlgorithm algorithm = signingAlgorithms[0];
+            comboBoxIntruderSigningAlg.setSelectedItem(algorithm);
+            intruderConfig.setSigningAlgorithm(algorithm);
         }
     }
 
