@@ -18,7 +18,6 @@ import java.util.Optional;
 
 import static burp.intruder.FuzzLocation.PAYLOAD;
 import static com.blackberry.jwteditor.model.jose.JOSEObjectFinder.parseJOSEObject;
-import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 public class JWSPayloadProcessor implements PayloadProcessor {
     private final Logging logging;
@@ -61,9 +60,7 @@ public class JWSPayloadProcessor implements PayloadProcessor {
     }
 
     private Optional<Key> loadKey() {
-        String keyId = intruderConfig.signingKeyId();
-
-        if (isNotEmpty(keyId)) {
+        if (!intruderConfig.resign()) {
             return Optional.empty();
         }
 
@@ -87,7 +84,8 @@ public class JWSPayloadProcessor implements PayloadProcessor {
             Optional<JWS> result = Optional.empty();
 
             try {
-                result = Optional.of(JWSFactory.sign(key, key.getSigningAlgorithms()[0], header, payload));
+                // TODO - update alg within header
+                result = Optional.of(JWSFactory.sign(key, intruderConfig.signingAlgorithm(), header, payload));
             } catch (SigningException ex) {
                 logging.logToError("Failed to sign JWS: " + ex);
             }

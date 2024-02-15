@@ -21,6 +21,7 @@ package burp.config;
 import burp.intruder.IntruderConfig;
 import org.junit.jupiter.api.Test;
 
+import static com.nimbusds.jose.JWSAlgorithm.HS256;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class IntruderConfigTest {
@@ -45,9 +46,20 @@ class IntruderConfigTest {
     }
 
     @Test
-    void givenValidKeyID_whenResignIsSetTrue_thenResignIsTrue() {
+    void givenValidKeyIDAndNullSigningAlgorithm_whenResignIsSetTrue_thenResignIsFalse() {
         IntruderConfig config = new IntruderConfig();
         config.setSigningKeyId("keyID");
+
+        config.setResign(true);
+
+        assertThat(config.resign()).isFalse();
+    }
+
+    @Test
+    void givenValidKeyIDAndNonNullSigningAlgorithm_whenResignIsSetTrue_thenResignIsTrue() {
+        IntruderConfig config = new IntruderConfig();
+        config.setSigningKeyId("keyID");
+        config.setSigningAlgorithm(HS256);
 
         config.setResign(true);
 
