@@ -18,6 +18,8 @@ limitations under the License.
 
 package burp.intruder;
 
+import com.nimbusds.jose.JWSAlgorithm;
+
 import static burp.intruder.FuzzLocation.PAYLOAD;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
@@ -25,6 +27,7 @@ public class IntruderConfig {
     private String fuzzParameter;
     private FuzzLocation fuzzLocation;
     private String signingKeyId;
+    private JWSAlgorithm signingAlgorithm;
     private boolean resign;
 
     public IntruderConfig() {
@@ -54,7 +57,7 @@ public class IntruderConfig {
 
     public void setSigningKeyId(String signingKeyId) {
         this.signingKeyId = signingKeyId;
-        this.resign = resign && isSigningKeyIdValid();
+        this.resign = resign && canSign();
     }
 
     public boolean resign() {
@@ -62,10 +65,19 @@ public class IntruderConfig {
     }
 
     public void setResign(boolean resign) {
-        this.resign = resign && isSigningKeyIdValid();
+        this.resign = resign && canSign();
     }
 
-    private boolean isSigningKeyIdValid() {
-        return isNotEmpty(signingKeyId);
+    public JWSAlgorithm signingAlgorithm() {
+        return signingAlgorithm;
+    }
+
+    public void setSigningAlgorithm(JWSAlgorithm signingAlgorithm) {
+        this.signingAlgorithm = signingAlgorithm;
+        this.resign = resign && canSign();
+    }
+
+    private boolean canSign() {
+        return isNotEmpty(signingKeyId) && signingAlgorithm != null;
     }
 }
