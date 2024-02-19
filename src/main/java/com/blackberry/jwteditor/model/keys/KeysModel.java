@@ -131,8 +131,11 @@ public class KeysModel {
             oldKey = keys.put(key.getID(), key);
         }
 
-        for (KeysModelListener modelListener: this.modelListeners) {
-            modelListener.notifyKeyDeleted(oldKey);
+        for (KeysModelListener modelListener : modelListeners) {
+            if (oldKey != null) {
+                modelListener.notifyKeyDeleted(oldKey);
+            }
+
             modelListener.notifyKeyInserted(key);
         }
     }
@@ -165,7 +168,7 @@ public class KeysModel {
         }
 
         if (rowIndex >= 0) {
-            for (KeysModelListener modelListener: this.modelListeners) {
+            for (KeysModelListener modelListener : this.modelListeners) {
                 modelListener.notifyKeyDeleted(rowIndex);
             }
         }
