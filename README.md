@@ -17,7 +17,7 @@ Additionally it facilitates several well-known attacks against JWT implementatio
 
 ## Changelog
 
-**2.2**
+**2.2 2024-02-29**
 - Allow resigning of JWS tokens during fuzzing (Thanks to [@BafDyce](https://github.com/BafDyce)).
 
 **2.1.1 2024-01-22**
