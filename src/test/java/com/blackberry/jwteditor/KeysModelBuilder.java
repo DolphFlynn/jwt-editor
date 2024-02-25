@@ -25,31 +25,43 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.blackberry.jwteditor.KeyLoader.*;
 
-class KeysModelBuilder {
+public class KeysModelBuilder {
     private final AtomicInteger keyId = new AtomicInteger();
     private final KeysModel model = new KeysModel();
 
-    KeysModelBuilder withECKey(String pem) {
-        model.addKey(loadECKey(pem, nextKeyId()));
+    public KeysModelBuilder withECKey(String pem) {
+        return withECKey(pem, nextKeyId());
+    }
+
+    public KeysModelBuilder withECKey(String pem, String keyId) {
+        model.addKey(loadECKey(pem, keyId));
         return this;
     }
 
-    KeysModelBuilder withRSAKey(String pem) {
-        model.addKey(loadRSAKey(pem, nextKeyId()));
+    public KeysModelBuilder withRSAKey(String pem) {
+        return withRSAKey(pem, nextKeyId());
+    }
+
+    public KeysModelBuilder withRSAKey(String pem, String keyId) {
+        model.addKey(loadRSAKey(pem, keyId));
         return this;
     }
 
-    KeysModelBuilder withOKPKey(String pem) {
-        model.addKey(loadOKPKey(pem, nextKeyId()));
+    public KeysModelBuilder withOKPKey(String pem) {
+        return withOKPKey(pem, nextKeyId());
+    }
+
+    public KeysModelBuilder withOKPKey(String pem, String keyId) {
+        model.addKey(loadOKPKey(pem, keyId));
         return this;
     }
 
-    KeysModelBuilder withKey(Key key) {
+    public KeysModelBuilder withKey(Key key) {
         model.addKey(key);
         return this;
     }
 
-    KeysModel build() {
+    public KeysModel build() {
         return model;
     }
 
@@ -57,7 +69,7 @@ class KeysModelBuilder {
         return Integer.toString(keyId.incrementAndGet());
     }
 
-    static KeysModelBuilder keysModel() {
+    public static KeysModelBuilder keysModel() {
         return new KeysModelBuilder();
     }
 }
