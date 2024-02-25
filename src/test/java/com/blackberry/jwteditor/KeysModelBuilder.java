@@ -18,50 +18,29 @@ limitations under the License.
 
 package com.blackberry.jwteditor;
 
-import com.blackberry.jwteditor.exceptions.PemException;
-import com.blackberry.jwteditor.exceptions.UnsupportedKeyException;
-import com.blackberry.jwteditor.model.keys.JWKKeyFactory;
 import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.model.keys.KeysModel;
-import com.blackberry.jwteditor.utils.PEMUtils;
-import com.nimbusds.jose.jwk.JWK;
 
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static com.blackberry.jwteditor.KeyLoader.*;
 
 class KeysModelBuilder {
     private final AtomicInteger keyId = new AtomicInteger();
     private final KeysModel model = new KeysModel();
 
     KeysModelBuilder withECKey(String pem) {
-        try {
-            JWK jwk = PEMUtils.pemToECKey(pem, Integer.toString(keyId.incrementAndGet()));
-            model.addKey(JWKKeyFactory.from(jwk));
-        } catch (PemException | UnsupportedKeyException e) {
-            throw new IllegalStateException(e);
-        }
-
+        model.addKey(loadECKey(pem, nextKeyId()));
         return this;
     }
 
     KeysModelBuilder withRSAKey(String pem) {
-        try {
-            JWK jwk = PEMUtils.pemToRSAKey(pem, Integer.toString(keyId.incrementAndGet()));
-            model.addKey(JWKKeyFactory.from(jwk));
-        } catch (PemException | UnsupportedKeyException e) {
-            throw new IllegalStateException(e);
-        }
-
+        model.addKey(loadRSAKey(pem, nextKeyId()));
         return this;
     }
 
     KeysModelBuilder withOKPKey(String pem) {
-        try {
-            JWK jwk = PEMUtils.pemToOctetKeyPair(pem, Integer.toString(keyId.incrementAndGet()));
-            model.addKey(JWKKeyFactory.from(jwk));
-        } catch (PemException | UnsupportedKeyException e) {
-            throw new IllegalStateException(e);
-        }
-
+        model.addKey(loadOKPKey(pem, nextKeyId()));
         return this;
     }
 
@@ -72,6 +51,10 @@ class KeysModelBuilder {
 
     KeysModel build() {
         return model;
+    }
+
+    private String nextKeyId() {
+        return Integer.toString(keyId.incrementAndGet());
     }
 
     static KeysModelBuilder keysModel() {
