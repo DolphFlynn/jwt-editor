@@ -80,17 +80,18 @@ public class JWSPayloadProcessor implements PayloadProcessor {
 
     // Creates a JWS object from the given attributes. Signs the JWS if possible (i.e., available key selected in Intruder settings)
     private JWS createJWS(Base64URL header, Base64URL payload, Base64URL originalSignature) {
-        return this.loadKey().flatMap(key -> {
-            Optional<JWS> result = Optional.empty();
-
-            try {
-                // TODO - update alg within header
-                result = Optional.of(JWSFactory.sign(key, intruderConfig.signingAlgorithm(), header, payload));
-            } catch (SigningException ex) {
-                logging.logToError("Failed to sign JWS: " + ex);
-            }
-
-            return result;
-        }).orElseGet(() -> JWSFactory.jwsFromParts(header, payload, originalSignature));
+        return loadKey()
+                .flatMap(key -> {
+                    try {
+                        // TODO - update alg within header
+                        return Optional.of(JWSFactory.sign(key, intruderConfig.signingAlgorithm(), header, payload));
+                    } catch (SigningException ex) {
+                        logging.logToError("Failed to sign JWS: " + ex);
+                        return Optional.empty();
+                    }
+                })
+                .orElseGet(
+                        () -> JWSFactory.jwsFromParts(header, payload, originalSignature)
+                );
     }
 }

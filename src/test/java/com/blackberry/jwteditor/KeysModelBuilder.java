@@ -30,17 +30,29 @@ public class KeysModelBuilder {
     private final KeysModel model = new KeysModel();
 
     public KeysModelBuilder withECKey(String pem) {
-        model.addKey(loadECKey(pem, nextKeyId()));
+        return withECKey(pem, nextKeyId());
+    }
+
+    public KeysModelBuilder withECKey(String pem, String keyId) {
+        model.addKey(loadECKey(pem, keyId));
         return this;
     }
 
     public KeysModelBuilder withRSAKey(String pem) {
-        model.addKey(loadRSAKey(pem, nextKeyId()));
+        return withRSAKey(pem, nextKeyId());
+    }
+
+    public KeysModelBuilder withRSAKey(String pem, String keyId) {
+        model.addKey(loadRSAKey(pem, keyId));
         return this;
     }
 
     public KeysModelBuilder withOKPKey(String pem) {
-        model.addKey(loadOKPKey(pem, nextKeyId()));
+        return withOKPKey(pem, nextKeyId());
+    }
+
+    public KeysModelBuilder withOKPKey(String pem, String keyId) {
+        model.addKey(loadOKPKey(pem, keyId));
         return this;
     }
 

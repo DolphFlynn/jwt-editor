@@ -1,5 +1,7 @@
 package burp.intruder;
 
+import com.nimbusds.jose.JWSAlgorithm;
+
 class IntruderConfigBuilder {
     private final IntruderConfig config;
 
@@ -14,6 +16,21 @@ class IntruderConfigBuilder {
 
     IntruderConfigBuilder withFuzzParameter(String parameterName) {
         config.setFuzzParameter(parameterName);
+        return this;
+    }
+
+    IntruderConfigBuilder withSigningKeyId(String signingId) {
+        config.setSigningKeyId(signingId);
+        return this;
+    }
+
+    IntruderConfigBuilder withSigningAlgorithm(JWSAlgorithm algorithm) {
+        config.setSigningAlgorithm(algorithm);
+        return this;
+    }
+
+    IntruderConfigBuilder withResigning(boolean resign) {
+        config.setResign(resign);
         return this;
     }
 
