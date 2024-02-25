@@ -45,7 +45,7 @@ public class ConfigView {
 
     private void createUIComponents() {
         proxyConfigView = new ProxyConfigView(userInterface, burpConfig.proxyConfig());
-        intruderConfigView = new IntruderConfigView(userInterface, keysModel, burpConfig.intruderConfig());
+        intruderConfigView = new IntruderConfigView(userInterface, new IntruderConfigModel(keysModel, burpConfig.intruderConfig()));
         scannerConfigView = new ScannerConfigView(userInterface, burpConfig.scannerConfig(), isProVersion);
     }
 }
