@@ -11,6 +11,7 @@ import com.blackberry.jwteditor.model.jose.JWS;
 import com.blackberry.jwteditor.model.jose.JWSFactory;
 import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.model.keys.KeysModel;
+import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.util.Base64URL;
 import org.json.JSONObject;
 
@@ -18,6 +19,7 @@ import java.util.Optional;
 
 import static burp.intruder.FuzzLocation.PAYLOAD;
 import static com.blackberry.jwteditor.model.jose.JOSEObjectFinder.parseJOSEObject;
+import static com.nimbusds.jose.HeaderParameterNames.ALGORITHM;
 
 public class JWSPayloadProcessor implements PayloadProcessor {
     private final Logging logging;
@@ -83,8 +85,20 @@ public class JWSPayloadProcessor implements PayloadProcessor {
         return loadKey()
                 .flatMap(key -> {
                     try {
-                        // TODO - update alg within header
-                        return Optional.of(JWSFactory.sign(key, intruderConfig.signingAlgorithm(), header, payload));
+                        JWSAlgorithm algorithm = intruderConfig.signingAlgorithm();
+
+                        String headerJson = header.decodeToString();
+                        JSONObject headerJsonObject = new JSONObject(headerJson);
+
+                        Object originalAlgorithm = headerJsonObject.get(ALGORITHM);
+                        headerJsonObject.put(ALGORITHM, algorithm.getName());
+
+                        // Only update when alg different to preserve key order
+                        Base64URL updatedHeader = originalAlgorithm instanceof JWSAlgorithm alg && alg.equals(algorithm)
+                                ? header
+                                : Base64URL.encode(headerJsonObject.toString());
+
+                        return Optional.of(JWSFactory.sign(key, algorithm, updatedHeader, payload));
                     } catch (SigningException ex) {
                         logging.logToError("Failed to sign JWS: " + ex);
                         return Optional.empty();

@@ -21,6 +21,7 @@ import static burp.intruder.FuzzLocation.HEADER;
 import static burp.intruder.FuzzLocation.PAYLOAD;
 import static burp.intruder.IntruderConfigBuilder.intruderConfig;
 import static com.blackberry.jwteditor.KeysModelBuilder.keysModel;
+import static com.nimbusds.jose.JWSAlgorithm.RS256;
 import static com.nimbusds.jose.JWSAlgorithm.RS512;
 import static data.PemData.RSA1024Private;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -166,5 +167,25 @@ class JWSPayloadProcessorTest {
 
         assertThat(result.action()).isEqualTo(USE_PAYLOAD);
         assertThat(result.processedPayload().toString()).isEqualTo("eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzUxMiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6ImVtYW5vbiIsImlhdCI6MTUxNjIzOTAyMn0.poPOxqjqp-CnC2b7eaf2QvfvAfawzp6k-P1QECIHN7KCTnFIlQbiJC4ZtLPH_0-o3HQcUGZbib3m1CVWeY21FIUTVUmOyjU8XuBohtBXRlXoaKXVWibrm5YiLC3yNQz5uAF-gdBB8ybvsmetK7JIZ8UvQdJ3mdvlAAW-3xFv8fs");
+    }
+
+    @Test
+    void givenBaseValueJWSAndFuzzParameterPresentInPayload_whenResignOnAndSigningKeyPresentAndAlgorithmChanged_thenPayloadAndAlgModifiedAndResigned() {
+        String baseValue = "eyJhbGciOiJIUzI1NiIsImtpZCI6ImNyZXMiLCJ0eXAiOiJKV1QifQ.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
+        PayloadData payloadData = payloadData().withBaseValue(baseValue).withCurrentPayload("emanon").build();
+        KeysModel keysModel = keysModel().withRSAKey(RSA1024Private, KEY_ID).build();
+        IntruderConfig intruderConfig = intruderConfig()
+                .withFuzzParameter("name")
+                .withFuzzLocation(PAYLOAD)
+                .withSigningKeyId(KEY_ID)
+                .withSigningAlgorithm(RS256)
+                .withResigning(true)
+                .build();
+
+        JWSPayloadProcessor processor = new JWSPayloadProcessor(intruderConfig, LOGGING, keysModel);
+        PayloadProcessingResult result = processor.processPayload(payloadData);
+
+        assertThat(result.action()).isEqualTo(USE_PAYLOAD);
+        assertThat(result.processedPayload().toString()).isEqualTo("eyJraWQiOiJjcmVzIiwidHlwIjoiSldUIiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6ImVtYW5vbiIsImlhdCI6MTUxNjIzOTAyMn0.qZw9QLyX5NAxBioegUsiBoWVpVShdy1EGHwwgOtknyVXhXqQDbXt15IYUkj66_dDIGNuZ76g_BdJLy9V9qG-sTbQgsLykbfLfdqelNhOsw-c_gs7eJPK0DYaYmBZNJayD5EJoOTF0Vs0AR2Rlnhf1PeoK04HZfJhoDS39gs4hRU");
     }
 }
