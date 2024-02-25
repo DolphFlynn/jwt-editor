@@ -25,31 +25,31 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.blackberry.jwteditor.KeyLoader.*;
 
-class KeysModelBuilder {
+public class KeysModelBuilder {
     private final AtomicInteger keyId = new AtomicInteger();
     private final KeysModel model = new KeysModel();
 
-    KeysModelBuilder withECKey(String pem) {
+    public KeysModelBuilder withECKey(String pem) {
         model.addKey(loadECKey(pem, nextKeyId()));
         return this;
     }
 
-    KeysModelBuilder withRSAKey(String pem) {
+    public KeysModelBuilder withRSAKey(String pem) {
         model.addKey(loadRSAKey(pem, nextKeyId()));
         return this;
     }
 
-    KeysModelBuilder withOKPKey(String pem) {
+    public KeysModelBuilder withOKPKey(String pem) {
         model.addKey(loadOKPKey(pem, nextKeyId()));
         return this;
     }
 
-    KeysModelBuilder withKey(Key key) {
+    public KeysModelBuilder withKey(Key key) {
         model.addKey(key);
         return this;
     }
 
-    KeysModel build() {
+    public KeysModel build() {
         return model;
     }
 
@@ -57,7 +57,7 @@ class KeysModelBuilder {
         return Integer.toString(keyId.incrementAndGet());
     }
 
-    static KeysModelBuilder keysModel() {
+    public static KeysModelBuilder keysModel() {
         return new KeysModelBuilder();
     }
 }

@@ -19,6 +19,8 @@ import static burp.api.montoya.intruder.PayloadProcessingAction.USE_PAYLOAD;
 import static burp.api.montoya.logging.StubLogging.LOGGING;
 import static burp.intruder.FuzzLocation.HEADER;
 import static burp.intruder.FuzzLocation.PAYLOAD;
+import static burp.intruder.IntruderConfigBuilder.intruderConfig;
+import static com.blackberry.jwteditor.KeysModelBuilder.keysModel;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -26,6 +28,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MontoyaExtension.class)
 class JWSPayloadProcessorTest {
+    private static final KeysModel EMPTY_KEYS_MODEL = keysModel().build();
 
     @BeforeEach
     void configureMocks() {
@@ -42,9 +45,9 @@ class JWSPayloadProcessorTest {
     void givenBaseValueNotJWS_whenPayloadProcessed_thenPayloadLeftUnchanged() {
         String baseValue = "isogeny";
         PayloadData payloadData = payloadData().withBaseValue(baseValue).build();
-        KeysModel keysModel = new KeysModel();
-        JWSPayloadProcessor processor = new JWSPayloadProcessor(intruderConfig("role", PAYLOAD), LOGGING, keysModel);
+        IntruderConfig intruderConfig = intruderConfig().withFuzzParameter("role").withFuzzLocation(PAYLOAD).build();
 
+        JWSPayloadProcessor processor = new JWSPayloadProcessor(intruderConfig, LOGGING, EMPTY_KEYS_MODEL);
         PayloadProcessingResult result = processor.processPayload(payloadData);
 
         assertThat(result.action()).isEqualTo(USE_PAYLOAD);
@@ -55,9 +58,9 @@ class JWSPayloadProcessorTest {
     void givenBaseValueJWSAndFuzzParameterNotPresent_whenPayloadProcessed_thenPayloadLeftUnchanged() {
         String baseValue = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
         PayloadData payloadData = payloadData().withBaseValue(baseValue).build();
-        KeysModel keysModel = new KeysModel();
-        JWSPayloadProcessor processor = new JWSPayloadProcessor(intruderConfig("role", PAYLOAD), LOGGING, keysModel);
+        IntruderConfig intruderConfig = intruderConfig().withFuzzParameter("role").withFuzzLocation(PAYLOAD).build();
 
+        JWSPayloadProcessor processor = new JWSPayloadProcessor(intruderConfig, LOGGING, EMPTY_KEYS_MODEL);
         PayloadProcessingResult result = processor.processPayload(payloadData);
 
         assertThat(result.action()).isEqualTo(USE_PAYLOAD);
@@ -68,9 +71,9 @@ class JWSPayloadProcessorTest {
     void givenBaseValueJWSAndFuzzParameterPresentInWrongContext_whenPayloadProcessed_thenPayloadLeftUnchanged() {
         String baseValue = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
         PayloadData payloadData = payloadData().withBaseValue(baseValue).build();
-        KeysModel keysModel = new KeysModel();
-        JWSPayloadProcessor processor = new JWSPayloadProcessor(intruderConfig("alg", PAYLOAD), LOGGING, keysModel);
+        IntruderConfig intruderConfig = intruderConfig().withFuzzParameter("alg").withFuzzLocation(PAYLOAD).build();
 
+        JWSPayloadProcessor processor = new JWSPayloadProcessor(intruderConfig, LOGGING, EMPTY_KEYS_MODEL);
         PayloadProcessingResult result = processor.processPayload(payloadData);
 
         assertThat(result.action()).isEqualTo(USE_PAYLOAD);
@@ -81,9 +84,9 @@ class JWSPayloadProcessorTest {
     void givenBaseValueJWSAndFuzzParameterPresentInHeader_whenPayloadProcessed_thenPayloadModified() {
         String baseValue = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
         PayloadData payloadData = payloadData().withBaseValue(baseValue).withCurrentPayload("RS256").build();
-        KeysModel keysModel = new KeysModel();
-        JWSPayloadProcessor processor = new JWSPayloadProcessor(intruderConfig("alg", HEADER), LOGGING, keysModel);
+        IntruderConfig intruderConfig = intruderConfig().withFuzzParameter("alg").withFuzzLocation(HEADER).build();
 
+        JWSPayloadProcessor processor = new JWSPayloadProcessor(intruderConfig, LOGGING, EMPTY_KEYS_MODEL);
         PayloadProcessingResult result = processor.processPayload(payloadData);
 
         assertThat(result.action()).isEqualTo(USE_PAYLOAD);
@@ -94,20 +97,12 @@ class JWSPayloadProcessorTest {
     void givenBaseValueJWSAndFuzzParameterPresentInPayload_whenPayloadProcessed_thenPayloadModified() {
         String baseValue = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
         PayloadData payloadData = payloadData().withBaseValue(baseValue).withCurrentPayload("emanon").build();
-        KeysModel keysModel = new KeysModel();
-        JWSPayloadProcessor processor = new JWSPayloadProcessor(intruderConfig("name", PAYLOAD), LOGGING, keysModel);
+        IntruderConfig intruderConfig = intruderConfig().withFuzzParameter("name").withFuzzLocation(PAYLOAD).build();
 
+        JWSPayloadProcessor processor = new JWSPayloadProcessor(intruderConfig, LOGGING, EMPTY_KEYS_MODEL);
         PayloadProcessingResult result = processor.processPayload(payloadData);
 
         assertThat(result.action()).isEqualTo(USE_PAYLOAD);
         assertThat(result.processedPayload().toString()).isEqualTo("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6ImVtYW5vbiIsImlhdCI6MTUxNjIzOTAyMn0.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c");
-    }
-
-    private static IntruderConfig intruderConfig(String parameterName, FuzzLocation parameterLocation) {
-        IntruderConfig intruderConfig = new IntruderConfig();
-        intruderConfig.setFuzzParameter(parameterName);
-        intruderConfig.setFuzzLocation(parameterLocation);
-
-        return intruderConfig;
     }
 }
