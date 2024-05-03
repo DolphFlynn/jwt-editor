@@ -25,6 +25,7 @@ import com.blackberry.jwteditor.view.editor.ResponseEditorView;
 import com.blackberry.jwteditor.view.rsta.RstaFactory;
 
 import java.awt.*;
+import java.util.NoSuchElementException;
 
 import static burp.api.montoya.core.BurpSuiteEdition.COMMUNITY_EDITION;
 import static burp.api.montoya.core.BurpSuiteEdition.PROFESSIONAL;
@@ -35,6 +36,16 @@ public class JWTEditorExtension implements BurpExtension {
 
     @Override
     public void initialize(MontoyaApi api) {
+        try{
+            __initialize(api);
+        }catch (NoSuchElementException noSuchElementException){
+            Preferences preferences = api.persistence().preferences();
+            BurpConfigPersistence burpConfigPersistence = new BurpConfigPersistence(preferences);
+            api.extension().registerUnloadingHandler(() -> burpConfigPersistence.save(new BurpConfig()));
+            __initialize(api);
+        }
+    }
+    public void __initialize(MontoyaApi api) {
         api.extension().setName(Utils.getResourceString("tool_name"));
 
         Preferences preferences = api.persistence().preferences();
