@@ -10,7 +10,7 @@ Additionally it facilitates several well-known attacks against JWT implementatio
 
 * A top level tab titled `JWT Editor`
 * A custom tab `JSON Web Token` tab within HTTP messages containing JWTs
-* JWT highlighting within proxied HTTP and web socket messages
+* JWT highlighting within proxied HTTP and WebSocket messages
 * JWS Intruder payload provider
 * JWS Scanner insertion point provider
 
@@ -45,7 +45,7 @@ Additionally it facilitates several well-known attacks against JWT implementatio
 Forked from [Fraser Winterborn](https://uk.linkedin.com/in/fraser-winterborn-198b8a129)'s version (original [repository](https://github.com/blackberry/jwt-editor)).
 * Payload processing rule to support fuzzing within JWS.
 * Insertion point provider for JWS header parameters.
-* JWT highlighting within websocket messages.
+* JWT highlighting within WebSocket messages.
 * Update to Java 17 and PortSwigger's new Montoya API.
 * Add ability to enable/disable JWT highlighting within proxied messages and to change highlight color.
 * Add ability to inject Collaborator payloads into x5u and jku headers.
