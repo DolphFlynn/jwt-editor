@@ -18,7 +18,7 @@ Additionally it facilitates several well-known attacks against JWT implementatio
 ## Changelog
 
 **2.2.1 2024-05-06**
-- Fix [issue](https://github.com/DolphFlynn/jwt-editor/issues/32) where an invalid Intruder signing key could prevent the extension from loading (Thanks to [@sebastianosrt](https://github.com/sebastianosrt) for reporting this).
+- Fix issue where an invalid Intruder signing key could prevent the extension from loading (Thanks to [@sebastianosrt](https://github.com/sebastianosrt) for reporting this).
 
 **2.2 2024-02-29**
 - Allow resigning of JWS tokens during fuzzing (Thanks to [@BafDyce](https://github.com/BafDyce)).
