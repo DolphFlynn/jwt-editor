@@ -86,4 +86,8 @@ jar {
                     })
         }
     }
+    from(rootDir) {
+        include 'LICENSE.md'
+        into 'META-INF'
+    }
 }
