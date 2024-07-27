@@ -35,17 +35,17 @@ dependencies {
             "com.jetbrains.intellij.java:java-gui-forms-rt:${gui_designer_version}",
             'com.nimbusds:nimbus-jose-jwt:9.21',
             'org.exbin.deltahex:deltahex-swing:0.1.2',
-            'com.fifesoft:rsyntaxtextarea:3.3.4',
-            'org.json:json:20240205',
+            'com.fifesoft:rsyntaxtextarea:3.4.1',
+            'org.json:json:20240303',
             'org.apache.commons:commons-lang3:3.14.0'
     )
     testImplementation(
             "org.bouncycastle:bcprov-jdk18on:${bouncycastle_version}",
             "org.bouncycastle:bcpkix-jdk18on:${bouncycastle_version}",
             "net.portswigger.burp.extensions:montoya-api:${extender_version}",
-            'org.junit.jupiter:junit-jupiter:5.10.1',
-            'org.assertj:assertj-core:3.24.2',
-            'org.mockito:mockito-core:5.8.0'
+            'org.junit.jupiter:junit-jupiter:5.10.3',
+            'org.assertj:assertj-core:3.26.3',
+            'org.mockito:mockito-core:5.12.0'
     )
 }
 
