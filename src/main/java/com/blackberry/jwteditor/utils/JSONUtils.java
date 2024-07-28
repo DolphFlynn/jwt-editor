@@ -46,8 +46,7 @@ public class JSONUtils {
 
             if (stringContext) {
                 stringBuilder.append(c);
-            }
-            else {
+            } else {
                 switch (c) {
                     case '{':
                     case '[':
@@ -99,12 +98,10 @@ public class JSONUtils {
         // Use JSONObject or JSONArray to perform an initial parse to check the content of the string is JSON
         try {
             new JSONObject(json);
-        }
-        catch (JSONException e) {
+        } catch (JSONException e) {
             try {
                 new JSONArray(json);
-            }
-            catch (JSONException e2){
+            } catch (JSONException e2) {
                 throw e;
             }
         }
@@ -112,18 +109,26 @@ public class JSONUtils {
         StringBuilder stringBuilder = new StringBuilder();
         // Whitespace in JSON is four characters that are not inside a matched pair of double quotes
         boolean stringContext = false;
-        for(char c: json.toCharArray()){
+        for (char c : json.toCharArray()) {
             if (!stringContext && (c == 0x20 || c == 0x0A || c == 0x0D || c == 0x09)) {
                 continue;
             }
 
             stringBuilder.append(c);
 
-            if(c == '"'){
+            if (c == '"') {
                 stringContext = !stringContext;
             }
         }
 
         return stringBuilder.toString();
+    }
+
+    public static boolean isJsonCompact(String json) {
+        try {
+            return compactJSON(json).equals(json);
+        } catch (JSONException e) {
+            return false;
+        }
     }
 }
