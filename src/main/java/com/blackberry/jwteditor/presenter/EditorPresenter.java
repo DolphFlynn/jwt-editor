@@ -25,7 +25,6 @@ import com.blackberry.jwteditor.model.jose.JWS;
 import com.blackberry.jwteditor.model.jose.MutableJOSEObject;
 import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.model.keys.KeyRing;
-import com.blackberry.jwteditor.utils.JSONUtils;
 import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.view.dialog.MessageDialogFactory;
 import com.blackberry.jwteditor.view.dialog.operations.*;
@@ -34,7 +33,6 @@ import com.blackberry.jwteditor.view.utils.ErrorLoggingActionListenerFactory;
 import com.nimbusds.jose.util.Base64URL;
 import org.json.JSONException;
 
-import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -143,23 +141,14 @@ public class EditorPresenter extends Presenter {
      * @param jwe the JWE to display
      */
     private void setJWE(JWE jwe) {
-
-        // Check if the header survives pretty printing and compaction without changes (i.e. it was compact when deserialized)
+        // Check if the header survives compaction without changes (i.e. it was compact when deserialized)
         String header = jwe.getHeader();
-        try {
-            String prettyPrintedJSON = prettyPrintJSON(header);
-            if (JSONUtils.compactJSON(prettyPrintedJSON).equals(header)) {
-                // If it does, display the pretty printed version
-                view.setJWEHeaderCompact(true);
-                view.setJWEHeader(prettyPrintedJSON);
-            } else {
-                // Otherwise, it contained whitespace, so don't try to pretty print, as the re-compacted version won't match the original
-                view.setJWEHeaderCompact(false);
-                view.setJWEHeader(header);
-            }
-        } catch (JSONException e) {
-            view.setJWEHeader(header);
-        }
+
+        boolean isHeaderJsonCompact = isJsonCompact(header);
+        String jweHeader = isHeaderJsonCompact ? prettyPrintJSON(header) : header;
+
+        view.setJWEHeader(jweHeader);
+        view.setJWEHeaderCompact(isHeaderJsonCompact);
 
         // Set the other JWE fields - these are all byte arrays
         view.setEncryptedKey(jwe.getEncryptedKey());
@@ -174,24 +163,14 @@ public class EditorPresenter extends Presenter {
      * @return the JWE built from the editor entry fields
      */
     private JWE getJWE() {
+        // Get the header text entry as base64. Compact the JSON if the compact checkbox is ticked
+        // Return the entry encoded as-is if this fails, or the compact checkbox is unticked
+        Base64URL header = base64UrlEncodeJson(view.getJWEHeader(), view.getJWEHeaderCompact());
 
-        Base64URL header;
         Base64URL encryptedKey = Base64URL.encode(view.getEncryptedKey());
         Base64URL iv = Base64URL.encode(view.getIV());
         Base64URL ciphertext = Base64URL.encode(view.getCiphertext());
         Base64URL tag = Base64URL.encode(view.getTag());
-
-        // Get the header text entry as base64. Compact the JSON if the compact checkbox is ticked
-        // Return the entry encoded as-is if this fails, or the compact checkbox is unticked
-        try {
-            if (view.getJWEHeaderCompact()) {
-                header = Base64URL.encode(JSONUtils.compactJSON(view.getJWEHeader()).getBytes(StandardCharsets.UTF_8));
-            } else {
-                header = Base64URL.encode(view.getJWEHeader().getBytes(StandardCharsets.UTF_8));
-            }
-        } catch (JSONException e) {
-            header = Base64URL.encode(view.getJWEHeader().getBytes(StandardCharsets.UTF_8));
-        }
 
         return jweFromParts(header, encryptedKey, iv, ciphertext, tag);
     }
