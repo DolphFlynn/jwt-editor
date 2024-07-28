@@ -18,7 +18,6 @@ limitations under the License.
 
 package com.blackberry.jwteditor.utils;
 
-import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -53,14 +52,14 @@ public class JSONUtils {
                         indentationLevel++;
                         stringBuilder.append(c);
                         stringBuilder.append('\n');
-                        stringBuilder.append(StringUtils.repeat(' ', indentationLevel * JSON_INDENTATION));
+                        stringBuilder.append(" ".repeat( indentationLevel * JSON_INDENTATION));
                         break;
 
                     case '}':
                     case ']':
                         indentationLevel--;
                         stringBuilder.append('\n');
-                        stringBuilder.append(StringUtils.repeat(' ', indentationLevel * JSON_INDENTATION));
+                        stringBuilder.append(" ".repeat(indentationLevel * JSON_INDENTATION));
                         stringBuilder.append(c);
                         break;
 
@@ -70,7 +69,7 @@ public class JSONUtils {
 
                     case ',':
                         stringBuilder.append(",\n");
-                        stringBuilder.append(StringUtils.repeat(' ', indentationLevel * JSON_INDENTATION));
+                        stringBuilder.append(" ".repeat(indentationLevel * JSON_INDENTATION));
                         break;
 
                     default:
