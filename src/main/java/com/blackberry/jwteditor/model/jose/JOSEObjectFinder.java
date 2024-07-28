@@ -78,7 +78,7 @@ public class JOSEObjectFinder {
 
     private static Set<String> findCandidateJoseObjectsWithin(String text) {
         Matcher m = JOSE_OBJECT_PATTERN.matcher(text);
-        Set<String> strings = new HashSet<>();
+        Set<String> strings = new LinkedHashSet<>();
 
         while (m.find()) {
             String token = m.group();
