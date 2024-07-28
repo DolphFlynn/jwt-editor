@@ -25,7 +25,6 @@ import com.blackberry.jwteditor.model.jose.JWS;
 import com.blackberry.jwteditor.model.jose.MutableJOSEObject;
 import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.model.keys.KeyRing;
-import com.blackberry.jwteditor.utils.JSONUtils;
 import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.view.dialog.MessageDialogFactory;
 import com.blackberry.jwteditor.view.dialog.operations.*;
@@ -34,7 +33,6 @@ import com.blackberry.jwteditor.view.utils.ErrorLoggingActionListenerFactory;
 import com.nimbusds.jose.util.Base64URL;
 import org.json.JSONException;
 
-import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +41,9 @@ import java.util.Optional;
 import static com.blackberry.jwteditor.model.jose.JOSEObjectFinder.containsJOSEObjects;
 import static com.blackberry.jwteditor.model.jose.JWEFactory.jweFromParts;
 import static com.blackberry.jwteditor.model.jose.JWSFactory.jwsFromParts;
+import static com.blackberry.jwteditor.utils.Base64URLUtils.base64UrlEncodeJson;
+import static com.blackberry.jwteditor.utils.JSONUtils.isJsonCompact;
+import static com.blackberry.jwteditor.utils.JSONUtils.prettyPrintJSON;
 
 /**
  * Presenter class for the Editor tab
@@ -79,7 +80,7 @@ public class EditorPresenter extends Presenter {
      * @param content text that may contain a serialized JWE/JWS
      * @return true if the content contains a JWE/JWS that can be edited
      */
-    public boolean isEnabled(String content){
+    public boolean isEnabled(String content) {
         return containsJOSEObjects(content);
     }
 
@@ -95,111 +96,59 @@ public class EditorPresenter extends Presenter {
 
     /**
      * Display a JWS in the editor
+     *
      * @param jws the JWS to display
      */
-    private void setJWS(JWS jws){
+    private void setJWS(JWS jws) {
+        // Check if the header and payload survives compaction without changes (i.e. it was compact when deserialized)
+        // If contain whitespace, don't try to pretty print, as the re-compacted version won't match the original
 
-        // Check if the header survives pretty printing and compaction without changes (i.e. it was compact when deserialized)
         String header = jws.getHeader();
-        try {
-            String prettyPrintedJSON = JSONUtils.prettyPrintJSON(header);
-            if(JSONUtils.compactJSON(prettyPrintedJSON).equals(header)) {
-                // If it does, display the pretty printed version
-                view.setJWSHeaderCompact(true);
-                view.setJWSHeader(prettyPrintedJSON);
-            }
-            else {
-                // Otherwise, it contained whitespace, so don't try to pretty print, as the re-compacted version won't match the original
-                view.setJWSHeaderCompact(false);
-                view.setJWSHeader(header);
-            }
-        }
-        catch(JSONException e){
-            view.setJWSHeader(header);
-        }
+        boolean isHeaderJsonCompact = isJsonCompact(header);
+        String jwsHeader = isHeaderJsonCompact ? prettyPrintJSON(header) : header;
 
-        // Check if the payload survives pretty printing and compaction without changes (i.e. it was compact when deserialized)
+        view.setJWSHeader(jwsHeader);
+        view.setJWSHeaderCompact(isHeaderJsonCompact);
+
         String payload = jws.getPayload();
-        try {
-            String prettyPrintedJSON = JSONUtils.prettyPrintJSON(payload);
-            if(JSONUtils.compactJSON(prettyPrintedJSON).equals(payload)) {
-                view.setJWSPayloadCompact(true);
-                view.setPayload(prettyPrintedJSON);
-            }
-            else {
-                view.setJWSPayloadCompact(false);
-                view.setPayload(payload);
-            }
-        }
-        catch(JSONException e){
-            view.setPayload(payload);
-        }
+        boolean isPayloadJsonCompact = isJsonCompact(payload);
+        String jwsPayload = isPayloadJsonCompact ? prettyPrintJSON(payload) : payload;
 
-        // Set the signature hex view
+        view.setJWSPayloadCompact(isPayloadJsonCompact);
+        view.setPayload(jwsPayload);
+
         view.setSignature(jws.getSignature());
     }
 
     /**
      * Convert the text/hex entry fields to a JWS
+     *
      * @return the JWS built from the editor entry fields
      */
     private JWS getJWS() {
-        Base64URL header;
-        Base64URL payload;
+        // Get the header and payload text entry as base64. Compact the JSON if corresponding compact checkbox is ticked
+        // Return the entry encoded as-is if this fails, or the corresponding compact checkbox is unticked
 
-        // Get the header text entry as base64. Compact the JSON if the compact checkbox is ticked
-        // Return the entry encoded as-is if this fails, or the compact checkbox is unticked
-        try {
-            if (view.getJWSHeaderCompact()) {
-                header = Base64URL.encode(JSONUtils.compactJSON(view.getJWSHeader()));
-            } else {
-                header = Base64URL.encode(view.getJWSHeader());
-            }
-        }
-        catch (JSONException e) {
-            header = Base64URL.encode(view.getJWSHeader());
-        }
-
-        // Get the payload text entry as base64. Compact the JSON if the checkbox is ticked
-        // Return the entry encoded as-is if this fails, or the compact checkbox is unticked
-        try {
-            if (view.getJWSPayloadCompact()) {
-                payload = Base64URL.encode(JSONUtils.compactJSON(view.getPayload()));
-            } else {
-                payload = Base64URL.encode(view.getPayload());
-            }
-        }
-        catch (JSONException e) {
-            payload = Base64URL.encode(view.getPayload());
-        }
+        Base64URL header = base64UrlEncodeJson(view.getJWSHeader(), view.getJWSHeaderCompact());
+        Base64URL payload = base64UrlEncodeJson(view.getPayload(), view.getJWSPayloadCompact());
 
         return jwsFromParts(header, payload, Base64URL.encode(view.getSignature()));
     }
 
     /**
      * Display a JWE in the editor
+     *
      * @param jwe the JWE to display
      */
-    private void setJWE(JWE jwe){
-
-        // Check if the header survives pretty printing and compaction without changes (i.e. it was compact when deserialized)
+    private void setJWE(JWE jwe) {
+        // Check if the header survives compaction without changes (i.e. it was compact when deserialized)
         String header = jwe.getHeader();
-        try {
-            String prettyPrintedJSON = JSONUtils.prettyPrintJSON(header);
-            if(JSONUtils.compactJSON(prettyPrintedJSON).equals(header)) {
-                // If it does, display the pretty printed version
-                view.setJWEHeaderCompact(true);
-                view.setJWEHeader(prettyPrintedJSON);
-            }
-            else {
-                // Otherwise, it contained whitespace, so don't try to pretty print, as the re-compacted version won't match the original
-                view.setJWEHeaderCompact(false);
-                view.setJWEHeader(header);
-            }
-        }
-        catch(JSONException e){
-            view.setJWEHeader(header);
-        }
+
+        boolean isHeaderJsonCompact = isJsonCompact(header);
+        String jweHeader = isHeaderJsonCompact ? prettyPrintJSON(header) : header;
+
+        view.setJWEHeader(jweHeader);
+        view.setJWEHeaderCompact(isHeaderJsonCompact);
 
         // Set the other JWE fields - these are all byte arrays
         view.setEncryptedKey(jwe.getEncryptedKey());
@@ -210,28 +159,18 @@ public class EditorPresenter extends Presenter {
 
     /**
      * Convert the text/hex entry fields to a JWE
+     *
      * @return the JWE built from the editor entry fields
      */
     private JWE getJWE() {
+        // Get the header text entry as base64. Compact the JSON if the compact checkbox is ticked
+        // Return the entry encoded as-is if this fails, or the compact checkbox is unticked
+        Base64URL header = base64UrlEncodeJson(view.getJWEHeader(), view.getJWEHeaderCompact());
 
-        Base64URL header;
         Base64URL encryptedKey = Base64URL.encode(view.getEncryptedKey());
         Base64URL iv = Base64URL.encode(view.getIV());
         Base64URL ciphertext = Base64URL.encode(view.getCiphertext());
         Base64URL tag = Base64URL.encode(view.getTag());
-
-        // Get the header text entry as base64. Compact the JSON if the compact checkbox is ticked
-        // Return the entry encoded as-is if this fails, or the compact checkbox is unticked
-        try {
-            if (view.getJWEHeaderCompact()) {
-                header = Base64URL.encode(JSONUtils.compactJSON(view.getJWEHeader()).getBytes(StandardCharsets.UTF_8));
-            } else {
-                header = Base64URL.encode(view.getJWEHeader().getBytes(StandardCharsets.UTF_8));
-            }
-        }
-        catch (JSONException e){
-            header = Base64URL.encode(view.getJWEHeader().getBytes(StandardCharsets.UTF_8));
-        }
 
         return jweFromParts(header, encryptedKey, iv, ciphertext, tag);
     }
@@ -336,7 +275,7 @@ public class EditorPresenter extends Presenter {
     /**
      * Handle click events from the Sign button
      */
-    public void onSignClicked(){
+    public void onSignClicked() {
         signingDialog(SignDialog.Mode.NORMAL);
     }
 
@@ -345,7 +284,7 @@ public class EditorPresenter extends Presenter {
      *
      * @param mode mode of the signing dialog to display
      */
-    private void signingDialog(SignDialog.Mode mode){
+    private void signingDialog(SignDialog.Mode mode) {
         KeysPresenter keysPresenter = (KeysPresenter) presenters.get(KeysPresenter.class);
 
         // Check there are signing keys in the keystore
@@ -419,7 +358,7 @@ public class EditorPresenter extends Presenter {
     /**
      * Handle click events from the Decrypt button
      */
-    public void onDecryptClicked(){
+    public void onDecryptClicked() {
         KeysPresenter keysPresenter = (KeysPresenter) presenters.get(KeysPresenter.class);
 
         // Check there are decryption keys in the keystore
@@ -482,11 +421,10 @@ public class EditorPresenter extends Presenter {
         JOSEObject joseObject = mutableJoseObject.getModified();
 
         // Change to JWE/JWS mode based on the newly selected JOSEObject
-        if (joseObject instanceof JWS){
+        if (joseObject instanceof JWS) {
             view.setJWSMode();
             setJWS((JWS) joseObject);
-        }
-        else {
+        } else {
             view.setJWEMode();
             setJWE((JWE) joseObject);
         }
@@ -515,9 +453,8 @@ public class EditorPresenter extends Presenter {
      */
     public void formatJWEHeader() {
         try {
-            view.setJWEHeader(JSONUtils.prettyPrintJSON(view.getJWEHeader()));
-        }
-        catch (JSONException e) {
+            view.setJWEHeader(prettyPrintJSON(view.getJWEHeader()));
+        } catch (JSONException e) {
             messageDialogFactory.showErrorDialog("error_title_unable_to_format_json", "error_format_json");
         }
     }
@@ -527,9 +464,8 @@ public class EditorPresenter extends Presenter {
      */
     public void formatJWSHeader() {
         try {
-            view.setJWSHeader(JSONUtils.prettyPrintJSON(view.getJWSHeader()));
-        }
-        catch (JSONException e) {
+            view.setJWSHeader(prettyPrintJSON(view.getJWSHeader()));
+        } catch (JSONException e) {
             messageDialogFactory.showErrorDialog("error_title_unable_to_format_json", "error_format_json");
         }
     }
@@ -539,9 +475,8 @@ public class EditorPresenter extends Presenter {
      */
     public void formatJWSPayload() {
         try {
-            view.setPayload(JSONUtils.prettyPrintJSON(view.getPayload()));
-        }
-        catch (JSONException e) {
+            view.setPayload(prettyPrintJSON(view.getPayload()));
+        } catch (JSONException e) {
             messageDialogFactory.showErrorDialog("error_title_unable_to_format_json", "error_format_json");
         }
     }
