@@ -36,8 +36,7 @@ dependencies {
             'com.nimbusds:nimbus-jose-jwt:9.21',
             'org.exbin.deltahex:deltahex-swing:0.1.2',
             'com.fifesoft:rsyntaxtextarea:3.4.1',
-            'org.json:json:20240303',
-            'org.apache.commons:commons-lang3:3.14.0'
+            'org.json:json:20240303'
     )
     testImplementation(
             "org.bouncycastle:bcprov-jdk18on:${bouncycastle_version}",
