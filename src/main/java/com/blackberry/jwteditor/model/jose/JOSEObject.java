@@ -22,6 +22,9 @@ import com.nimbusds.jose.util.Base64URL;
 
 import java.util.List;
 
+import static java.util.function.Predicate.not;
+import static java.util.stream.Collectors.joining;
+
 /**
  * Abstract class representing common elements of JWE/JWT
  */
@@ -55,4 +58,13 @@ public abstract class JOSEObject {
     public abstract String serialize();
 
     public abstract List<TimeClaim> timeClaims();
+
+    public String getWarnings() {
+        String warnings = timeClaims().stream()
+                .map(TimeClaim::warning)
+                .filter(not(String::isEmpty))
+                .collect(joining(", "));
+
+        return warnings.isEmpty() ? "" : warnings + ".";
+    }
 }

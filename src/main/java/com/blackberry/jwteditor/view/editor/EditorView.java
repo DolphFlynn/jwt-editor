@@ -45,6 +45,7 @@ import java.util.List;
 
 import static java.awt.Color.RED;
 import static java.awt.EventQueue.invokeLater;
+import static java.awt.Font.BOLD;
 import static java.awt.event.HierarchyEvent.SHOWING_CHANGED;
 import static org.exbin.deltahex.EditationAllowed.ALLOWED;
 import static org.exbin.deltahex.EditationAllowed.READ_ONLY;
@@ -92,6 +93,7 @@ public abstract class EditorView implements ExtensionProvidedEditor {
     private JCheckBox checkBoxJWSPayloadCompactJSON;
     private JSplitPane upperSplitPane;
     private JSplitPane lowerSplitPane;
+    private JLabel labelWarnings;
 
     private CodeArea codeAreaSignature;
     private CodeArea codeAreaEncryptedKey;
@@ -544,6 +546,13 @@ public abstract class EditorView implements ExtensionProvidedEditor {
         textAreaJWEHeader = rstaFactory.buildDefaultTextArea();
         textAreaJWSHeader = rstaFactory.buildDefaultTextArea();
         textAreaPayload = rstaFactory.buildDefaultTextArea();
+    }
+
+    public void setWarnings(String text) {
+        invokeLater(() -> {
+            labelWarnings.setFont(labelWarnings.getFont().deriveFont(BOLD));
+            labelWarnings.setText(text);
+        });
     }
 
     private class ResizeSplitPanesOnFirstRenderHierarchyListener implements HierarchyListener {

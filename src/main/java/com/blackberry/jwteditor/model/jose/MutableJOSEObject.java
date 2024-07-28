@@ -71,4 +71,8 @@ public class MutableJOSEObject {
     public String getOriginal() {
         return original;
     }
+
+    public String getWarnings() {
+        return modified.getWarnings();
+    }
 }

@@ -33,6 +33,20 @@ public record TimeClaim(TimeClaimType type, String data, Long value) {
         return type.isValid(value);
     }
 
+    public String warning() {
+        if (isValid()) {
+            return "";
+        }
+
+        if (value == null || value < 0) {
+            return "'%s' value is invalid".formatted(type.name);
+        }
+
+        String futurePast = type.dateInThePastRequired() ? "future" : "past";
+
+        return "'%s' date is in the %s".formatted(type.name, futurePast);
+    }
+
     static List<TimeClaim> from(String payloadJson) {
         Optional<JSONObject> optional = parsePayload(payloadJson);
 

@@ -40,9 +40,13 @@ public enum TimeClaimType {
 
         Instant valueTime = Instant.ofEpochSecond(value);
 
+        return dateInThePastRequired() ? valueTime.isBefore(now()) : valueTime.isAfter(now());
+    }
+
+    public boolean dateInThePastRequired() {
         return switch (this) {
-            case EXPIRATION_TIME ->  valueTime.isAfter(now());
-            case NOT_BEFORE_TIME, ISSUED_AT_TIME ->  valueTime.isBefore(now());
+            case EXPIRATION_TIME -> false;
+            case NOT_BEFORE_TIME, ISSUED_AT_TIME -> true;
         };
     }
 }
