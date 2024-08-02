@@ -1,7 +1,7 @@
 /*
 Author : Dolph Flynn
 
-Copyright 2022 Dolph Flynn
+Copyright 2024 Dolph Flynn
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -19,28 +19,25 @@ limitations under the License.
 package com.blackberry.jwteditor.view.editor;
 
 import burp.api.montoya.collaborator.CollaboratorPayloadGenerator;
-import burp.api.montoya.http.message.HttpRequestResponse;
-import burp.api.montoya.http.message.responses.HttpResponse;
+import burp.api.montoya.core.ByteArray;
 import burp.api.montoya.logging.Logging;
 import burp.api.montoya.ui.UserInterface;
-import burp.api.montoya.ui.editor.extension.ExtensionProvidedHttpResponseEditor;
+import burp.api.montoya.ui.contextmenu.WebSocketMessage;
+import burp.api.montoya.ui.editor.extension.ExtensionProvidedWebSocketMessageEditor;
 import com.blackberry.jwteditor.presenter.PresenterStore;
 import com.blackberry.jwteditor.view.hexcodearea.HexCodeAreaFactory;
 import com.blackberry.jwteditor.view.rsta.RstaFactory;
 import com.blackberry.jwteditor.view.utils.ErrorLoggingActionListenerFactory;
 
-import static burp.api.montoya.internal.ObjectFactoryLocator.FACTORY;
+public class WebSocketEditorView extends EditorView implements ExtensionProvidedWebSocketMessageEditor {
 
-public class ResponseEditorView extends EditorView implements ExtensionProvidedHttpResponseEditor {
-
-    public ResponseEditorView(
-            PresenterStore presenters,
-            RstaFactory rstaFactory,
-            Logging logging,
-            UserInterface userInterface,
-            CollaboratorPayloadGenerator collaboratorPayloadGenerator,
-            boolean editable,
-            boolean isProVersion) {
+    public WebSocketEditorView(PresenterStore presenters,
+                               RstaFactory rstaFactory,
+                               Logging logging,
+                               UserInterface userInterface,
+                               CollaboratorPayloadGenerator collaboratorPayloadGenerator,
+                               boolean editable,
+                               boolean isProVersion) {
         super(
                 presenters,
                 rstaFactory,
@@ -53,19 +50,18 @@ public class ResponseEditorView extends EditorView implements ExtensionProvidedH
     }
 
     @Override
-    public void setRequestResponse(HttpRequestResponse requestResponse) {
-        HttpResponse httpResponse = requestResponse.response();
-        presenter.setMessage(httpResponse.toByteArray().toString());
+    public ByteArray getMessage() {
+        return ByteArray.byteArray(presenter.getMessage());
     }
 
     @Override
-    public boolean isEnabledFor(HttpRequestResponse requestResponse) {
-        String content = requestResponse.response().toByteArray().toString();
+    public void setMessage(WebSocketMessage message) {
+        presenter.setMessage(message.payload().toString());
+    }
+
+    @Override
+    public boolean isEnabledFor(WebSocketMessage message) {
+        String content = message.payload().toString();
         return presenter.isEnabled(content);
-    }
-
-    @Override
-    public HttpResponse getResponse() {
-        return FACTORY.httpResponse(presenter.getMessage());
     }
 }
