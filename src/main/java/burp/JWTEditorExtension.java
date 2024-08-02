@@ -22,6 +22,7 @@ import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.view.SuiteView;
 import com.blackberry.jwteditor.view.editor.HttpRequestEditorView;
 import com.blackberry.jwteditor.view.editor.HttpResponseEditorView;
+import com.blackberry.jwteditor.view.editor.WebSocketEditorView;
 import com.blackberry.jwteditor.view.rsta.RstaFactory;
 
 import java.awt.*;
@@ -81,6 +82,18 @@ public class JWTEditorExtension implements BurpExtension {
 
         userInterface.registerHttpResponseEditorProvider(editorCreationContext ->
                 new HttpResponseEditorView(
+                        presenters,
+                        rstaFactory,
+                        api.logging(),
+                        api.userInterface(),
+                        api.collaborator().defaultPayloadGenerator(),
+                        editorCreationContext.editorMode() != READ_ONLY,
+                        isProVersion
+                )
+        );
+
+        userInterface.registerWebSocketMessageEditorProvider(editorCreationContext ->
+                new WebSocketEditorView(
                         presenters,
                         rstaFactory,
                         api.logging(),
