@@ -29,7 +29,7 @@ public class ErrorLoggingActionListenerFactory {
         this.logging = logging;
     }
 
-    public ErrorLoggingActionListener from(ActionListener actionListener) {
+    public ActionListener from(ActionListener actionListener) {
         return new ErrorLoggingActionListener(logging, actionListener);
     }
 }

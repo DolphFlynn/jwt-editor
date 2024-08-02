@@ -1,7 +1,7 @@
 /*
 Author : Dolph Flynn
 
-Copyright 2022 Dolph Flynn
+Copyright 2024 Dolph Flynn
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -19,53 +19,30 @@ limitations under the License.
 package com.blackberry.jwteditor.view.editor;
 
 import burp.api.montoya.collaborator.CollaboratorPayloadGenerator;
-import burp.api.montoya.http.message.HttpRequestResponse;
-import burp.api.montoya.http.message.responses.HttpResponse;
-import burp.api.montoya.logging.Logging;
-import burp.api.montoya.ui.UserInterface;
-import burp.api.montoya.ui.editor.extension.ExtensionProvidedHttpResponseEditor;
+import burp.api.montoya.ui.editor.extension.ExtensionProvidedEditor;
 import com.blackberry.jwteditor.presenter.PresenterStore;
 import com.blackberry.jwteditor.view.hexcodearea.HexCodeAreaFactory;
 import com.blackberry.jwteditor.view.rsta.RstaFactory;
 import com.blackberry.jwteditor.view.utils.ErrorLoggingActionListenerFactory;
 
-import static burp.api.montoya.internal.ObjectFactoryLocator.FACTORY;
+abstract class HttpEditorView extends EditorView implements ExtensionProvidedEditor {
 
-public class ResponseEditorView extends EditorView implements ExtensionProvidedHttpResponseEditor {
-
-    public ResponseEditorView(
+    HttpEditorView(
             PresenterStore presenters,
             RstaFactory rstaFactory,
-            Logging logging,
-            UserInterface userInterface,
+            HexCodeAreaFactory hexAreaCodeFactory,
             CollaboratorPayloadGenerator collaboratorPayloadGenerator,
+            ErrorLoggingActionListenerFactory actionListenerFactory,
             boolean editable,
             boolean isProVersion) {
         super(
                 presenters,
                 rstaFactory,
-                new HexCodeAreaFactory(logging, userInterface),
+                hexAreaCodeFactory,
                 collaboratorPayloadGenerator,
-                new ErrorLoggingActionListenerFactory(logging),
+                actionListenerFactory,
                 editable,
                 isProVersion
         );
-    }
-
-    @Override
-    public void setRequestResponse(HttpRequestResponse requestResponse) {
-        HttpResponse httpResponse = requestResponse.response();
-        presenter.setMessage(httpResponse.toByteArray().toString());
-    }
-
-    @Override
-    public boolean isEnabledFor(HttpRequestResponse requestResponse) {
-        String content = requestResponse.response().toByteArray().toString();
-        return presenter.isEnabled(content);
-    }
-
-    @Override
-    public HttpResponse getResponse() {
-        return FACTORY.httpResponse(presenter.getMessage());
     }
 }

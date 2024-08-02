@@ -20,7 +20,6 @@ package com.blackberry.jwteditor.view.editor;
 
 import burp.api.montoya.collaborator.CollaboratorPayloadGenerator;
 import burp.api.montoya.ui.Selection;
-import burp.api.montoya.ui.editor.extension.ExtensionProvidedEditor;
 import com.blackberry.jwteditor.presenter.EditorPresenter;
 import com.blackberry.jwteditor.presenter.PresenterStore;
 import com.blackberry.jwteditor.utils.Utils;
@@ -53,7 +52,7 @@ import static org.exbin.deltahex.EditationAllowed.READ_ONLY;
 /**
  * View class for the Editor tab
  */
-public abstract class EditorView implements ExtensionProvidedEditor {
+public abstract class EditorView {
     public static final int TAB_JWS = 0;
     public static final int TAB_JWE = 1;
 
@@ -454,26 +453,22 @@ public abstract class EditorView implements ExtensionProvidedEditor {
         return checkBoxJWEHeaderCompactJSON.isSelected();
     }
 
-    @Override
     public String caption() {
         return Utils.getResourceString("burp_editor_tab");
     }
 
-    @Override
     public Component uiComponent() {
         return panel;
     }
 
-    @Override
     public Selection selectedData() {
         return null;
     }
 
     /**
-     * Has the HTTP message been altered by the extension
+     * Has the message been altered by the extension
      * @return true if the extension has altered the message
      */
-    @Override
     public boolean isModified() {
         return presenter.isModified();
     }

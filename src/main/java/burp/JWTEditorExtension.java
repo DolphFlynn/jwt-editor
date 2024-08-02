@@ -20,8 +20,8 @@ import com.blackberry.jwteditor.model.persistence.KeysModelPersistence;
 import com.blackberry.jwteditor.presenter.PresenterStore;
 import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.view.SuiteView;
-import com.blackberry.jwteditor.view.editor.RequestEditorView;
-import com.blackberry.jwteditor.view.editor.ResponseEditorView;
+import com.blackberry.jwteditor.view.editor.HttpRequestEditorView;
+import com.blackberry.jwteditor.view.editor.HttpResponseEditorView;
 import com.blackberry.jwteditor.view.rsta.RstaFactory;
 
 import java.awt.*;
@@ -68,7 +68,7 @@ public class JWTEditorExtension implements BurpExtension {
         userInterface.registerSuiteTab(suiteView.getTabCaption(), suiteView.getUiComponent());
 
         userInterface.registerHttpRequestEditorProvider(editorCreationContext ->
-                new RequestEditorView(
+                new HttpRequestEditorView(
                         presenters,
                         rstaFactory,
                         api.logging(),
@@ -80,7 +80,7 @@ public class JWTEditorExtension implements BurpExtension {
         );
 
         userInterface.registerHttpResponseEditorProvider(editorCreationContext ->
-                new ResponseEditorView(
+                new HttpResponseEditorView(
                         presenters,
                         rstaFactory,
                         api.logging(),
