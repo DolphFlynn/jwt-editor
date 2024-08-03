@@ -27,6 +27,7 @@ import com.blackberry.jwteditor.view.hexcodearea.HexCodeAreaFactory;
 import com.blackberry.jwteditor.view.rsta.RstaFactory;
 import com.blackberry.jwteditor.view.utils.ErrorLoggingActionListenerFactory;
 import com.blackberry.jwteditor.view.utils.MaxLengthStringComboBoxModel;
+import com.blackberry.jwteditor.view.utils.RunEDTActionOnFirstRenderHierarchyListener;
 import org.exbin.deltahex.EditationAllowed;
 import org.exbin.deltahex.swing.CodeArea;
 import org.exbin.utils.binary_data.ByteArrayEditableData;
@@ -38,14 +39,11 @@ import javax.swing.border.LineBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
-import java.awt.event.HierarchyEvent;
-import java.awt.event.HierarchyListener;
 import java.util.List;
 
 import static java.awt.Color.RED;
 import static java.awt.EventQueue.invokeLater;
 import static java.awt.Font.BOLD;
-import static java.awt.event.HierarchyEvent.SHOWING_CHANGED;
 import static org.exbin.deltahex.EditationAllowed.ALLOWED;
 import static org.exbin.deltahex.EditationAllowed.READ_ONLY;
 
@@ -114,7 +112,13 @@ public abstract class EditorView {
         this.isProVersion = isProVersion;
         this.presenter = new EditorPresenter(this, collaboratorPayloadGenerator, actionListenerFactory, presenters);
 
-        panel.addHierarchyListener(new ResizeSplitPanesOnFirstRenderHierarchyListener());
+        panel.addHierarchyListener(new RunEDTActionOnFirstRenderHierarchyListener(
+                panel,
+                () -> {
+                    upperSplitPane.setDividerLocation(0.25);
+                    lowerSplitPane.setDividerLocation(0.75);
+                }
+        ));
 
         // Event handler for Header / JWS payload change events
         DocumentListener documentListener = new DocumentListener() {
@@ -548,21 +552,5 @@ public abstract class EditorView {
             labelWarnings.setFont(labelWarnings.getFont().deriveFont(BOLD));
             labelWarnings.setText(text);
         });
-    }
-
-    private class ResizeSplitPanesOnFirstRenderHierarchyListener implements HierarchyListener {
-        @Override
-        public void hierarchyChanged(HierarchyEvent e) {
-            if (e.getChangeFlags() != SHOWING_CHANGED || !e.getComponent().isShowing()) {
-                return;
-            }
-
-            invokeLater(() -> {
-                        upperSplitPane.setDividerLocation(0.25);
-                        lowerSplitPane.setDividerLocation(0.75);
-                    });
-
-            panel.removeHierarchyListener(this);
-        }
     }
 }
