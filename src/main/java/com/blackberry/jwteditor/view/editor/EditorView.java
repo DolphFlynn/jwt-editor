@@ -51,9 +51,8 @@ import static org.exbin.deltahex.EditationAllowed.READ_ONLY;
  * View class for the Editor tab
  */
 public abstract class EditorView {
-    public static final int TAB_JWS = 0;
-    public static final int TAB_JWE = 1;
-
+    private static final int JWS_TAB_INDEX = 0;
+    private static final int JWE_TAB_INDEX = 1;
     private static final int MAX_JOSE_OBJECT_STRING_LENGTH = 68;
 
     final EditorPresenter presenter;
@@ -63,7 +62,7 @@ public abstract class EditorView {
     private final HexCodeAreaFactory hexCodeAreaFactory;
     private final boolean isProVersion;
 
-    private int mode;
+    private EditorMode mode;
     private JTabbedPane tabbedPane;
     private JComboBox<String> comboBoxJOSEObject;
     private JButton buttonSign;
@@ -350,18 +349,25 @@ public abstract class EditorView {
      * Get the UI mode - JWS or JWE
      * @return UI mode value
      */
-    public int getMode() {
+    public EditorMode getMode() {
         return mode;
     }
 
-    /**
-     * Set the UI to JWS mode
-     */
-    public void setJWSMode() {
-        mode = TAB_JWS;
-        tabbedPane.setSelectedIndex(TAB_JWS);
-        tabbedPane.setEnabledAt(TAB_JWS, true);
-        tabbedPane.setEnabledAt(TAB_JWE, false);
+    public void setMode(EditorMode mode)
+    {
+        this.mode = mode;
+
+        if (mode == EditorMode.JWS) {
+            configureUIForJWS();
+        } else {
+            configureUIForJWE();
+        }
+    }
+
+    private void configureUIForJWS() {
+        tabbedPane.setSelectedIndex(JWS_TAB_INDEX);
+        tabbedPane.setEnabledAt(JWS_TAB_INDEX, true);
+        tabbedPane.setEnabledAt(JWE_TAB_INDEX, false);
         buttonAttack.setEnabled(editable);
         buttonSign.setEnabled(editable);
         buttonVerify.setEnabled(true);
@@ -378,14 +384,10 @@ public abstract class EditorView {
         codeAreaSignature.setEditationAllowed(editable ? ALLOWED : READ_ONLY);
     }
 
-    /**
-     * Set the UI to JWE mode
-     */
-    public void setJWEMode() {
-        mode = TAB_JWE;
-        tabbedPane.setSelectedIndex(TAB_JWE);
-        tabbedPane.setEnabledAt(TAB_JWS, false);
-        tabbedPane.setEnabledAt(TAB_JWE, true);
+    private void configureUIForJWE() {
+        tabbedPane.setSelectedIndex(JWE_TAB_INDEX);
+        tabbedPane.setEnabledAt(JWS_TAB_INDEX, false);
+        tabbedPane.setEnabledAt(JWE_TAB_INDEX, true);
         buttonAttack.setEnabled(false);
         buttonSign.setEnabled(false);
         buttonVerify.setEnabled(false);

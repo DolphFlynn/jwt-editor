@@ -28,6 +28,7 @@ import com.blackberry.jwteditor.model.keys.KeyRing;
 import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.view.dialog.MessageDialogFactory;
 import com.blackberry.jwteditor.view.dialog.operations.*;
+import com.blackberry.jwteditor.view.editor.EditorMode;
 import com.blackberry.jwteditor.view.editor.EditorView;
 import com.blackberry.jwteditor.view.utils.ErrorLoggingActionListenerFactory;
 import com.nimbusds.jose.util.Base64URL;
@@ -349,8 +350,9 @@ public class EditorPresenter extends Presenter {
 
         // If a JWE was created by the dialog, replace the contents of the editor and change to JWE mode
         JWE jwe = encryptDialog.getJWE();
+
         if (jwe != null) {
-            view.setJWEMode();
+            view.setMode(EditorMode.JWE);
             setJWE(jwe);
         }
     }
@@ -374,7 +376,7 @@ public class EditorPresenter extends Presenter {
 
             // If decryption was successful, set the contents of the editor to the decrypted JWS and set the editor mode to JWS
             if (jws.isPresent()) {
-                view.setJWSMode();
+                view.setMode(EditorMode.JWS);
                 setJWS(jws.get());
             } else {
                 messageDialogFactory.showWarningDialog("error_title_unable_to_decrypt", "error_decryption_all_keys_failed");
@@ -422,10 +424,10 @@ public class EditorPresenter extends Presenter {
 
         // Change to JWE/JWS mode based on the newly selected JOSEObject
         if (joseObject instanceof JWS) {
-            view.setJWSMode();
+            view.setMode(EditorMode.JWS);
             setJWS((JWS) joseObject);
         } else {
-            view.setJWEMode();
+            view.setMode(EditorMode.JWE);
             setJWE((JWE) joseObject);
         }
 
@@ -441,7 +443,7 @@ public class EditorPresenter extends Presenter {
         MutableJOSEObject mutableJoseObject = model.getJOSEObject(view.getSelectedJOSEObjectIndex());
 
         //Serialize the text/hex entries to a JWS/JWE in compact form, depending on the editor mode
-        JOSEObject joseObject = view.getMode() == EditorView.TAB_JWS ? getJWS() : getJWE();
+        JOSEObject joseObject = view.getMode() == EditorMode.JWS ? getJWS() : getJWE();
         //Update the JOSEObjectPair with the change
         mutableJoseObject.setModified(joseObject);
         //Highlight the serialized text as changed if it differs from the original, and the change wasn't triggered by onSelectionChanging
