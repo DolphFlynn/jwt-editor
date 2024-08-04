@@ -42,6 +42,7 @@ import java.awt.*;
 import java.util.List;
 
 import static java.awt.Color.RED;
+import static java.awt.EventQueue.invokeLater;
 import static org.exbin.deltahex.EditationAllowed.ALLOWED;
 import static org.exbin.deltahex.EditationAllowed.READ_ONLY;
 
@@ -86,7 +87,9 @@ public abstract class EditorView {
     private JButton buttonJWSPayloadFormatJSON;
     private JCheckBox checkBoxJWSPayloadCompactJSON;
     private JSplitPane upperSplitPane;
+    private JSplitPane midSplitPane;
     private JSplitPane lowerSplitPane;
+    private JTextPane informationTextPane;
 
     private CodeArea codeAreaSignature;
     private CodeArea codeAreaEncryptedKey;
@@ -112,7 +115,8 @@ public abstract class EditorView {
                 panel,
                 () -> {
                     upperSplitPane.setDividerLocation(0.25);
-                    lowerSplitPane.setDividerLocation(0.75);
+                    lowerSplitPane.setDividerLocation(0.5);
+                    invokeLater(() -> midSplitPane.setDividerLocation(0.693));
                 }
         ));
 
