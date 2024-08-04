@@ -21,6 +21,7 @@ package com.blackberry.jwteditor.view.editor;
 import burp.api.montoya.collaborator.CollaboratorPayloadGenerator;
 import burp.api.montoya.ui.Selection;
 import com.blackberry.jwteditor.presenter.EditorPresenter;
+import com.blackberry.jwteditor.presenter.Information;
 import com.blackberry.jwteditor.presenter.PresenterStore;
 import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.view.hexcodearea.HexCodeAreaFactory;
@@ -43,7 +44,6 @@ import java.util.List;
 
 import static java.awt.Color.RED;
 import static java.awt.EventQueue.invokeLater;
-import static java.awt.Font.BOLD;
 import static org.exbin.deltahex.EditationAllowed.ALLOWED;
 import static org.exbin.deltahex.EditationAllowed.READ_ONLY;
 
@@ -60,6 +60,7 @@ public abstract class EditorView {
     private final RstaFactory rstaFactory;
     private final boolean editable;
     private final HexCodeAreaFactory hexCodeAreaFactory;
+    private final InformationPanel informationPanel;
     private final boolean isProVersion;
 
     private EditorMode mode;
@@ -88,8 +89,9 @@ public abstract class EditorView {
     private JButton buttonJWSPayloadFormatJSON;
     private JCheckBox checkBoxJWSPayloadCompactJSON;
     private JSplitPane upperSplitPane;
+    private JSplitPane midSplitPane;
     private JSplitPane lowerSplitPane;
-    private JLabel labelWarnings;
+    private JScrollPane informationScrollPane;
 
     private CodeArea codeAreaSignature;
     private CodeArea codeAreaEncryptedKey;
@@ -103,6 +105,7 @@ public abstract class EditorView {
             HexCodeAreaFactory hexAreaCodeFactory,
             CollaboratorPayloadGenerator collaboratorPayloadGenerator,
             ErrorLoggingActionListenerFactory actionListenerFactory,
+            InformationPanelFactory informationPanelFactory,
             boolean editable,
             boolean isProVersion) {
         this.rstaFactory = rstaFactory;
@@ -110,12 +113,16 @@ public abstract class EditorView {
         this.hexCodeAreaFactory = hexAreaCodeFactory;
         this.isProVersion = isProVersion;
         this.presenter = new EditorPresenter(this, collaboratorPayloadGenerator, actionListenerFactory, presenters);
+        this.informationPanel = informationPanelFactory.build();
+
+        informationScrollPane.setViewportView(informationPanel);
 
         panel.addHierarchyListener(new RunEDTActionOnFirstRenderHierarchyListener(
                 panel,
                 () -> {
                     upperSplitPane.setDividerLocation(0.25);
-                    lowerSplitPane.setDividerLocation(0.75);
+                    lowerSplitPane.setDividerLocation(0.5);
+                    invokeLater(() -> midSplitPane.setDividerLocation(0.693));
                 }
         ));
 
@@ -549,10 +556,7 @@ public abstract class EditorView {
         textAreaPayload = rstaFactory.buildDefaultTextArea();
     }
 
-    public void setWarnings(String text) {
-        invokeLater(() -> {
-            labelWarnings.setFont(labelWarnings.getFont().deriveFont(BOLD));
-            labelWarnings.setText(text);
-        });
+    public void setInformation(List<Information> information) {
+        informationPanel.updateInformation(information);
     }
 }

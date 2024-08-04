@@ -23,14 +23,16 @@ import java.time.Instant;
 import static java.time.Instant.now;
 
 public enum TimeClaimType {
-    EXPIRATION_TIME("exp"),
-    NOT_BEFORE_TIME("nbf"),
-    ISSUED_AT_TIME("iat");
+    EXPIRATION_TIME("exp", "Expiration Time"),
+    NOT_BEFORE_TIME("nbf", "Not Before"),
+    ISSUED_AT_TIME("iat", "Issued At");
 
     final String name;
+    private final String displayName;
 
-    TimeClaimType(String name) {
+    TimeClaimType(String name, String displayName) {
         this.name = name;
+        this.displayName = displayName;
     }
 
     public boolean isValid(Long value) {
@@ -43,10 +45,15 @@ public enum TimeClaimType {
         return dateInThePastRequired() ? valueTime.isBefore(now()) : valueTime.isAfter(now());
     }
 
-    public boolean dateInThePastRequired() {
+    private boolean dateInThePastRequired() {
         return switch (this) {
             case EXPIRATION_TIME -> false;
             case NOT_BEFORE_TIME, ISSUED_AT_TIME -> true;
         };
+    }
+
+    @Override
+    public String toString() {
+        return displayName;
     }
 }
