@@ -449,7 +449,7 @@ public class EditorPresenter extends Presenter {
         //Highlight the serialized text as changed if it differs from the original, and the change wasn't triggered by onSelectionChanging
         view.setSerialized(joseObject.serialize(), mutableJoseObject.changed() && !selectionChanging);
 
-        view.setWarnings(mutableJoseObject.getWarnings());
+        view.setInformation(mutableJoseObject.getWarnings());
     }
 
     /**
