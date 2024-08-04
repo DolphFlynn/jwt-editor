@@ -44,6 +44,7 @@ public class WebSocketEditorView extends EditorView implements ExtensionProvided
                 new HexCodeAreaFactory(logging, userInterface),
                 collaboratorPayloadGenerator,
                 new ErrorLoggingActionListenerFactory(logging),
+                new InformationPanelFactory(userInterface, logging),
                 editable,
                 isProVersion
         );

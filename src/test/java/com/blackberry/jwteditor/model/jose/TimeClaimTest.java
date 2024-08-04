@@ -38,13 +38,6 @@ class TimeClaimTest {
         assertThat(jws.timeClaims()).isEmpty();
     }
 
-    @Test
-    void givenJWSWithNoTimeClaims_thenWarningsAreEmpty() throws ParseException {
-        JWS jws = JWSFactory.parse("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJUZXN0In0.WVLalefVZ5Rj991Cjgh0qBjKSIQaqC_CgN3b-30GKpQ");
-
-        assertThat(jws.getWarnings()).isEmpty();
-    }
-
     @ParameterizedTest
     @ValueSource(strings = {
             "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiZXhwIjoxNzE2MjM5MDIyfQ.FuJB22Dq3zXcFXtIAc59tWnmbbFC6jRXzb_2ejbhhoQ",
@@ -74,14 +67,6 @@ class TimeClaimTest {
         assertThat(timeClaim.isValid()).isTrue();
     }
 
-    @ParameterizedTest
-    @MethodSource("jwsWithValidExpValues")
-    void givenJWSWithExpTimeClaims_whenExpiryDateInTheFuture_thenWarningsEmpty(String data) throws ParseException {
-        JWS jws = JWSFactory.parse(data);
-
-        assertThat(jws.getWarnings()).isEmpty();
-    }
-
     private static Stream<String> jwsWithInvalidExpValues() {
         return Stream.of(
                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiZXhwIjoiemVvbGl0ZSJ9.Vsy0uiJVpA17ys9DRFWldEcgiut_N5QhvHCRRcp8Xow",
@@ -101,14 +86,6 @@ class TimeClaimTest {
         assertThat(timeClaim.isValid()).isFalse();
     }
 
-    @ParameterizedTest
-    @MethodSource("jwsWithInvalidExpValues")
-    void givenJWSWithExpTimeClaims_whenExpiryDateInvalid_thenWarningsAreCorrect(String data) throws ParseException {
-        JWS jws = JWSFactory.parse(data);
-
-        assertThat(jws.getWarnings()).isEqualTo("'exp' value is invalid.");
-    }
-
     private static Stream<String> jwsWithExpValuesInThePast() {
         return Stream.of(
                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJleHAiOjE1MTYyMzkwMjJ9.mVGXFv3OuwtuZPsdaf_oGUYm2uOH-T-JRTDQE1c10q0",
@@ -125,14 +102,6 @@ class TimeClaimTest {
 
         assertThat(timeClaim.type()).isEqualTo(EXPIRATION_TIME);
         assertThat(timeClaim.isValid()).isFalse();
-    }
-
-    @ParameterizedTest
-    @MethodSource("jwsWithExpValuesInThePast")
-    void givenJWSWithExpTimeClaims_whenExpiryDateIsInThePast_thenWarningsCorrect(String data) throws ParseException {
-        JWS jws = JWSFactory.parse(data);
-
-        assertThat(jws.getWarnings()).isEqualTo("'exp' date is in the past.");
     }
 
     @ParameterizedTest
@@ -167,14 +136,6 @@ class TimeClaimTest {
         assertThat(timeClaim.isValid()).isTrue();
     }
 
-    @ParameterizedTest
-    @MethodSource("jwsWithValidNbfValues")
-    void givenJWSWithNbfTimeClaims_whenNotBeforeDateInThePast_thenWarningsEmpty(String data) throws ParseException {
-        JWS jws = JWSFactory.parse(data);
-
-        assertThat(jws.getWarnings()).isEmpty();
-    }
-
     private static Stream<String> jwsWithInvalidNbfValues() {
         return Stream.of(
                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwibmJmIjoiemVvbGl0ZSJ9.kmx4FteQrcATfc2Zx47WypsqrIC-e1IM4opeLJxLyrI",
@@ -193,15 +154,6 @@ class TimeClaimTest {
         assertThat(timeClaim.type()).isEqualTo(NOT_BEFORE_TIME);
         assertThat(timeClaim.isValid()).isFalse();
     }
-
-    @ParameterizedTest
-    @MethodSource("jwsWithInvalidNbfValues")
-    void givenJWSWithNbfTimeClaims_whenNotBeforeDateInvalid_thenWarningsCorrect(String data) throws ParseException {
-        JWS jws = JWSFactory.parse(data);
-
-        assertThat(jws.getWarnings()).isEqualTo("'nbf' value is invalid.");
-    }
-
     private static Stream<String> jwsWithFutureNbfValues() {
         return Stream.of(
                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJuYmYiOjIzMjIxNjc0Nzd9.cMocfo6ghvuYBqDwZ9GBdfbCnMLsUcZe2GZRuaah0-c",
@@ -220,14 +172,6 @@ class TimeClaimTest {
         assertThat(timeClaim.isValid()).isFalse();
     }
 
-    @ParameterizedTest
-    @MethodSource("jwsWithFutureNbfValues")
-    void givenJWSWithNbfTimeClaims_whenNotBeforeDateIsInTheFuture_thenWarningsCorrect(String data) throws ParseException {
-        JWS jws = JWSFactory.parse(data);
-
-        assertThat(jws.getWarnings()).isEqualTo("'nbf' date is in the future.");
-    }
-
     private static Stream<String> jwsWithValidIatValues() {
         return Stream.of(
                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOjE3MTYyMzkwMjJ9.y06rqsXv0DMutukwDaUJU0Sf-Ye3qrDkyFpOaj1J08A",
@@ -241,14 +185,6 @@ class TimeClaimTest {
         JWS jws = JWSFactory.parse(data);
 
         assertThat(jws.timeClaims()).containsExactly(new TimeClaim(ISSUED_AT_TIME, "1716239022", 1716239022L));
-    }
-
-    @ParameterizedTest
-    @MethodSource("jwsWithValidIatValues")
-    void givenJWSWithNIatTimeClaims_thenWarningsEmpty(String data) throws ParseException {
-        JWS jws = JWSFactory.parse(data);
-
-        assertThat(jws.getWarnings()).isEmpty();
     }
 
     private static Stream<String> jwsWithValidIatDatesInThePast() {
@@ -272,14 +208,6 @@ class TimeClaimTest {
         assertThat(timeClaim.isValid()).isTrue();
     }
 
-    @ParameterizedTest
-    @MethodSource("jwsWithValidIatDatesInThePast")
-    void givenJWSWithIatTimeClaims_whenIssuedAtDateInThePast_thenWarningsEmpty(String data) throws ParseException {
-        JWS jws = JWSFactory.parse(data);
-
-        assertThat(jws.getWarnings()).isEmpty();
-    }
-
     private static Stream<String> jwsWithInvalidIatValues() {
         return Stream.of(
                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOiJ6ZW9saXRlIn0.-IpgDK_M_jQJQ6FDa-wd25xGFJ2bHNthdYn1JlQNxjg",
@@ -296,14 +224,6 @@ class TimeClaimTest {
 
         assertThat(timeClaim.type()).isEqualTo(ISSUED_AT_TIME);
         assertThat(timeClaim.isValid()).isFalse();
-    }
-
-    @ParameterizedTest
-    @MethodSource("jwsWithInvalidIatValues")
-    void givenJWSWithIatTimeClaims_whenIssuedAtDateInvalid_thenWarningsCorrect(String data) throws ParseException {
-        JWS jws = JWSFactory.parse(data);
-
-        assertThat(jws.getWarnings()).isEqualTo("'iat' value is invalid.");
     }
 
     private static Stream<String> jwsWithFutureIatDates() {
@@ -323,25 +243,10 @@ class TimeClaimTest {
         assertThat(timeClaim.isValid()).isFalse();
     }
 
-    @ParameterizedTest
-    @MethodSource("jwsWithFutureIatDates")
-    void givenJWSWithIatTimeClaims_whenIssuedAtDateIsInTheFuture_thenWarningsCorrect(String data) throws ParseException {
-        JWS jws = JWSFactory.parse(data);
-
-        assertThat(jws.getWarnings()).isEqualTo("'iat' date is in the future.");
-    }
-
     @Test
     void givenJWE_thenTimeClaimsIsEmpty() throws ParseException {
         JWE jwe = JWEFactory.parse("eyJlbmMiOiJBMTI4R0NNIiwiYWxnIjoiQTEyOEtXIn0.H3X6mT5HLgcFfzLoe4ku6Knhh9Ofv1eL.qF5-N_7K8VQ4yMSz.WXUNY6eg5fR4tc8Hqf5XDRM9ALGwcQyYG4IYwwg8Ctkx1UuxoV7t6UnemjzCj2sOYUqi3KYpDzrKVJpzokz0vcIem4lFe5N_ds8FAMpW0GSF9ePA8qvV99WaP0N2ECVPmgihvL6qwNhdptlLKtxcOpE41U5LnU22voPK55VF4_1j0WmTgWgZ7DwLDysp6EIDjrrt-DY.febBmP71KADmKRVfeSnv_g");
 
         assertThat(jwe.timeClaims()).isEmpty();
-    }
-
-    @Test
-    void givenJWE_thenWarningsAreEmpty() throws ParseException {
-        JWE jwe = JWEFactory.parse("eyJlbmMiOiJBMTI4R0NNIiwiYWxnIjoiQTEyOEtXIn0.H3X6mT5HLgcFfzLoe4ku6Knhh9Ofv1eL.qF5-N_7K8VQ4yMSz.WXUNY6eg5fR4tc8Hqf5XDRM9ALGwcQyYG4IYwwg8Ctkx1UuxoV7t6UnemjzCj2sOYUqi3KYpDzrKVJpzokz0vcIem4lFe5N_ds8FAMpW0GSF9ePA8qvV99WaP0N2ECVPmgihvL6qwNhdptlLKtxcOpE41U5LnU22voPK55VF4_1j0WmTgWgZ7DwLDysp6EIDjrrt-DY.febBmP71KADmKRVfeSnv_g");
-
-        assertThat(jwe.getWarnings()).isEmpty();
     }
 }
