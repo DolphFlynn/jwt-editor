@@ -21,6 +21,7 @@ package com.blackberry.jwteditor.view.editor;
 import burp.api.montoya.collaborator.CollaboratorPayloadGenerator;
 import burp.api.montoya.ui.Selection;
 import com.blackberry.jwteditor.presenter.EditorPresenter;
+import com.blackberry.jwteditor.presenter.Information;
 import com.blackberry.jwteditor.presenter.PresenterStore;
 import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.view.hexcodearea.HexCodeAreaFactory;
@@ -59,6 +60,7 @@ public abstract class EditorView {
     private final RstaFactory rstaFactory;
     private final boolean editable;
     private final HexCodeAreaFactory hexCodeAreaFactory;
+    private final InformationPanel informationPanel;
     private final boolean isProVersion;
 
     private EditorMode mode;
@@ -89,7 +91,7 @@ public abstract class EditorView {
     private JSplitPane upperSplitPane;
     private JSplitPane midSplitPane;
     private JSplitPane lowerSplitPane;
-    private JTextPane informationTextPane;
+    private JScrollPane informationScrollPane;
 
     private CodeArea codeAreaSignature;
     private CodeArea codeAreaEncryptedKey;
@@ -103,6 +105,7 @@ public abstract class EditorView {
             HexCodeAreaFactory hexAreaCodeFactory,
             CollaboratorPayloadGenerator collaboratorPayloadGenerator,
             ErrorLoggingActionListenerFactory actionListenerFactory,
+            InformationPanelFactory informationPanelFactory,
             boolean editable,
             boolean isProVersion) {
         this.rstaFactory = rstaFactory;
@@ -110,6 +113,9 @@ public abstract class EditorView {
         this.hexCodeAreaFactory = hexAreaCodeFactory;
         this.isProVersion = isProVersion;
         this.presenter = new EditorPresenter(this, collaboratorPayloadGenerator, actionListenerFactory, presenters);
+        this.informationPanel = informationPanelFactory.build();
+
+        informationScrollPane.setViewportView(informationPanel);
 
         panel.addHierarchyListener(new RunEDTActionOnFirstRenderHierarchyListener(
                 panel,
@@ -550,6 +556,7 @@ public abstract class EditorView {
         textAreaPayload = rstaFactory.buildDefaultTextArea();
     }
 
-    public void setInformation(String text) {
+    public void setInformation(List<Information> information) {
+        informationPanel.updateInformation(information);
     }
 }

@@ -19,7 +19,10 @@ limitations under the License.
 package com.blackberry.jwteditor.presenter;
 
 import burp.api.montoya.collaborator.CollaboratorPayloadGenerator;
-import com.blackberry.jwteditor.model.jose.*;
+import com.blackberry.jwteditor.model.jose.JOSEObject;
+import com.blackberry.jwteditor.model.jose.JWE;
+import com.blackberry.jwteditor.model.jose.JWS;
+import com.blackberry.jwteditor.model.jose.MutableJOSEObject;
 import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.model.keys.KeyRing;
 import com.blackberry.jwteditor.utils.Utils;
@@ -446,8 +449,11 @@ public class EditorPresenter extends Presenter {
         //Highlight the serialized text as changed if it differs from the original, and the change wasn't triggered by onSelectionChanging
         view.setSerialized(joseObject.serialize(), mutableJoseObject.changed() && !selectionChanging);
 
-        List<TimeClaim> timeClaims = mutableJoseObject.timeClaims();
-        view.setInformation(""); // TODO
+        List<Information> information = mutableJoseObject.timeClaims().stream()
+                .map(Information::from)
+                .toList();
+
+        view.setInformation(information);
     }
 
     /**

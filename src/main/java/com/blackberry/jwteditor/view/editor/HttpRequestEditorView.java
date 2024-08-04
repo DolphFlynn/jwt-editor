@@ -49,6 +49,7 @@ public class HttpRequestEditorView extends HttpEditorView implements ExtensionPr
                 new HexCodeAreaFactory(logging, userInterface),
                 collaboratorPayloadGenerator,
                 new ErrorLoggingActionListenerFactory(logging),
+                new InformationPanelFactory(userInterface, logging),
                 editable,
                 isProVersion
         );

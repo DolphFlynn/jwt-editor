@@ -21,30 +21,37 @@ package com.blackberry.jwteditor.model.jose;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
+import static java.time.ZoneOffset.UTC;
 import static java.util.Arrays.stream;
 import static java.util.Collections.emptyList;
 
 public record TimeClaim(TimeClaimType type, String data, Long value) {
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("EEE MMM dd yyyy HH:mm:ss").withZone(ZoneId.from(UTC));
+
+    public String date() {
+        if (value == null) {
+            return null;
+        }
+
+        Instant instant = Instant.ofEpochSecond(value);
+        ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(instant, UTC);
+
+        return FORMATTER.format(zonedDateTime);
+    }
+
+    public boolean hasDate() {
+        return value != null;
+    }
 
     public boolean isValid() {
         return type.isValid(value);
-    }
-
-    public String warning() {
-        if (isValid()) {
-            return "";
-        }
-
-        if (value == null || value < 0) {
-            return "'%s' value is invalid".formatted(type.name);
-        }
-
-        String futurePast = type.dateInThePastRequired() ? "future" : "past";
-
-        return "'%s' date is in the %s".formatted(type.name, futurePast);
     }
 
     static List<TimeClaim> from(String payloadJson) {

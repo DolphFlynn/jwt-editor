@@ -33,6 +33,7 @@ abstract class HttpEditorView extends EditorView implements ExtensionProvidedEdi
             HexCodeAreaFactory hexAreaCodeFactory,
             CollaboratorPayloadGenerator collaboratorPayloadGenerator,
             ErrorLoggingActionListenerFactory actionListenerFactory,
+            InformationPanelFactory informationPanelFactory,
             boolean editable,
             boolean isProVersion) {
         super(
@@ -41,6 +42,7 @@ abstract class HttpEditorView extends EditorView implements ExtensionProvidedEdi
                 hexAreaCodeFactory,
                 collaboratorPayloadGenerator,
                 actionListenerFactory,
+                informationPanelFactory,
                 editable,
                 isProVersion
         );
