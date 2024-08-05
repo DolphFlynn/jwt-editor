@@ -18,9 +18,10 @@ limitations under the License.
 
 package com.blackberry.jwteditor.model.jose;
 
-import java.time.Instant;
+import java.time.ZonedDateTime;
 
 import static java.time.Instant.now;
+import static java.time.ZoneOffset.UTC;
 
 public enum TimeClaimType {
     EXPIRATION_TIME("exp", "Expiration Time"),
@@ -35,14 +36,13 @@ public enum TimeClaimType {
         this.displayName = displayName;
     }
 
-    public boolean isValid(Long value) {
-        if (value == null || value < 0) {
+    public boolean isValid(ZonedDateTime dateTime) {
+        if (dateTime == null) {
             return false;
         }
 
-        Instant valueTime = Instant.ofEpochSecond(value);
-
-        return dateInThePastRequired() ? valueTime.isBefore(now()) : valueTime.isAfter(now());
+        ZonedDateTime now = ZonedDateTime.ofInstant(now(), UTC);
+        return dateInThePastRequired() ? dateTime.isBefore(now) : dateTime.isAfter(now);
     }
 
     private boolean dateInThePastRequired() {

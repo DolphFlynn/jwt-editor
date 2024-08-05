@@ -28,7 +28,7 @@ public record Information(String text, boolean isWarning) {
         if (timeClaim.hasDate()) {
             sb.append(timeClaim.date());
         } else {
-            sb.append("invalid value: ").append(timeClaim.data());
+            sb.append("invalid value: ").append(timeClaim.value());
         }
 
         return new Information(sb.toString(), !timeClaim.isValid());
