@@ -19,7 +19,6 @@ limitations under the License.
 package com.blackberry.jwteditor.presenter;
 
 import com.blackberry.jwteditor.model.jose.TimeClaim;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -36,17 +35,16 @@ class InformationTest {
         return Stream.of(
                 arguments(new TimeClaim(ISSUED_AT_TIME, "isogeny", null), "Issued At - invalid value: isogeny", true),
                 arguments(new TimeClaim(ISSUED_AT_TIME, "1516239022", 1516239022L), "Issued At - Thu Jan 18 2018 01:30:22", false),
-                arguments(new TimeClaim(ISSUED_AT_TIME, "1516239022", 2516239022L), "Issued At - Sun Sept 26 2049 03:17:02", true),
+                arguments(new TimeClaim(ISSUED_AT_TIME, "1516239022", 2516239022L), "Issued At - Sun Sep 26 2049 03:17:02", true),
                 arguments(new TimeClaim(NOT_BEFORE_TIME, "isogeny", null), "Not Before - invalid value: isogeny", true),
                 arguments(new TimeClaim(NOT_BEFORE_TIME, "1516239022", 1516239022L), "Not Before - Thu Jan 18 2018 01:30:22", false),
-                arguments(new TimeClaim(NOT_BEFORE_TIME, "1516239022", 2516239022L), "Not Before - Sun Sept 26 2049 03:17:02", true),
+                arguments(new TimeClaim(NOT_BEFORE_TIME, "1516239022", 2516239022L), "Not Before - Sun Sep 26 2049 03:17:02", true),
                 arguments(new TimeClaim(EXPIRATION_TIME, "isogeny", null), "Expiration Time - invalid value: isogeny", true),
                 arguments(new TimeClaim(EXPIRATION_TIME, "1516239022", 1516239022L), "Expiration Time - Thu Jan 18 2018 01:30:22", true),
-                arguments(new TimeClaim(EXPIRATION_TIME, "1516239022", 2516239022L), "Expiration Time - Sun Sept 26 2049 03:17:02", false)
+                arguments(new TimeClaim(EXPIRATION_TIME, "1516239022", 2516239022L), "Expiration Time - Sun Sep 26 2049 03:17:02", false)
         );
     }
 
-    @Disabled
     @MethodSource("data")
     @ParameterizedTest
     void testInformationFromTimeClaims(TimeClaim timeClaim, String expectedText, boolean expectedIsWarning) {
