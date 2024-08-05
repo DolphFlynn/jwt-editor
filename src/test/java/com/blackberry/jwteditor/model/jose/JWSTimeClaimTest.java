@@ -52,7 +52,8 @@ class JWSTimeClaimTest {
     private static Stream<String> jwsWithValidExpValues() {
         return Stream.of(
                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiZXhwIjoyMzE2MjM5MDIyfQ.nmCDcUHT-yLgrRG1LKMH9E2FQs2xWcB8CncxoqKdQEQ",
-                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiZXhwIjoiMjMxNjIzOTAyMiJ9.kDOLZJTcFVwrSVSDeFK31EIx7Q4e4Ya33iNCk4QZ10c"
+                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiZXhwIjoiMjMxNjIzOTAyMiJ9.kDOLZJTcFVwrSVSDeFK31EIx7Q4e4Ya33iNCk4QZ10c",
+                "eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiZXhwIjoiMjAzNi0xMi0xOVQxNjozOTo1Ny0wODowMCJ9."
         );
     }
 
@@ -121,7 +122,8 @@ class JWSTimeClaimTest {
                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwibmJmIjoiMTcxNjIzOTAyMiJ9.JD7t6jE6sOzuaFi5Lj5e3RhnoRDDWW9QHv_U3bFgEKM",
                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJuYmYiOjE1MTYyMzkwMjJ9.1OhNEYnVM64dytXGZ1kj_Z3fV73xGFxWyba52S5r7wc",
                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJuYmYiOjB9.AqIAHlKSdpcDp7mD6sWsfKCQxI2hyJYsI7Y4Dh6N6pI",
-                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJuYmYiOjE3MjIxNjc0Nzd9.2almhOGrigs8lXH9DLKBkkUCS6r5j7zpJXYsXJN39d4"
+                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJuYmYiOjE3MjIxNjc0Nzd9.2almhOGrigs8lXH9DLKBkkUCS6r5j7zpJXYsXJN39d4",
+                "eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwibmJmIjoiMjAyNC0wNS0yMFQyMjowMzo0MiswMTowMCJ9."
         );
     }
 
@@ -181,7 +183,7 @@ class JWSTimeClaimTest {
 
     @ParameterizedTest
     @MethodSource("jwsWithValidIatValues")
-    void givenJWSWithNIatTimeClaims_thenTimeClaimsCorrect(String data) throws ParseException {
+    void givenJWSWithIatTimeClaims_thenTimeClaimsCorrect(String data) throws ParseException {
         JWS jws = JWSFactory.parse(data);
 
         assertThat(jws.timeClaims()).containsExactly(TimeClaimFactory.fromEpochSeconds(ISSUED_AT_TIME, "1716239022", 1716239022L));
@@ -193,7 +195,8 @@ class JWSTimeClaimTest {
                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOiIxNzE2MjM5MDIyIn0.c2Ogr8QeTwopupVPqI56VaovZXE3svug2BI-Trft2EA",
                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOjE1MTYyMzkwMjJ9.hqWGSaFpvbrXkOWc6lrnffhNWR19W_S1YKFBx2arWBk",
                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOjB9.9TaucSjKgR3_gXUlzTGperv3PK9IAXO0ZVbgP9Wx4IY",
-                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOjE3MjIxNjc0Nzd9.SWmvLUBWE5ddBWvSEWnrHM8W3rfzyYmEQVk6-ywFFgQ"
+                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOjE3MjIxNjc0Nzd9.SWmvLUBWE5ddBWvSEWnrHM8W3rfzyYmEQVk6-ywFFgQ",
+                "eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoiMjAyNC0wNS0yMFQyMjowMzo0MiswMTowMCJ9."
         );
     }
 

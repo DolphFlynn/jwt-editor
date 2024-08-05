@@ -23,10 +23,12 @@ import org.json.JSONObject;
 
 import java.time.Instant;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Optional;
 
 import static java.time.ZoneOffset.UTC;
+import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static java.util.Arrays.stream;
 import static java.util.Collections.emptyList;
 
@@ -34,6 +36,10 @@ public class TimeClaimFactory {
 
     public static TimeClaim fromEpochSeconds(TimeClaimType type, String value, Long epochSeconds) {
         return new TimeClaim(type, value, dateTimeValue(epochSeconds));
+    }
+
+    public static TimeClaim fromIsoDateTime(TimeClaimType type, String value) {
+        return new TimeClaim(type, value, parseDateTime(value));
     }
 
     static List<TimeClaim> fromPayloadJson(String payloadJson) {
@@ -49,9 +55,14 @@ public class TimeClaimFactory {
                 .filter(type -> jsonObject.has(type.name))
                 .map(type -> {
                             String value = jsonObject.get(type.name).toString();
-                            Long epochSeconds = numberValue(jsonObject, type.name);
 
-                            return fromEpochSeconds(type, value, epochSeconds);
+                            if (value.matches("\\d+")) {
+                                Long epochSeconds = numberValue(jsonObject, type.name);
+
+                                return fromEpochSeconds(type, value, epochSeconds);
+                            } else {
+                                return fromIsoDateTime(type, value);
+                            }
                         }
                 )
                 .toList();
@@ -81,5 +92,13 @@ public class TimeClaimFactory {
         Instant instant = Instant.ofEpochSecond(numberValue);
 
         return ZonedDateTime.ofInstant(instant, UTC);
+    }
+
+    private static ZonedDateTime parseDateTime(String value) {
+        try {
+            return ZonedDateTime.parse(value, ISO_DATE_TIME);
+        } catch (DateTimeParseException e) {
+            return null;
+        }
     }
 }

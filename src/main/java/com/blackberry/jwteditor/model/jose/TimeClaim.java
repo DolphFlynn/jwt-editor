@@ -28,7 +28,7 @@ public record TimeClaim(TimeClaimType type, String value, ZonedDateTime dateTime
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(DATE_TIME_PATTERN).withLocale(US);
 
     public String date() {
-        return dateTime == null ? null : FORMATTER.format(dateTime);
+        return dateTime == null ? "" : FORMATTER.format(dateTime);
     }
 
     public boolean hasDate() {
