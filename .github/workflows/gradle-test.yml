@@ -24,3 +24,12 @@ jobs:
       uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25 # v2.6.0
       with:
         arguments: test
+
+    - name: Publish test report on failure
+      uses: actions/upload-artifact@v4
+      if: failure()
+      with:
+        name: test-report
+        path: build/reports
+        if-no-files-found: ignore
+        retention-days: 1
