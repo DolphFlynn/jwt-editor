@@ -20,233 +20,174 @@ package com.blackberry.jwteditor.model.jose;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.ValueSource;
 
-import java.text.ParseException;
+import java.time.Instant;
 import java.util.stream.Stream;
 
 import static com.blackberry.jwteditor.model.jose.TimeClaimType.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 class TimeClaimTest {
 
-    @Test
-    void givenJWSWithNoTimeClaims_thenTimeClaimsIsEmpty() throws ParseException {
-        JWS jws = JWSFactory.parse("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJUZXN0In0.WVLalefVZ5Rj991Cjgh0qBjKSIQaqC_CgN3b-30GKpQ");
-
-        assertThat(jws.timeClaims()).isEmpty();
-    }
-
+    @EnumSource(TimeClaimType.class)
     @ParameterizedTest
-    @ValueSource(strings = {
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiZXhwIjoxNzE2MjM5MDIyfQ.FuJB22Dq3zXcFXtIAc59tWnmbbFC6jRXzb_2ejbhhoQ",
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiZXhwIjoiMTcxNjIzOTAyMiJ9.8Tm8e1DEoD92S98fm9Hh_xFMsFVGNN7VjRZppD-bfMM"
-    })
-    void givenJWSWithExpTimeClaims_thenTimeClaimsCorrect(String data) throws ParseException {
-        JWS jws = JWSFactory.parse(data);
+    void invalidEpochTime(TimeClaimType type) {
+        TimeClaim timeClaim = TimeClaimFactory.fromEpochSeconds(type, "-1", -1L);
 
-        assertThat(jws.timeClaims()).containsExactly(new TimeClaim(EXPIRATION_TIME, "1716239022", 1716239022L));
-    }
-
-    private static Stream<String> jwsWithValidExpValues() {
-        return Stream.of(
-                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiZXhwIjoyMzE2MjM5MDIyfQ.nmCDcUHT-yLgrRG1LKMH9E2FQs2xWcB8CncxoqKdQEQ",
-                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiZXhwIjoiMjMxNjIzOTAyMiJ9.kDOLZJTcFVwrSVSDeFK31EIx7Q4e4Ya33iNCk4QZ10c"
-        );
-    }
-
-    @ParameterizedTest
-    @MethodSource("jwsWithValidExpValues")
-    void givenJWSWithExpTimeClaims_whenExpiryDateInTheFuture_thenTimeClaimValid(String data) throws ParseException {
-        JWS jws = JWSFactory.parse(data);
-
-        TimeClaim timeClaim = jws.timeClaims().getFirst();
-
-        assertThat(timeClaim.type()).isEqualTo(EXPIRATION_TIME);
-        assertThat(timeClaim.isValid()).isTrue();
-    }
-
-    private static Stream<String> jwsWithInvalidExpValues() {
-        return Stream.of(
-                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiZXhwIjoiemVvbGl0ZSJ9.Vsy0uiJVpA17ys9DRFWldEcgiut_N5QhvHCRRcp8Xow",
-                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiZXhwIjpudWxsfQ.JsGUzIiM3S7cZF3LjYg-S6rYz4VXK-GBpGELzNJKOgY",
-                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiZXhwIjotMTIzNDV9.BCgzT_CEurIxa0MxbS9seJ62lgfJT54P7AQpUkp65GE"
-        );
-    }
-
-    @ParameterizedTest
-    @MethodSource("jwsWithInvalidExpValues")
-    void givenJWSWithExpTimeClaims_whenExpiryDateInvalid_thenTimeClaimNotValid(String data) throws ParseException {
-        JWS jws = JWSFactory.parse(data);
-
-        TimeClaim timeClaim = jws.timeClaims().getFirst();
-
-        assertThat(timeClaim.type()).isEqualTo(EXPIRATION_TIME);
+        assertThat(timeClaim.type()).isEqualTo(type);
+        assertThat(timeClaim.value()).isEqualTo("-1");
         assertThat(timeClaim.isValid()).isFalse();
+        assertThat(timeClaim.hasDate()).isFalse();
+        assertThat(timeClaim.date()).isEmpty();
+        assertThat(timeClaim.dateTime()).isNull();
     }
 
-    private static Stream<String> jwsWithExpValuesInThePast() {
-        return Stream.of(
-                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJleHAiOjE1MTYyMzkwMjJ9.mVGXFv3OuwtuZPsdaf_oGUYm2uOH-T-JRTDQE1c10q0",
-                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJleHAiOjB9.eVVhRMapPD77WuMWIHKBqYw0cjJHC49On-mHEuonYjk"
-        );
-    }
-
+    @EnumSource(TimeClaimType.class)
     @ParameterizedTest
-    @MethodSource("jwsWithExpValuesInThePast")
-    void givenJWSWithExpTimeClaims_whenExpiryDateIsInThePast_thenTimeClaimNotValid(String data) throws ParseException {
-        JWS jws = JWSFactory.parse(data);
+    void invalidDateString(TimeClaimType type) {
+        TimeClaim timeClaim = TimeClaimFactory.fromIsoDateTime(type, "invalid");
 
-        TimeClaim timeClaim = jws.timeClaims().getFirst();
-
-        assertThat(timeClaim.type()).isEqualTo(EXPIRATION_TIME);
+        assertThat(timeClaim.type()).isEqualTo(type);
+        assertThat(timeClaim.value()).isEqualTo("invalid");
         assertThat(timeClaim.isValid()).isFalse();
+        assertThat(timeClaim.hasDate()).isFalse();
+        assertThat(timeClaim.date()).isEmpty();
+        assertThat(timeClaim.dateTime()).isNull();
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = {
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwibmJmIjoxNzE2MjM5MDIyfQ.mZ_wGwRA0BBp_m6LJOPOBfwMosKrhTf9DbnKZYTzBzg",
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwibmJmIjoiMTcxNjIzOTAyMiJ9.JD7t6jE6sOzuaFi5Lj5e3RhnoRDDWW9QHv_U3bFgEKM"
-    })
-    void givenJWSWithNbfTimeClaims_thenTimeClaimsCorrect(String data) throws ParseException {
-        JWS jws = JWSFactory.parse(data);
-
-        assertThat(jws.timeClaims()).containsExactly(new TimeClaim(NOT_BEFORE_TIME, "1716239022", 1716239022L));
-    }
-
-    private static Stream<String> jwsWithValidNbfValues() {
+    static Stream<Arguments> isoDateTimes() {
         return Stream.of(
-                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwibmJmIjoxNzE2MjM5MDIyfQ.mZ_wGwRA0BBp_m6LJOPOBfwMosKrhTf9DbnKZYTzBzg",
-                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwibmJmIjoiMTcxNjIzOTAyMiJ9.JD7t6jE6sOzuaFi5Lj5e3RhnoRDDWW9QHv_U3bFgEKM",
-                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJuYmYiOjE1MTYyMzkwMjJ9.1OhNEYnVM64dytXGZ1kj_Z3fV73xGFxWyba52S5r7wc",
-                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJuYmYiOjB9.AqIAHlKSdpcDp7mD6sWsfKCQxI2hyJYsI7Y4Dh6N6pI",
-                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJuYmYiOjE3MjIxNjc0Nzd9.2almhOGrigs8lXH9DLKBkkUCS6r5j7zpJXYsXJN39d4"
+                arguments("1985-04-12T23:20:50.52Z", "Fri Apr 12 1985 23:20:50"),
+                arguments("1996-12-19T16:39:57-08:00", "Thu Dec 19 1996 16:39:57")
         );
     }
 
+
+    @MethodSource("isoDateTimes")
     @ParameterizedTest
-    @MethodSource("jwsWithValidNbfValues")
-    void givenJWSWithNbfTimeClaims_whenNotBeforeDateInThePast_thenTimeClaimValid(String data) throws ParseException {
-        JWS jws = JWSFactory.parse(data);
-
-        TimeClaim timeClaim = jws.timeClaims().getFirst();
-
-        assertThat(timeClaim.type()).isEqualTo(NOT_BEFORE_TIME);
-        assertThat(timeClaim.isValid()).isTrue();
-    }
-
-    private static Stream<String> jwsWithInvalidNbfValues() {
-        return Stream.of(
-                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwibmJmIjoiemVvbGl0ZSJ9.kmx4FteQrcATfc2Zx47WypsqrIC-e1IM4opeLJxLyrI",
-                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwibmJmIjpudWxsfQ.Nyai4iIAzjR5OcUwaE8xQYbArYuBIzbKxaJDnvu1J_I",
-                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwibmJmIjotMTIzNDV9.rlnrK7unNEaaghPFhNQnDp1GRbCU0rGORO2yDf5YIZk"
-        );
-    }
-
-    @ParameterizedTest
-    @MethodSource("jwsWithInvalidNbfValues")
-    void givenJWSWithNbfTimeClaims_whenNotBeforeDateInvalid_thenTimeClaimNotValid(String data) throws ParseException {
-        JWS jws = JWSFactory.parse(data);
-
-        TimeClaim timeClaim = jws.timeClaims().getFirst();
-
-        assertThat(timeClaim.type()).isEqualTo(NOT_BEFORE_TIME);
-        assertThat(timeClaim.isValid()).isFalse();
-    }
-    private static Stream<String> jwsWithFutureNbfValues() {
-        return Stream.of(
-                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJuYmYiOjIzMjIxNjc0Nzd9.cMocfo6ghvuYBqDwZ9GBdfbCnMLsUcZe2GZRuaah0-c",
-                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJuYmYiOjE4MjIxNjc0Nzd9._m-Rhio9DLcVRfWo7S-KIvlTk29QuDgal-tqreN4y4E"
-        );
-    }
-
-    @ParameterizedTest
-    @MethodSource("jwsWithFutureNbfValues")
-    void givenJWSWithNbfTimeClaims_whenNotBeforeDateIsInTheFuture_thenTimeClaimNotValid(String data) throws ParseException {
-        JWS jws = JWSFactory.parse(data);
-
-        TimeClaim timeClaim = jws.timeClaims().getFirst();
-
-        assertThat(timeClaim.type()).isEqualTo(NOT_BEFORE_TIME);
-        assertThat(timeClaim.isValid()).isFalse();
-    }
-
-    private static Stream<String> jwsWithValidIatValues() {
-        return Stream.of(
-                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOjE3MTYyMzkwMjJ9.y06rqsXv0DMutukwDaUJU0Sf-Ye3qrDkyFpOaj1J08A",
-                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOiIxNzE2MjM5MDIyIn0.c2Ogr8QeTwopupVPqI56VaovZXE3svug2BI-Trft2EA"
-        );
-    }
-
-    @ParameterizedTest
-    @MethodSource("jwsWithValidIatValues")
-    void givenJWSWithNIatTimeClaims_thenTimeClaimsCorrect(String data) throws ParseException {
-        JWS jws = JWSFactory.parse(data);
-
-        assertThat(jws.timeClaims()).containsExactly(new TimeClaim(ISSUED_AT_TIME, "1716239022", 1716239022L));
-    }
-
-    private static Stream<String> jwsWithValidIatDatesInThePast() {
-        return Stream.of(
-                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOjE3MTYyMzkwMjJ9.y06rqsXv0DMutukwDaUJU0Sf-Ye3qrDkyFpOaj1J08A",
-                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOiIxNzE2MjM5MDIyIn0.c2Ogr8QeTwopupVPqI56VaovZXE3svug2BI-Trft2EA",
-                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOjE1MTYyMzkwMjJ9.hqWGSaFpvbrXkOWc6lrnffhNWR19W_S1YKFBx2arWBk",
-                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOjB9.9TaucSjKgR3_gXUlzTGperv3PK9IAXO0ZVbgP9Wx4IY",
-                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOjE3MjIxNjc0Nzd9.SWmvLUBWE5ddBWvSEWnrHM8W3rfzyYmEQVk6-ywFFgQ"
-        );
-    }
-
-    @ParameterizedTest
-    @MethodSource("jwsWithValidIatDatesInThePast")
-    void givenJWSWithIatTimeClaims_whenIssuedAtDateInThePast_thenTimeClaimValid(String data) throws ParseException {
-        JWS jws = JWSFactory.parse(data);
-
-        TimeClaim timeClaim = jws.timeClaims().getFirst();
+    void testIssuedAtTimeClaimsForIsoDateTimeStrings(String isoDateTime, String expectedDateTimeString) {
+        TimeClaim timeClaim = TimeClaimFactory.fromIsoDateTime(ISSUED_AT_TIME, isoDateTime);
 
         assertThat(timeClaim.type()).isEqualTo(ISSUED_AT_TIME);
+        assertThat(timeClaim.value()).isEqualTo(isoDateTime);
         assertThat(timeClaim.isValid()).isTrue();
+        assertThat(timeClaim.hasDate()).isTrue();
+        assertThat(timeClaim.date()).isEqualTo(expectedDateTimeString);
+        assertThat(timeClaim.dateTime()).isNotNull();
     }
 
-    private static Stream<String> jwsWithInvalidIatValues() {
+    static Stream<Arguments> epochDateTimes() {
         return Stream.of(
-                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOiJ6ZW9saXRlIn0.-IpgDK_M_jQJQ6FDa-wd25xGFJ2bHNthdYn1JlQNxjg",
-                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOm51bGx9.uplfi-hImBCsHTs__K-0LU612y3EW92J1TbINlDGc-k",
-                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOi0xMjM0NX0.gVkVHyEasqw2NZ63un0T9Yd6bW8bmY9uMYndlptiQzQ");
-    }
-
-    @ParameterizedTest
-    @MethodSource("jwsWithInvalidIatValues")
-    void givenJWSWithIatTimeClaims_whenIssuedAtDateInvalid_thenTimeClaimNotValid(String data) throws ParseException {
-        JWS jws = JWSFactory.parse(data);
-
-        TimeClaim timeClaim = jws.timeClaims().getFirst();
-
-        assertThat(timeClaim.type()).isEqualTo(ISSUED_AT_TIME);
-        assertThat(timeClaim.isValid()).isFalse();
-    }
-
-    private static Stream<String> jwsWithFutureIatDates() {
-        return Stream.of(
-                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOjIzMjIxNjc0Nzd9.3UYGoLpdXRhnlai81VFV_iWmW90xnCimcYverY1-Zk4",
-                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOjE4MjIxNjc0Nzd9._H-G7WjMbg8IVADVbz1Lsd7I_bGQZBYKPf8S2Q9vxf4"
+                arguments(482196050L, "Fri Apr 12 1985 23:20:50"),
+                arguments(851042397L, "Fri Dec 20 1996 00:39:57")
         );
     }
-    @ParameterizedTest
-    @MethodSource("jwsWithFutureIatDates")
-    void givenJWSWithIatTimeClaims_whenIssuedAtDateIsInTheFuture_thenTimeClaimNotValid(String data) throws ParseException {
-        JWS jws = JWSFactory.parse(data);
 
-        TimeClaim timeClaim = jws.timeClaims().getFirst();
+    @MethodSource("epochDateTimes")
+    @ParameterizedTest
+    void testIssuedAtTimeClaimsForEpochTimes(long epochDateTime, String expectedDateTimeString) {
+        String epochDateTimeValue = Long.toString(epochDateTime);
+
+        TimeClaim timeClaim = TimeClaimFactory.fromEpochSeconds(ISSUED_AT_TIME, epochDateTimeValue, epochDateTime);
 
         assertThat(timeClaim.type()).isEqualTo(ISSUED_AT_TIME);
-        assertThat(timeClaim.isValid()).isFalse();
+        assertThat(timeClaim.value()).isEqualTo(epochDateTimeValue);
+        assertThat(timeClaim.isValid()).isTrue();
+        assertThat(timeClaim.hasDate()).isTrue();
+        assertThat(timeClaim.date()).isEqualTo(expectedDateTimeString);
+        assertThat(timeClaim.dateTime()).isNotNull();
     }
 
     @Test
-    void givenJWE_thenTimeClaimsIsEmpty() throws ParseException {
-        JWE jwe = JWEFactory.parse("eyJlbmMiOiJBMTI4R0NNIiwiYWxnIjoiQTEyOEtXIn0.H3X6mT5HLgcFfzLoe4ku6Knhh9Ofv1eL.qF5-N_7K8VQ4yMSz.WXUNY6eg5fR4tc8Hqf5XDRM9ALGwcQyYG4IYwwg8Ctkx1UuxoV7t6UnemjzCj2sOYUqi3KYpDzrKVJpzokz0vcIem4lFe5N_ds8FAMpW0GSF9ePA8qvV99WaP0N2ECVPmgihvL6qwNhdptlLKtxcOpE41U5LnU22voPK55VF4_1j0WmTgWgZ7DwLDysp6EIDjrrt-DY.febBmP71KADmKRVfeSnv_g");
+    void testExpiredDatesInThePastAreInvalid() {
+        long epochSeconds = Instant.now().getEpochSecond() - 1;
+        String epochSecondsValue = Long.toString(epochSeconds);
 
-        assertThat(jwe.timeClaims()).isEmpty();
+        TimeClaim timeClaim = TimeClaimFactory.fromEpochSeconds(EXPIRATION_TIME, epochSecondsValue, epochSeconds);
+
+        assertThat(timeClaim.type()).isEqualTo(EXPIRATION_TIME);
+        assertThat(timeClaim.value()).isEqualTo(epochSecondsValue);
+        assertThat(timeClaim.isValid()).isFalse();
+        assertThat(timeClaim.hasDate()).isTrue();
+        assertThat(timeClaim.date()).isNotEmpty();
+        assertThat(timeClaim.dateTime()).isNotNull();
+    }
+
+    @Test
+    void testExpiredDatesInTheFutureAreValid() {
+        long epochSeconds = Instant.now().getEpochSecond() + 5;
+        String epochSecondsValue = Long.toString(epochSeconds);
+
+        TimeClaim timeClaim = TimeClaimFactory.fromEpochSeconds(EXPIRATION_TIME, epochSecondsValue, epochSeconds);
+
+        assertThat(timeClaim.type()).isEqualTo(EXPIRATION_TIME);
+        assertThat(timeClaim.value()).isEqualTo(epochSecondsValue);
+        assertThat(timeClaim.isValid()).isTrue();
+        assertThat(timeClaim.hasDate()).isTrue();
+        assertThat(timeClaim.date()).isNotEmpty();
+        assertThat(timeClaim.dateTime()).isNotNull();
+    }
+
+    @Test
+    void testIssuedAtDatesInThePastAreValid() {
+        long epochSeconds = Instant.now().getEpochSecond() - 1;
+        String epochSecondsValue = Long.toString(epochSeconds);
+
+        TimeClaim timeClaim = TimeClaimFactory.fromEpochSeconds(ISSUED_AT_TIME, epochSecondsValue, epochSeconds);
+
+        assertThat(timeClaim.type()).isEqualTo(ISSUED_AT_TIME);
+        assertThat(timeClaim.value()).isEqualTo(epochSecondsValue);
+        assertThat(timeClaim.isValid()).isTrue();
+        assertThat(timeClaim.hasDate()).isTrue();
+        assertThat(timeClaim.date()).isNotEmpty();
+        assertThat(timeClaim.dateTime()).isNotNull();
+    }
+
+    @Test
+    void testIssuedAtDatesInTheFutureAreInvalid() {
+        long epochSeconds = Instant.now().getEpochSecond() + 5;
+        String epochSecondsValue = Long.toString(epochSeconds);
+
+        TimeClaim timeClaim = TimeClaimFactory.fromEpochSeconds(ISSUED_AT_TIME, epochSecondsValue, epochSeconds);
+
+        assertThat(timeClaim.type()).isEqualTo(ISSUED_AT_TIME);
+        assertThat(timeClaim.value()).isEqualTo(epochSecondsValue);
+        assertThat(timeClaim.isValid()).isFalse();
+        assertThat(timeClaim.hasDate()).isTrue();
+        assertThat(timeClaim.date()).isNotEmpty();
+        assertThat(timeClaim.dateTime()).isNotNull();
+    }
+    @Test
+    void testNotBeforeDatesInThePastAreValid() {
+        long epochSeconds = Instant.now().getEpochSecond() - 1;
+        String epochSecondsValue = Long.toString(epochSeconds);
+
+        TimeClaim timeClaim = TimeClaimFactory.fromEpochSeconds(NOT_BEFORE_TIME, epochSecondsValue, epochSeconds);
+
+        assertThat(timeClaim.type()).isEqualTo(NOT_BEFORE_TIME);
+        assertThat(timeClaim.value()).isEqualTo(epochSecondsValue);
+        assertThat(timeClaim.isValid()).isTrue();
+        assertThat(timeClaim.hasDate()).isTrue();
+        assertThat(timeClaim.date()).isNotEmpty();
+        assertThat(timeClaim.dateTime()).isNotNull();
+    }
+
+    @Test
+    void testNotBeforeDatesInTheFutureAreInvalid() {
+        long epochSeconds = Instant.now().getEpochSecond() + 5;
+        String epochSecondsValue = Long.toString(epochSeconds);
+
+        TimeClaim timeClaim = TimeClaimFactory.fromEpochSeconds(NOT_BEFORE_TIME, epochSecondsValue, epochSeconds);
+
+        assertThat(timeClaim.type()).isEqualTo(NOT_BEFORE_TIME);
+        assertThat(timeClaim.value()).isEqualTo(epochSecondsValue);
+        assertThat(timeClaim.isValid()).isFalse();
+        assertThat(timeClaim.hasDate()).isTrue();
+        assertThat(timeClaim.date()).isNotEmpty();
+        assertThat(timeClaim.dateTime()).isNotNull();
     }
 }

@@ -48,7 +48,7 @@ public class JWS extends JOSEObject {
         super(header);
         this.payload = payload;
         this.signature = signature;
-        this.timeClaims = TimeClaim.from(payload.decodeToString());
+        this.timeClaims = TimeClaimFactory.fromPayloadJson(payload.decodeToString());
     }
 
     /**

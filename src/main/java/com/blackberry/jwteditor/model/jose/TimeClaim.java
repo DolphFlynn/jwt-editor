@@ -18,74 +18,24 @@ limitations under the License.
 
 package com.blackberry.jwteditor.model.jose;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Optional;
 
-import static java.time.ZoneOffset.UTC;
-import static java.util.Arrays.stream;
-import static java.util.Collections.emptyList;
 import static java.util.Locale.US;
 
-public record TimeClaim(TimeClaimType type, String data, Long value) {
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("EEE MMM dd yyyy HH:mm:ss").withLocale(US);
+public record TimeClaim(TimeClaimType type, String value, ZonedDateTime dateTime) {
+    private static final String DATE_TIME_PATTERN = "EEE MMM dd yyyy HH:mm:ss";
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(DATE_TIME_PATTERN).withLocale(US);
 
     public String date() {
-        if (value == null) {
-            return null;
-        }
-
-        Instant instant = Instant.ofEpochSecond(value);
-        ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(instant, UTC);
-
-        return FORMATTER.format(zonedDateTime);
+        return dateTime == null ? "" : FORMATTER.format(dateTime);
     }
 
     public boolean hasDate() {
-        return value != null;
+        return dateTime != null;
     }
 
     public boolean isValid() {
-        return type.isValid(value);
-    }
-
-    static List<TimeClaim> from(String payloadJson) {
-        Optional<JSONObject> optional = parsePayload(payloadJson);
-
-        if (optional.isEmpty()) {
-            return emptyList();
-        }
-
-        JSONObject jsonObject = optional.get();
-
-        return stream(TimeClaimType.values())
-                .filter(type -> jsonObject.has(type.name))
-                .map(type -> new TimeClaim(
-                        type,
-                        jsonObject.get(type.name).toString(),
-                        numberValue(jsonObject, type.name))
-                )
-                .toList();
-    }
-
-    private static Optional<JSONObject> parsePayload(String payloadJson) {
-        try {
-            return Optional.of(new JSONObject(payloadJson));
-        } catch (JSONException e) {
-            return Optional.empty();
-        }
-    }
-
-    private static Long numberValue(JSONObject jsonObject, String name) {
-        try {
-            return jsonObject.getLong(name);
-        } catch (JSONException e) {
-            return null;
-        }
+        return type.isValid(dateTime);
     }
 }
