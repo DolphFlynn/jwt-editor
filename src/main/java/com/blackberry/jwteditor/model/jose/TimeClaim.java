@@ -22,7 +22,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.time.Instant;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -31,9 +30,10 @@ import java.util.Optional;
 import static java.time.ZoneOffset.UTC;
 import static java.util.Arrays.stream;
 import static java.util.Collections.emptyList;
+import static java.util.Locale.US;
 
 public record TimeClaim(TimeClaimType type, String data, Long value) {
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("EEE MMM dd yyyy HH:mm:ss").withZone(ZoneId.from(UTC));
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("EEE MMM dd yyyy HH:mm:ss").withLocale(US);
 
     public String date() {
         if (value == null) {
