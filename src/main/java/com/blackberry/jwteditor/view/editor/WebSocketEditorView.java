@@ -20,8 +20,6 @@ package com.blackberry.jwteditor.view.editor;
 
 import burp.api.montoya.collaborator.CollaboratorPayloadGenerator;
 import burp.api.montoya.core.ByteArray;
-import burp.api.montoya.logging.Logging;
-import burp.api.montoya.ui.UserInterface;
 import burp.api.montoya.ui.contextmenu.WebSocketMessage;
 import burp.api.montoya.ui.editor.extension.ExtensionProvidedWebSocketMessageEditor;
 import com.blackberry.jwteditor.model.keys.KeysRepository;
@@ -33,18 +31,19 @@ public class WebSocketEditorView extends EditorView implements ExtensionProvided
 
     public WebSocketEditorView(KeysRepository keysRepository,
                                RstaFactory rstaFactory,
-                               Logging logging,
-                               UserInterface userInterface,
                                CollaboratorPayloadGenerator collaboratorPayloadGenerator,
+                               HexCodeAreaFactory hexAreaCodeFactory,
+                               ErrorLoggingActionListenerFactory actionListenerFactory,
+                               InformationPanelFactory informationPanelFactory,
                                boolean editable,
                                boolean isProVersion) {
         super(
                 keysRepository,
                 rstaFactory,
-                new HexCodeAreaFactory(logging, userInterface),
+                hexAreaCodeFactory,
                 collaboratorPayloadGenerator,
-                new ErrorLoggingActionListenerFactory(logging),
-                new InformationPanelFactory(userInterface, logging),
+                actionListenerFactory,
+                informationPanelFactory,
                 editable,
                 isProVersion
         );
