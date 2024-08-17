@@ -35,7 +35,7 @@ dependencies {
             "com.jetbrains.intellij.java:java-gui-forms-rt:${gui_designer_version}",
             'com.nimbusds:nimbus-jose-jwt:9.21',
             'org.exbin.deltahex:deltahex-swing:0.1.2',
-            'com.fifesoft:rsyntaxtextarea:3.4.1',
+            'com.fifesoft:rsyntaxtextarea:3.5.1',
             'org.json:json:20240303'
     )
     testImplementation(
