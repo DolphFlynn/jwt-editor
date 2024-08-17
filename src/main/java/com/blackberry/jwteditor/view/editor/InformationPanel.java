@@ -50,6 +50,7 @@ class InformationPanel extends JTextPane {
         this.lineSpacingStyle = addStyle("lineSpacingStyleName", null);
 
         setBorder(BorderFactory.createEmptyBorder(10, 10, 5, 5));
+        setEditable(false);
 
         configureStyles();
     }
