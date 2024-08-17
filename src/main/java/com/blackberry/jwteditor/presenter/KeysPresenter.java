@@ -42,33 +42,29 @@ import static com.blackberry.jwteditor.utils.JSONUtils.prettyPrintJSON;
 /**
  * Presenter for the Keys tab
  */
-public class KeysPresenter extends Presenter {
+public class KeysPresenter {
 
     private final KeysModel model;
     private final KeysView view;
     private final RstaFactory rstaFactory;
-    private final PresenterStore presenters;
     private final AsymmetricKeyDialogFactory asymmetricKeyDialogFactory;
 
     /**
      * Create a new KeysPresenter
      *
      * @param view                 the KeysView to associate with the presenter
-     * @param presenters           the shared list of all presenters
      * @param keysModelPersistence class used to persist keys model
      * @param keysModel            KeysModel to use (or null to create a new one)
      * @param rstaFactory          Factory to create RSyntaxTextArea
      */
     public KeysPresenter(KeysView view,
-                         PresenterStore presenters,
                          KeysModelPersistence keysModelPersistence,
                          KeysModel keysModel,
                          RstaFactory rstaFactory) {
         this.view = view;
         this.rstaFactory = rstaFactory;
-        this.presenters = presenters;
         this.model = keysModel;
-        this.asymmetricKeyDialogFactory = new AsymmetricKeyDialogFactory(view.getParent(), presenters, rstaFactory);
+        this.asymmetricKeyDialogFactory = new AsymmetricKeyDialogFactory(view.getParent(), model, rstaFactory);
 
         model.addKeyModelListener(new KeysModelListener() {
             @Override
@@ -91,8 +87,6 @@ public class KeysPresenter extends Presenter {
                 keysModelPersistence.save(keysModel);
             }
         });
-
-        presenters.register(this);
     }
 
     /**
@@ -123,27 +117,18 @@ public class KeysPresenter extends Presenter {
                 case RSAKey rsaKey -> asymmetricKeyDialogFactory.rsaKeyDialog(rsaKey);
                 case ECKey ecKey -> asymmetricKeyDialogFactory.ecKeyDialog(ecKey);
                 case OctetKeyPair octetKeyPair -> asymmetricKeyDialogFactory.okpDialog(octetKeyPair);
-                case OctetSequenceKey octetSequenceKey -> new SymmetricKeyDialog(view.getParent(), presenters, rstaFactory, octetSequenceKey);
+                case OctetSequenceKey octetSequenceKey -> new SymmetricKeyDialog(view.getParent(), model, rstaFactory, octetSequenceKey);
                 default -> null;
             };
         }
 
         if (key instanceof PasswordKey passwordKey) {
-            return new PasswordDialog(view.getParent(), presenters, passwordKey);
+            return new PasswordDialog(view.getParent(), model, passwordKey);
         }
 
         return null;
     }
 
-    /**
-     * Check if a key exists in the key model
-     *
-     * @param keyId id of key to check
-     * @return true if the key exists in the model
-     */
-    public boolean keyExists(String keyId) {
-        return model.getKey(keyId) != null;
-    }
 
     private void onButtonNewClicked(KeyDialog d) {
         d.display();
@@ -158,7 +143,7 @@ public class KeysPresenter extends Presenter {
      * Handler for button clicks for new symmetric keys
      */
     public void onButtonNewSymmetricClick() {
-        onButtonNewClicked(new SymmetricKeyDialog(view.getParent(), presenters, rstaFactory, null));
+        onButtonNewClicked(new SymmetricKeyDialog(view.getParent(), model, rstaFactory, null));
     }
 
     /**
@@ -186,7 +171,7 @@ public class KeysPresenter extends Presenter {
      * Handler for button clicks for new passwords
      */
     public void onButtonNewPasswordClick() {
-        onButtonNewClicked(new PasswordDialog(view.getParent(), presenters));
+        onButtonNewClicked(new PasswordDialog(view.getParent(), model));
     }
 
     /**
@@ -345,41 +330,5 @@ public class KeysPresenter extends Presenter {
         String jwkSetJson = jwkSet.serialize();
 
         Utils.copyToClipboard(jwkSetJson);
-    }
-
-    /**
-     * Get a list of signing keys from the model
-     *
-     * @return list of keys that can be used for signing
-     */
-    public List<Key> getSigningKeys() {
-        return model.getSigningKeys();
-    }
-
-    /**
-     * Get a list of encryption keys from the model
-     *
-     * @return list of keys that can be used for encryption
-     */
-    public List<Key> getEncryptionKeys() {
-        return model.getEncryptionKeys();
-    }
-
-    /**
-     * Get a list of decryption keys from the model
-     *
-     * @return list of keys that can be used for decryption
-     */
-    public List<Key> getDecryptionKeys() {
-        return model.getDecryptionKeys();
-    }
-
-    /**
-     * Get a list of verification keys from the model
-     *
-     * @return list of keys that can be used for verification
-     */
-    public List<Key> getVerificationKeys() {
-        return model.getVerificationKeys();
     }
 }

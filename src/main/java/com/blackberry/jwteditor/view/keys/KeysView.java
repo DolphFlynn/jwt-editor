@@ -22,7 +22,6 @@ import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.model.keys.KeysModel;
 import com.blackberry.jwteditor.model.persistence.KeysModelPersistence;
 import com.blackberry.jwteditor.presenter.KeysPresenter;
-import com.blackberry.jwteditor.presenter.PresenterStore;
 import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.view.rsta.RstaFactory;
 import com.blackberry.jwteditor.view.utils.AlternateRowBackgroundDecoratingTableCellRenderer;
@@ -65,7 +64,6 @@ public class KeysView {
 
     public KeysView(
             Window parent,
-            PresenterStore presenters,
             KeysModelPersistence keysModelPersistence,
             KeysModel keysModel,
             RstaFactory rstaFactory) {
@@ -77,7 +75,6 @@ public class KeysView {
         // Initialise the presenter
         presenter = new KeysPresenter(
                 this,
-                presenters,
                 keysModelPersistence,
                 keysModel,
                 rstaFactory
