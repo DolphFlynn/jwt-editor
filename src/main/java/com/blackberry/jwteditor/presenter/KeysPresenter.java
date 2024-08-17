@@ -100,37 +100,39 @@ public class KeysPresenter extends Presenter {
      */
     public void onTableKeysDoubleClick() {
         Key key = model.getKey(view.getSelectedRow());
+        KeyDialog dialog = buildKeyDialog(key);
 
-        KeyDialog d;
-
-        // Get the dialog type based on the key type
-        if (key instanceof JWKKey) {
-            JWK jwk = ((JWKKey) key).getJWK();
-            if (jwk instanceof RSAKey rsaKey) {
-                d = asymmetricKeyDialogFactory.rsaKeyDialog(rsaKey);
-            } else if (jwk instanceof ECKey ecKey) {
-                d = asymmetricKeyDialogFactory.ecKeyDialog(ecKey);
-            } else if (jwk instanceof OctetKeyPair octetKeyPair) {
-                d = asymmetricKeyDialogFactory.okpDialog(octetKeyPair);
-            } else if (jwk instanceof OctetSequenceKey octetSequenceKey) {
-                d = new SymmetricKeyDialog(view.getParent(), presenters, rstaFactory, octetSequenceKey);
-            } else {
-                return;
-            }
-        } else if (key instanceof PasswordKey) {
-            d = new PasswordDialog(view.getParent(), presenters, (PasswordKey) key);
-        } else {
+        if (dialog == null) {
             return;
         }
 
-        d.display();
+        dialog.display();
 
         // If dialog returned a key, replace the key in the store with the new key
-        Key newKey = d.getKey();
+        Key newKey = dialog.getKey();
+
         if (newKey != null) {
             model.deleteKey(key.getID());
-            model.addKey(d.getKey());
+            model.addKey(dialog.getKey());
         }
+    }
+
+    private KeyDialog buildKeyDialog(Key key) {
+        if (key instanceof JWKKey jwkKey) {
+            return switch (jwkKey.getJWK()) {
+                case RSAKey rsaKey -> asymmetricKeyDialogFactory.rsaKeyDialog(rsaKey);
+                case ECKey ecKey -> asymmetricKeyDialogFactory.ecKeyDialog(ecKey);
+                case OctetKeyPair octetKeyPair -> asymmetricKeyDialogFactory.okpDialog(octetKeyPair);
+                case OctetSequenceKey octetSequenceKey -> new SymmetricKeyDialog(view.getParent(), presenters, rstaFactory, octetSequenceKey);
+                default -> null;
+            };
+        }
+
+        if (key instanceof PasswordKey passwordKey) {
+            return new PasswordDialog(view.getParent(), presenters, passwordKey);
+        }
+
+        return null;
     }
 
     /**
