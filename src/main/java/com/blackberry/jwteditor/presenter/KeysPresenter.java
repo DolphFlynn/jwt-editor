@@ -24,13 +24,10 @@ import com.blackberry.jwteditor.model.keys.*;
 import com.blackberry.jwteditor.model.persistence.KeysModelPersistence;
 import com.blackberry.jwteditor.utils.PEMUtils;
 import com.blackberry.jwteditor.utils.Utils;
-import com.blackberry.jwteditor.view.dialog.keys.AsymmetricKeyDialogFactory;
 import com.blackberry.jwteditor.view.dialog.keys.KeyDialog;
-import com.blackberry.jwteditor.view.dialog.keys.PasswordDialog;
-import com.blackberry.jwteditor.view.dialog.keys.SymmetricKeyDialog;
+import com.blackberry.jwteditor.view.dialog.keys.KeysDialogFactory;
 import com.blackberry.jwteditor.view.keys.KeysView;
-import com.blackberry.jwteditor.view.rsta.RstaFactory;
-import com.nimbusds.jose.jwk.*;
+import com.nimbusds.jose.jwk.JWK;
 
 import javax.swing.*;
 import java.util.List;
@@ -46,25 +43,15 @@ public class KeysPresenter {
 
     private final KeysModel model;
     private final KeysView view;
-    private final RstaFactory rstaFactory;
-    private final AsymmetricKeyDialogFactory asymmetricKeyDialogFactory;
+    private final KeysDialogFactory keysDialogFactory;
 
-    /**
-     * Create a new KeysPresenter
-     *
-     * @param view                 the KeysView to associate with the presenter
-     * @param keysModelPersistence class used to persist keys model
-     * @param keysModel            KeysModel to use (or null to create a new one)
-     * @param rstaFactory          Factory to create RSyntaxTextArea
-     */
     public KeysPresenter(KeysView view,
                          KeysModelPersistence keysModelPersistence,
                          KeysModel keysModel,
-                         RstaFactory rstaFactory) {
+                         KeysDialogFactory keysDialogFactory) {
         this.view = view;
-        this.rstaFactory = rstaFactory;
         this.model = keysModel;
-        this.asymmetricKeyDialogFactory = new AsymmetricKeyDialogFactory(view.getParent(), model, rstaFactory);
+        this.keysDialogFactory = keysDialogFactory;
 
         model.addKeyModelListener(new KeysModelListener() {
             @Override
@@ -94,7 +81,7 @@ public class KeysPresenter {
      */
     public void onTableKeysDoubleClick() {
         Key key = model.getKey(view.getSelectedRow());
-        KeyDialog dialog = buildKeyDialog(key);
+        KeyDialog dialog = keysDialogFactory.dialogFor(key);
 
         if (dialog == null) {
             return;
@@ -111,25 +98,6 @@ public class KeysPresenter {
         }
     }
 
-    private KeyDialog buildKeyDialog(Key key) {
-        if (key instanceof JWKKey jwkKey) {
-            return switch (jwkKey.getJWK()) {
-                case RSAKey rsaKey -> asymmetricKeyDialogFactory.rsaKeyDialog(rsaKey);
-                case ECKey ecKey -> asymmetricKeyDialogFactory.ecKeyDialog(ecKey);
-                case OctetKeyPair octetKeyPair -> asymmetricKeyDialogFactory.okpDialog(octetKeyPair);
-                case OctetSequenceKey octetSequenceKey -> new SymmetricKeyDialog(view.getParent(), model, rstaFactory, octetSequenceKey);
-                default -> null;
-            };
-        }
-
-        if (key instanceof PasswordKey passwordKey) {
-            return new PasswordDialog(view.getParent(), model, passwordKey);
-        }
-
-        return null;
-    }
-
-
     private void onButtonNewClicked(KeyDialog d) {
         d.display();
 
@@ -143,35 +111,35 @@ public class KeysPresenter {
      * Handler for button clicks for new symmetric keys
      */
     public void onButtonNewSymmetricClick() {
-        onButtonNewClicked(new SymmetricKeyDialog(view.getParent(), model, rstaFactory, null));
+        onButtonNewClicked(keysDialogFactory.symmetricKeyDialog());
     }
 
     /**
      * Handler for button clicks for new RSA keys
      */
     public void onButtonNewRSAClick() {
-        onButtonNewClicked(asymmetricKeyDialogFactory.rsaKeyDialog());
+        onButtonNewClicked(keysDialogFactory.rsaKeyDialog());
     }
 
     /**
      * Handler for button clicks for new EC keys
      */
     public void onButtonNewECClick() {
-        onButtonNewClicked(asymmetricKeyDialogFactory.ecKeyDialog());
+        onButtonNewClicked(keysDialogFactory.ecKeyDialog());
     }
 
     /**
      * Handler for button clicks for new OKPs
      */
     public void onButtonNewOKPClick() {
-        onButtonNewClicked(asymmetricKeyDialogFactory.okpDialog());
+        onButtonNewClicked(keysDialogFactory.okpDialog());
     }
 
     /**
      * Handler for button clicks for new passwords
      */
     public void onButtonNewPasswordClick() {
-        onButtonNewClicked(new PasswordDialog(view.getParent(), model));
+        onButtonNewClicked(keysDialogFactory.passwordDialog());
     }
 
     /**
