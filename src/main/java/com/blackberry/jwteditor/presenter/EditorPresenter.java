@@ -25,7 +25,7 @@ import com.blackberry.jwteditor.model.jose.JWS;
 import com.blackberry.jwteditor.model.jose.MutableJOSEObject;
 import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.model.keys.KeyRing;
-import com.blackberry.jwteditor.model.keys.KeysModel;
+import com.blackberry.jwteditor.model.keys.KeysRepository;
 import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.view.dialog.MessageDialogFactory;
 import com.blackberry.jwteditor.view.dialog.operations.*;
@@ -52,7 +52,7 @@ import static com.blackberry.jwteditor.utils.JSONUtils.prettyPrintJSON;
  */
 public class EditorPresenter {
 
-    private final KeysModel keysModel;
+    private final KeysRepository keysRepository;
     private final EditorView view;
     private final CollaboratorPayloadGenerator collaboratorPayloadGenerator;
     private final ErrorLoggingActionListenerFactory actionListenerFactory;
@@ -65,11 +65,11 @@ public class EditorPresenter {
             EditorView view,
             CollaboratorPayloadGenerator collaboratorPayloadGenerator,
             ErrorLoggingActionListenerFactory actionListenerFactory,
-            KeysModel keysModel) {
+            KeysRepository keysRepository) {
         this.view = view;
         this.collaboratorPayloadGenerator = collaboratorPayloadGenerator;
         this.actionListenerFactory = actionListenerFactory;
-        this.keysModel = keysModel;
+        this.keysRepository = keysRepository;
         this.model = new EditorModel();
         this.messageDialogFactory = new MessageDialogFactory(view.uiComponent());
     }
@@ -189,7 +189,7 @@ public class EditorPresenter {
         List<Key> attackKeys = new ArrayList<>();
 
         // Get a list of verification capable public keys
-        List<Key> verificationKeys = keysModel.getVerificationKeys();
+        List<Key> verificationKeys = keysRepository.getVerificationKeys();
         for (Key signingKey : verificationKeys) {
             if (signingKey.isPublic() && signingKey.hasPEM()) {
                 attackKeys.add(signingKey);
@@ -284,7 +284,7 @@ public class EditorPresenter {
      */
     private void signingDialog(SignDialog.Mode mode) {
         // Check there are signing keys in the keystore
-        if (keysModel.getSigningKeys().isEmpty()) {
+        if (keysRepository.getSigningKeys().isEmpty()) {
             messageDialogFactory.showWarningDialog("error_title_no_signing_keys", "error_no_signing_keys");
             return;
         }
@@ -292,7 +292,7 @@ public class EditorPresenter {
         SignDialog signDialog = new SignDialog(
                 view.window(),
                 actionListenerFactory,
-                keysModel.getSigningKeys(),
+                keysRepository.getSigningKeys(),
                 getJWS(),
                 mode
         );
@@ -309,7 +309,7 @@ public class EditorPresenter {
      * Handle click events from the Verify button
      */
     public void onVerifyClicked() {
-        List<Key> keys = keysModel.getVerificationKeys();
+        List<Key> keys = keysRepository.getVerificationKeys();
 
         // Check there are verification keys in the keystore
         if (keys.isEmpty()) {
@@ -328,7 +328,7 @@ public class EditorPresenter {
 
     public void onEncryptClicked() {
         // Check there are encryption keys in the keystore
-        if (keysModel.getEncryptionKeys().isEmpty()) {
+        if (keysRepository.getEncryptionKeys().isEmpty()) {
             messageDialogFactory.showWarningDialog("error_title_no_encryption_keys", "error_no_encryption_keys");
             return;
         }
@@ -337,7 +337,7 @@ public class EditorPresenter {
                 view.window(),
                 actionListenerFactory,
                 getJWS(),
-                keysModel.getEncryptionKeys()
+                keysRepository.getEncryptionKeys()
         );
         encryptDialog.display();
 
@@ -354,14 +354,14 @@ public class EditorPresenter {
      * Handle click events from the Decrypt button
      */
     public void onDecryptClicked() {
-        if (keysModel.getDecryptionKeys().isEmpty()) {
+        if (keysRepository.getDecryptionKeys().isEmpty()) {
             messageDialogFactory.showWarningDialog("error_title_no_decryption_keys", "error_no_decryption_keys");
             return;
         }
 
         // Attempt to decrypt the contents of the editor with all available keys
         try {
-            List<Key> keys = keysModel.getDecryptionKeys();
+            List<Key> keys = keysRepository.getDecryptionKeys();
             Optional<JWS> jws = new KeyRing(keys).attemptDecryption(getJWE());
 
             // If decryption was successful, set the contents of the editor to the decrypted JWS and set the editor mode to JWS
