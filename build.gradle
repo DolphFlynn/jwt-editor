@@ -81,7 +81,8 @@ jar {
                                  'org/exbin/deltahex/swing/DefaultCodeAreaCommandHandler$2.class',
                                  'org/exbin/deltahex/swing/DefaultCodeAreaCommandHandler$BinaryDataClipboardData.class',
                                  'org/exbin/deltahex/swing/DefaultCodeAreaCommandHandler$ClipboardData.class',
-                                 'org/exbin/deltahex/swing/DefaultCodeAreaCommandHandler$CodeDataClipboardData.class'
+                                 'org/exbin/deltahex/swing/DefaultCodeAreaCommandHandler$CodeDataClipboardData.class',
+                                 'META-INF/LICENSE'
                     })
         }
     }
