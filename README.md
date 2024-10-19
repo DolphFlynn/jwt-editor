@@ -162,7 +162,7 @@ This option is automatically enabled if it is detected that the original JWT did
 
 ## Building JWT Editor from source
 *JWT Editor* can be built from source.
-* Ensure that Java JDK 17 or newer is installed
+* Ensure that Java JDK 21 or newer is installed
 * From root of project, run the command `./gradlew jar`
 * This should place the JAR file `jwt-editor-2.3.jar` within the `build/libs` directory
 * This can be loaded into Burp Suite by navigating to the `Extensions` tab, `Installed` sub-tab, clicking `Add` and loading the JAR file
