@@ -17,7 +17,6 @@ import burp.scanner.JWSHeaderInsertionPointProvider;
 import com.blackberry.jwteditor.model.keys.KeysModel;
 import com.blackberry.jwteditor.model.persistence.BurpKeysModelPersistence;
 import com.blackberry.jwteditor.model.persistence.KeysModelPersistence;
-import com.blackberry.jwteditor.presenter.PresenterStore;
 import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.view.SuiteView;
 import com.blackberry.jwteditor.view.editor.HttpRequestEditorView;
@@ -51,13 +50,11 @@ public class JWTEditorExtension implements BurpExtension {
         Window suiteWindow = userInterface.swingUtils().suiteFrame();
 
         RstaFactory rstaFactory = new RstaFactory(userInterface, api.logging());
-        PresenterStore presenters = new PresenterStore();
 
         boolean isProVersion = api.burpSuite().version().edition() == PROFESSIONAL;
 
         SuiteView suiteView = new SuiteView(
                 suiteWindow,
-                presenters,
                 keysModelPersistence,
                 keysModel,
                 rstaFactory,
@@ -70,7 +67,7 @@ public class JWTEditorExtension implements BurpExtension {
 
         userInterface.registerHttpRequestEditorProvider(editorCreationContext ->
                 new HttpRequestEditorView(
-                        presenters,
+                        keysModel,
                         rstaFactory,
                         api.logging(),
                         api.userInterface(),
@@ -82,7 +79,7 @@ public class JWTEditorExtension implements BurpExtension {
 
         userInterface.registerHttpResponseEditorProvider(editorCreationContext ->
                 new HttpResponseEditorView(
-                        presenters,
+                        keysModel,
                         rstaFactory,
                         api.logging(),
                         api.userInterface(),
@@ -94,7 +91,7 @@ public class JWTEditorExtension implements BurpExtension {
 
         userInterface.registerWebSocketMessageEditorProvider(editorCreationContext ->
                 new WebSocketEditorView(
-                        presenters,
+                        keysModel,
                         rstaFactory,
                         api.logging(),
                         api.userInterface(),

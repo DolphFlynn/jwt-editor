@@ -20,9 +20,9 @@ package com.blackberry.jwteditor.view.editor;
 
 import burp.api.montoya.collaborator.CollaboratorPayloadGenerator;
 import burp.api.montoya.ui.Selection;
+import com.blackberry.jwteditor.model.keys.KeysModel;
 import com.blackberry.jwteditor.presenter.EditorPresenter;
 import com.blackberry.jwteditor.presenter.Information;
-import com.blackberry.jwteditor.presenter.PresenterStore;
 import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.view.hexcodearea.HexCodeAreaFactory;
 import com.blackberry.jwteditor.view.rsta.RstaFactory;
@@ -100,7 +100,7 @@ public abstract class EditorView {
     private CodeArea codeAreaTag;
 
     EditorView(
-            PresenterStore presenters,
+            KeysModel keysModel,
             RstaFactory rstaFactory,
             HexCodeAreaFactory hexAreaCodeFactory,
             CollaboratorPayloadGenerator collaboratorPayloadGenerator,
@@ -112,7 +112,7 @@ public abstract class EditorView {
         this.editable = editable;
         this.hexCodeAreaFactory = hexAreaCodeFactory;
         this.isProVersion = isProVersion;
-        this.presenter = new EditorPresenter(this, collaboratorPayloadGenerator, actionListenerFactory, presenters);
+        this.presenter = new EditorPresenter(this, collaboratorPayloadGenerator, actionListenerFactory, keysModel);
         this.informationPanel = informationPanelFactory.build();
 
         informationScrollPane.setViewportView(informationPanel);

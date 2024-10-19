@@ -213,4 +213,10 @@ public class KeysModel {
             return keys.get(keyId);
         }
     }
+
+    public boolean keyExists(String keyId) {
+        synchronized (lock) {
+            return keys.get(keyId) != null;
+        }
+    }
 }

@@ -24,14 +24,14 @@ import burp.api.montoya.logging.Logging;
 import burp.api.montoya.ui.UserInterface;
 import burp.api.montoya.ui.contextmenu.WebSocketMessage;
 import burp.api.montoya.ui.editor.extension.ExtensionProvidedWebSocketMessageEditor;
-import com.blackberry.jwteditor.presenter.PresenterStore;
+import com.blackberry.jwteditor.model.keys.KeysModel;
 import com.blackberry.jwteditor.view.hexcodearea.HexCodeAreaFactory;
 import com.blackberry.jwteditor.view.rsta.RstaFactory;
 import com.blackberry.jwteditor.view.utils.ErrorLoggingActionListenerFactory;
 
 public class WebSocketEditorView extends EditorView implements ExtensionProvidedWebSocketMessageEditor {
 
-    public WebSocketEditorView(PresenterStore presenters,
+    public WebSocketEditorView(KeysModel keysModel,
                                RstaFactory rstaFactory,
                                Logging logging,
                                UserInterface userInterface,
@@ -39,7 +39,7 @@ public class WebSocketEditorView extends EditorView implements ExtensionProvided
                                boolean editable,
                                boolean isProVersion) {
         super(
-                presenters,
+                keysModel,
                 rstaFactory,
                 new HexCodeAreaFactory(logging, userInterface),
                 collaboratorPayloadGenerator,

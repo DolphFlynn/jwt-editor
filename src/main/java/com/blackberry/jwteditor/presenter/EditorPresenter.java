@@ -25,6 +25,7 @@ import com.blackberry.jwteditor.model.jose.JWS;
 import com.blackberry.jwteditor.model.jose.MutableJOSEObject;
 import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.model.keys.KeyRing;
+import com.blackberry.jwteditor.model.keys.KeysModel;
 import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.view.dialog.MessageDialogFactory;
 import com.blackberry.jwteditor.view.dialog.operations.*;
@@ -49,9 +50,9 @@ import static com.blackberry.jwteditor.utils.JSONUtils.prettyPrintJSON;
 /**
  * Presenter class for the Editor tab
  */
-public class EditorPresenter extends Presenter {
+public class EditorPresenter {
 
-    private final PresenterStore presenters;
+    private final KeysModel keysModel;
     private final EditorView view;
     private final CollaboratorPayloadGenerator collaboratorPayloadGenerator;
     private final ErrorLoggingActionListenerFactory actionListenerFactory;
@@ -64,15 +65,13 @@ public class EditorPresenter extends Presenter {
             EditorView view,
             CollaboratorPayloadGenerator collaboratorPayloadGenerator,
             ErrorLoggingActionListenerFactory actionListenerFactory,
-            PresenterStore presenters) {
+            KeysModel keysModel) {
         this.view = view;
         this.collaboratorPayloadGenerator = collaboratorPayloadGenerator;
         this.actionListenerFactory = actionListenerFactory;
-        this.presenters = presenters;
+        this.keysModel = keysModel;
         this.model = new EditorModel();
         this.messageDialogFactory = new MessageDialogFactory(view.uiComponent());
-
-        presenters.register(this);
     }
 
     /**
@@ -187,12 +186,10 @@ public class EditorPresenter extends Presenter {
      * Handle click events from the HMAC Key Confusion button
      */
     public void onAttackKeyConfusionClicked() {
-        KeysPresenter keysPresenter = (KeysPresenter) presenters.get(KeysPresenter.class);
-
         List<Key> attackKeys = new ArrayList<>();
 
         // Get a list of verification capable public keys
-        List<Key> verificationKeys = keysPresenter.getVerificationKeys();
+        List<Key> verificationKeys = keysModel.getVerificationKeys();
         for (Key signingKey : verificationKeys) {
             if (signingKey.isPublic() && signingKey.hasPEM()) {
                 attackKeys.add(signingKey);
@@ -286,10 +283,8 @@ public class EditorPresenter extends Presenter {
      * @param mode mode of the signing dialog to display
      */
     private void signingDialog(SignDialog.Mode mode) {
-        KeysPresenter keysPresenter = (KeysPresenter) presenters.get(KeysPresenter.class);
-
         // Check there are signing keys in the keystore
-        if (keysPresenter.getSigningKeys().isEmpty()) {
+        if (keysModel.getSigningKeys().isEmpty()) {
             messageDialogFactory.showWarningDialog("error_title_no_signing_keys", "error_no_signing_keys");
             return;
         }
@@ -297,7 +292,7 @@ public class EditorPresenter extends Presenter {
         SignDialog signDialog = new SignDialog(
                 view.window(),
                 actionListenerFactory,
-                keysPresenter.getSigningKeys(),
+                keysModel.getSigningKeys(),
                 getJWS(),
                 mode
         );
@@ -314,7 +309,7 @@ public class EditorPresenter extends Presenter {
      * Handle click events from the Verify button
      */
     public void onVerifyClicked() {
-        List<Key> keys = ((KeysPresenter) presenters.get(KeysPresenter.class)).getVerificationKeys();
+        List<Key> keys = keysModel.getVerificationKeys();
 
         // Check there are verification keys in the keystore
         if (keys.isEmpty()) {
@@ -332,10 +327,8 @@ public class EditorPresenter extends Presenter {
     }
 
     public void onEncryptClicked() {
-        KeysPresenter keysPresenter = (KeysPresenter) presenters.get(KeysPresenter.class);
-
         // Check there are encryption keys in the keystore
-        if (keysPresenter.getEncryptionKeys().isEmpty()) {
+        if (keysModel.getEncryptionKeys().isEmpty()) {
             messageDialogFactory.showWarningDialog("error_title_no_encryption_keys", "error_no_encryption_keys");
             return;
         }
@@ -344,7 +337,7 @@ public class EditorPresenter extends Presenter {
                 view.window(),
                 actionListenerFactory,
                 getJWS(),
-                keysPresenter.getEncryptionKeys()
+                keysModel.getEncryptionKeys()
         );
         encryptDialog.display();
 
@@ -361,17 +354,14 @@ public class EditorPresenter extends Presenter {
      * Handle click events from the Decrypt button
      */
     public void onDecryptClicked() {
-        KeysPresenter keysPresenter = (KeysPresenter) presenters.get(KeysPresenter.class);
-
-        // Check there are decryption keys in the keystore
-        if (keysPresenter.getDecryptionKeys().isEmpty()) {
+        if (keysModel.getDecryptionKeys().isEmpty()) {
             messageDialogFactory.showWarningDialog("error_title_no_decryption_keys", "error_no_decryption_keys");
             return;
         }
 
         // Attempt to decrypt the contents of the editor with all available keys
         try {
-            List<Key> keys = keysPresenter.getDecryptionKeys();
+            List<Key> keys = keysModel.getDecryptionKeys();
             Optional<JWS> jws = new KeyRing(keys).attemptDecryption(getJWE());
 
             // If decryption was successful, set the contents of the editor to the decrypted JWS and set the editor mode to JWS
