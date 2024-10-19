@@ -1,3 +1,21 @@
+/*
+Author : Dolph Flynn
+
+Copyright 2024 Dolph Flynn
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package burp.intruder;
 
 import burp.api.montoya.core.ByteArray;
@@ -10,7 +28,7 @@ import com.blackberry.jwteditor.model.jose.JOSEObject;
 import com.blackberry.jwteditor.model.jose.JWS;
 import com.blackberry.jwteditor.model.jose.JWSFactory;
 import com.blackberry.jwteditor.model.keys.Key;
-import com.blackberry.jwteditor.model.keys.KeysModel;
+import com.blackberry.jwteditor.model.keys.KeysRepository;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.util.Base64URL;
 import org.json.JSONObject;
@@ -24,12 +42,12 @@ import static com.nimbusds.jose.HeaderParameterNames.ALGORITHM;
 public class JWSPayloadProcessor implements PayloadProcessor {
     private final Logging logging;
     private final IntruderConfig intruderConfig;
-    private final KeysModel keysModel;
+    private final KeysRepository keysRepository;
 
-    public JWSPayloadProcessor(IntruderConfig intruderConfig, Logging logging, KeysModel keysModel) {
+    public JWSPayloadProcessor(IntruderConfig intruderConfig, Logging logging, KeysRepository keysRepository) {
         this.logging = logging;
         this.intruderConfig = intruderConfig;
-        this.keysModel = keysModel;
+        this.keysRepository = keysRepository;
     }
 
     @Override
@@ -66,7 +84,7 @@ public class JWSPayloadProcessor implements PayloadProcessor {
             return Optional.empty();
         }
 
-        Key key = keysModel.getKey(intruderConfig.signingKeyId());
+        Key key = keysRepository.getKey(intruderConfig.signingKeyId());
 
         if (key == null) {
             logging.logToError("Key with ID " + intruderConfig.signingKeyId() + " not found.");
