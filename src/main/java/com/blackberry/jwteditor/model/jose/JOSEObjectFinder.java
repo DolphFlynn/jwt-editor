@@ -27,6 +27,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.blackberry.jwteditor.utils.JSONUtils.isJsonObject;
 import static com.nimbusds.jose.Header.MAX_HEADER_STRING_LENGTH;
 import static com.nimbusds.jose.HeaderParameterNames.ALGORITHM;
 
@@ -127,10 +128,9 @@ public class JOSEObjectFinder {
                 throw new ParseException("Missing \"alg\" in header JSON object", 0);
             }
 
-            // Payload must be Base64URL encoded UTF-8 encoded JSON object
-            Base64URL encodedPayload = parts[1];
-            String payload = encodedPayload.decodeToString();
-            JSONObjectUtils.parse(payload); // throws ParseException if not JSON object
+            if (!isJsonObject(parts[1].decodeToString())) {
+                throw new ParseException("Payload is invalid JSON object", 0);
+            }
 
             return Optional.of(JWSFactory.parse(candidate));
         } catch (ParseException e) {
