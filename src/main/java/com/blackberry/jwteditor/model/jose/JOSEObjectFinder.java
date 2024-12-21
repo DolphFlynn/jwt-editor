@@ -27,14 +27,13 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.blackberry.jwteditor.utils.JSONUtils.isJsonObject;
 import static com.nimbusds.jose.Header.MAX_HEADER_STRING_LENGTH;
 import static com.nimbusds.jose.HeaderParameterNames.ALGORITHM;
 
 public class JOSEObjectFinder {
     public static final String BASE64_REGEX = "[A-Za-z0-9-_]";
 
-    private static final String JWS_REGEX = "e%s*\\.%s+\\.%s*".formatted(BASE64_REGEX, BASE64_REGEX, BASE64_REGEX);
+    private static final String JWS_REGEX = "e%s*\\.%s+\\.%s*[\\.^]?".formatted(BASE64_REGEX, BASE64_REGEX, BASE64_REGEX);
     private static final String JWE_REGEX = "e%s*\\.%s*\\.%s+\\.%s+\\.%s+".formatted(BASE64_REGEX, BASE64_REGEX, BASE64_REGEX, BASE64_REGEX, BASE64_REGEX);
     private static final Pattern JOSE_OBJECT_PATTERN = Pattern.compile("(%s)|(%s)".formatted(JWE_REGEX, JWS_REGEX));
 
@@ -126,10 +125,6 @@ public class JOSEObjectFinder {
 
             if (algValue == null || algValue.isBlank()) {
                 throw new ParseException("Missing \"alg\" in header JSON object", 0);
-            }
-
-            if (!isJsonObject(parts[1].decodeToString())) {
-                throw new ParseException("Payload is invalid JSON object", 0);
             }
 
             return Optional.of(JWSFactory.parse(candidate));
