@@ -20,6 +20,7 @@ package com.blackberry.jwteditor.model.jose;
 
 import com.blackberry.jwteditor.exceptions.VerificationException;
 import com.blackberry.jwteditor.model.keys.Key;
+import com.blackberry.jwteditor.presenter.Information;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.JWSVerifier;
@@ -71,8 +72,10 @@ public class JWS extends JOSEObject {
     }
 
     @Override
-    public List<TimeClaim> timeClaims() {
-        return claims.timeClaims();
+    public List<Information> information() {
+        return claims.timeClaims().stream()
+                .map(Information::from)
+                .toList();
     }
 
     /**

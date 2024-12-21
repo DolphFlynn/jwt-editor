@@ -20,6 +20,7 @@ package com.blackberry.jwteditor.model.jose;
 
 import com.blackberry.jwteditor.exceptions.DecryptionException;
 import com.blackberry.jwteditor.model.keys.Key;
+import com.blackberry.jwteditor.presenter.Information;
 import com.nimbusds.jose.JWEDecrypter;
 import com.nimbusds.jose.JWEHeader;
 import com.nimbusds.jose.util.Base64URL;
@@ -68,7 +69,7 @@ public class JWE extends JOSEObject {
     }
 
     @Override
-    public List<TimeClaim> timeClaims() {
+    public List<Information> information() {
         return emptyList();
     }
 

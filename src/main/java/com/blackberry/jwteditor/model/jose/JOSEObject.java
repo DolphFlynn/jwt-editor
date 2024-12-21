@@ -18,6 +18,7 @@ limitations under the License.
 
 package com.blackberry.jwteditor.model.jose;
 
+import com.blackberry.jwteditor.presenter.Information;
 import com.nimbusds.jose.util.Base64URL;
 
 import java.util.List;
@@ -42,5 +43,5 @@ public abstract class JOSEObject {
      */
     public abstract String serialize();
 
-    public abstract List<TimeClaim> timeClaims();
+    public abstract List<Information> information();
 }
