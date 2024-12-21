@@ -22,14 +22,22 @@ import com.nimbusds.jose.util.Base64URL;
 
 import java.util.List;
 
+import static com.blackberry.jwteditor.model.jose.ClaimsType.JSON;
+import static com.blackberry.jwteditor.model.jose.ClaimsType.TEXT;
+import static com.blackberry.jwteditor.utils.JSONUtils.isJsonObject;
+import static java.util.Collections.emptyList;
+
 public class JWSClaims extends Base64Encoded {
     private final ClaimsType type;
     private final List<TimeClaim> timeClaims;
 
-    public JWSClaims(Base64URL encodedClaims, ClaimsType type) {
+    public JWSClaims(Base64URL encodedClaims) {
         super(encodedClaims);
-        this.type = type;
-        this.timeClaims = TimeClaimFactory.fromPayloadJson(encodedClaims.decodeToString());
+
+        this.type = isJsonObject(encodedClaims.decodeToString()) ? JSON : TEXT;
+        this.timeClaims = type == JSON
+                ? TimeClaimFactory.fromPayloadJson(encodedClaims.decodeToString())
+                : emptyList();
     }
 
     public ClaimsType type() {

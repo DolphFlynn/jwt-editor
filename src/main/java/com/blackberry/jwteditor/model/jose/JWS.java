@@ -31,8 +31,6 @@ import java.security.Provider;
 import java.security.Security;
 import java.util.List;
 
-import static com.blackberry.jwteditor.model.jose.ClaimsType.JSON;
-
 /**
  * Class representing a JWS
  */
@@ -48,7 +46,7 @@ public class JWS extends JOSEObject {
      */
     JWS(Base64URL header, Base64URL payload, Base64URL signature) {
         super(header);
-        this.claims = new JWSClaims(payload, JSON);
+        this.claims = new JWSClaims(payload);
         this.signature = new Signature(signature);
     }
 
