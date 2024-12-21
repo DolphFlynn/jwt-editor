@@ -20,15 +20,23 @@ package com.blackberry.jwteditor.model.jose;
 
 import com.nimbusds.jose.util.Base64URL;
 
+import java.util.List;
+
 public class JWSClaims extends Base64Encoded {
     private final ClaimsType type;
+    private final List<TimeClaim> timeClaims;
 
     public JWSClaims(Base64URL encodedClaims, ClaimsType type) {
         super(encodedClaims);
         this.type = type;
+        this.timeClaims = TimeClaimFactory.fromPayloadJson(encodedClaims.decodeToString());
     }
 
     public ClaimsType type() {
         return type;
+    }
+
+    public List<TimeClaim> timeClaims() {
+        return timeClaims;
     }
 }

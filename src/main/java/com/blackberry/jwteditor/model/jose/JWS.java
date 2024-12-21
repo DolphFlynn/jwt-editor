@@ -37,7 +37,6 @@ import static com.blackberry.jwteditor.model.jose.ClaimsType.JSON;
  */
 public class JWS extends JOSEObject {
     private final JWSClaims claims;
-    private final List<TimeClaim> timeClaims;
     private final Signature signature;
 
     /**
@@ -49,7 +48,6 @@ public class JWS extends JOSEObject {
     JWS(Base64URL header, Base64URL payload, Base64URL signature) {
         super(header);
         this.claims = new JWSClaims(payload, JSON);
-        this.timeClaims = TimeClaimFactory.fromPayloadJson(payload.decodeToString());
         this.signature = new Signature(signature);
     }
 
@@ -74,7 +72,7 @@ public class JWS extends JOSEObject {
 
     @Override
     public List<TimeClaim> timeClaims() {
-        return timeClaims;
+        return claims.timeClaims();
     }
 
     /**
