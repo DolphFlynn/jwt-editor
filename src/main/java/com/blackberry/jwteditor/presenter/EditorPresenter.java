@@ -439,11 +439,7 @@ public class EditorPresenter {
         //Highlight the serialized text as changed if it differs from the original, and the change wasn't triggered by onSelectionChanging
         view.setSerialized(joseObject.serialize(), mutableJoseObject.changed() && !selectionChanging);
 
-        List<Information> information = mutableJoseObject.timeClaims().stream()
-                .map(Information::from)
-                .toList();
-
-        view.setInformation(information);
+        view.setInformation(mutableJoseObject.information());
     }
 
     /**

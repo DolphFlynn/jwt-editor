@@ -21,8 +21,6 @@ package com.blackberry.jwteditor.view.editor;
 import burp.api.montoya.collaborator.CollaboratorPayloadGenerator;
 import burp.api.montoya.http.message.HttpRequestResponse;
 import burp.api.montoya.http.message.responses.HttpResponse;
-import burp.api.montoya.logging.Logging;
-import burp.api.montoya.ui.UserInterface;
 import burp.api.montoya.ui.editor.extension.ExtensionProvidedHttpResponseEditor;
 import com.blackberry.jwteditor.model.keys.KeysRepository;
 import com.blackberry.jwteditor.view.hexcodearea.HexCodeAreaFactory;
@@ -36,18 +34,19 @@ public class HttpResponseEditorView extends HttpEditorView implements ExtensionP
     public HttpResponseEditorView(
             KeysRepository keysRepository,
             RstaFactory rstaFactory,
-            Logging logging,
-            UserInterface userInterface,
             CollaboratorPayloadGenerator collaboratorPayloadGenerator,
+            HexCodeAreaFactory hexAreaCodeFactory,
+            ErrorLoggingActionListenerFactory actionListenerFactory,
+            InformationPanelFactory informationPanelFactory,
             boolean editable,
             boolean isProVersion) {
         super(
                 keysRepository,
                 rstaFactory,
-                new HexCodeAreaFactory(logging, userInterface),
+                hexAreaCodeFactory,
                 collaboratorPayloadGenerator,
-                new ErrorLoggingActionListenerFactory(logging),
-                new InformationPanelFactory(userInterface, logging),
+                actionListenerFactory,
+                informationPanelFactory,
                 editable,
                 isProVersion
         );

@@ -18,6 +18,8 @@ limitations under the License.
 
 package com.blackberry.jwteditor.model.jose;
 
+import com.blackberry.jwteditor.presenter.Information;
+
 import java.util.List;
 
 /**
@@ -74,7 +76,9 @@ public class MutableJOSEObject {
         return original;
     }
 
-    public List<TimeClaim> timeClaims() {
-        return modified.timeClaims();
+    public List<Information> information() {
+        return modified.timeClaims().stream()
+                .map(Information::from)
+                .toList();
     }
 }

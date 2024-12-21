@@ -22,7 +22,7 @@ import com.blackberry.jwteditor.model.jose.TimeClaim;
 
 public record Information(String text, boolean isWarning) {
 
-    static Information from(TimeClaim timeClaim) {
+    public static Information from(TimeClaim timeClaim) {
         StringBuilder sb = new StringBuilder(timeClaim.type().toString()).append(" - ");
 
         if (timeClaim.hasDate()) {
