@@ -126,7 +126,7 @@ public class EditorPresenter {
             default -> throw new IllegalStateException("Unsupported claim type: " + claim.type());
         }
 
-        view.setSignature(jws.getSignature());
+        view.setSignature(jws.signature().data());
     }
 
     /**

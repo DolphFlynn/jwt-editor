@@ -69,7 +69,7 @@ class AttackTests {
 
         assertThat(modifiedJWS.header().decoded()).isEqualTo(String.format("{\"typ\":\"JWT\",\"alg\":\"%s\"}", algorithm));
         assertThat(modifiedJWS.claims().encoded().toString()).isEqualTo(HMAC_KEY_CONFUSION_JWS.split("\\.")[1]);
-        assertThat(modifiedJWS.getSignature()).isEmpty();
+        assertThat(modifiedJWS.signature().data()).isEmpty();
     }
 
     @Test
@@ -80,7 +80,7 @@ class AttackTests {
 
         JWS modifiedJWS  = Attacks.hmacKeyConfusion(jws, key, JWSAlgorithm.HS256, false);
 
-        assertThat(modifiedJWS.getSignature()).isEqualTo(expectedJWS.getSignature());
+        assertThat(modifiedJWS.signature().data()).isEqualTo(expectedJWS.signature().data());
     }
 
     @Test

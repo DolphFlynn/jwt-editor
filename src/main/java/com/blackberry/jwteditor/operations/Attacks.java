@@ -185,6 +185,6 @@ public class Attacks {
         headerJsonObject.put(location, url);
         Base64URL headerBase64 = Base64URL.encode(headerJsonObject.toString());
 
-        return jwsFromParts(headerBase64, jws.claims().encoded(), jws.getEncodedSignature());
+        return jwsFromParts(headerBase64, jws.claims().encoded(), jws.signature().encoded());
     }
 }

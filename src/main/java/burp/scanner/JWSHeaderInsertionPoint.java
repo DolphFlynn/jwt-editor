@@ -96,6 +96,6 @@ class JWSHeaderInsertionPoint implements AuditInsertionPoint {
         headerJsonObject.put(headerParameterName, payload.toString());
         Base64URL headerBase64 = Base64URL.encode(headerJsonObject.toString());
 
-        return "%s.%s.%s".formatted(headerBase64, jws.claims().encoded(), jws.getEncodedSignature()).getBytes(UTF_8);
+        return "%s.%s.%s".formatted(headerBase64, jws.claims().encoded(), jws.signature().encoded()).getBytes(UTF_8);
     }
 }

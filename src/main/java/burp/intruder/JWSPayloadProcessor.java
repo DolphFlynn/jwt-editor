@@ -69,7 +69,7 @@ public class JWSPayloadProcessor implements PayloadProcessor {
                         ? Base64URL.encode(targetJson.toString())
                         : jwsClaims.encoded();
 
-                JWS updatedJws = createJWS(updatedHeader, updatedPayload, jws.getEncodedSignature());
+                JWS updatedJws = createJWS(updatedHeader, updatedPayload, jws.signature().encoded());
                 baseValue = ByteArray.byteArray(updatedJws.serialize());
             }
         }

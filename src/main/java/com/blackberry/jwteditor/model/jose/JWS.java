@@ -37,8 +37,8 @@ import static com.blackberry.jwteditor.model.jose.ClaimsType.JSON;
  */
 public class JWS extends JOSEObject {
     private final JWSClaims claims;
-    private final Base64URL signature;
     private final List<TimeClaim> timeClaims;
+    private final Signature signature;
 
     /**
      * Construct a JWS from encoded components
@@ -48,20 +48,19 @@ public class JWS extends JOSEObject {
      */
     JWS(Base64URL header, Base64URL payload, Base64URL signature) {
         super(header);
-        this.signature = signature;
         this.claims = new JWSClaims(payload, JSON);
         this.timeClaims = TimeClaimFactory.fromPayloadJson(payload.decodeToString());
+        this.signature = new Signature(signature);
     }
 
     public JWSClaims claims() {
         return claims;
     }
 
-    public byte[] getSignature() {
-        return signature.decode();
+    public Signature signature()
+    {
+        return signature;
     }
-
-    public Base64URL getEncodedSignature() { return signature; }
 
     /**
      * Serialize the JWS to compact form
@@ -112,7 +111,7 @@ public class JWS extends JOSEObject {
 
         // Verify the payload with the key and the algorithm provided
         try {
-            return verifier.verify(verificationInfo, signingInput, signature);
+            return verifier.verify(verificationInfo, signingInput, signature.encoded());
         } catch (JOSEException e) {
             throw new VerificationException(e.getMessage());
         }
