@@ -78,7 +78,7 @@ public class JWSFactory {
                 key,
                 algorithm,
                 updateMode.buildUpdatedHeader(jws, key, algorithm),
-                jws.getEncodedPayload()
+                jws.claims().encoded()
         );
     }
 

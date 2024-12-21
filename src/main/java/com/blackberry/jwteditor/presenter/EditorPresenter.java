@@ -19,10 +19,7 @@ limitations under the License.
 package com.blackberry.jwteditor.presenter;
 
 import burp.api.montoya.collaborator.CollaboratorPayloadGenerator;
-import com.blackberry.jwteditor.model.jose.JOSEObject;
-import com.blackberry.jwteditor.model.jose.JWE;
-import com.blackberry.jwteditor.model.jose.JWS;
-import com.blackberry.jwteditor.model.jose.MutableJOSEObject;
+import com.blackberry.jwteditor.model.jose.*;
 import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.model.keys.KeyRing;
 import com.blackberry.jwteditor.model.keys.KeysRepository;
@@ -40,6 +37,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static com.blackberry.jwteditor.model.jose.ClaimsType.JSON;
+import static com.blackberry.jwteditor.model.jose.ClaimsType.TEXT;
 import static com.blackberry.jwteditor.model.jose.JOSEObjectFinder.containsJOSEObjects;
 import static com.blackberry.jwteditor.model.jose.JWEFactory.jweFromParts;
 import static com.blackberry.jwteditor.model.jose.JWSFactory.jwsFromParts;
@@ -110,12 +109,22 @@ public class EditorPresenter {
         view.setJWSHeader(jwsHeader);
         view.setJWSHeaderCompact(isHeaderJsonCompact);
 
-        String payload = jws.getPayload();
-        boolean isPayloadJsonCompact = isJsonCompact(payload);
-        String jwsPayload = isPayloadJsonCompact ? prettyPrintJSON(payload) : payload;
+        JWSClaims claim = jws.claims();
 
-        view.setJWSPayloadCompact(isPayloadJsonCompact);
-        view.setPayload(jwsPayload);
+        switch (claim.type()) {
+            case JSON -> {
+                String payload = claim.decoded();
+                boolean isPayloadJsonCompact = isJsonCompact(payload);
+                String jwsPayload = isPayloadJsonCompact ? prettyPrintJSON(payload) : payload;
+
+                view.setJWSPayloadCompact(isPayloadJsonCompact);
+                view.setPayload(jwsPayload, JSON);
+            }
+
+            case TEXT -> view.setPayload(claim.decoded(), TEXT);
+
+            default -> throw new IllegalStateException("Unsupported claim type: " + claim.type());
+        }
 
         view.setSignature(jws.getSignature());
     }
@@ -469,7 +478,7 @@ public class EditorPresenter {
      */
     public void formatJWSPayload() {
         try {
-            view.setPayload(prettyPrintJSON(view.getPayload()));
+            view.setPayload(prettyPrintJSON(view.getPayload()), JSON);
         } catch (JSONException e) {
             messageDialogFactory.showErrorDialog("error_title_unable_to_format_json", "error_format_json");
         }

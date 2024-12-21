@@ -20,12 +20,14 @@ package com.blackberry.jwteditor.view.editor;
 
 import burp.api.montoya.collaborator.CollaboratorPayloadGenerator;
 import burp.api.montoya.ui.Selection;
+import com.blackberry.jwteditor.model.jose.ClaimsType;
 import com.blackberry.jwteditor.model.keys.KeysRepository;
 import com.blackberry.jwteditor.presenter.EditorPresenter;
 import com.blackberry.jwteditor.presenter.Information;
 import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.view.hexcodearea.HexCodeAreaFactory;
 import com.blackberry.jwteditor.view.rsta.RstaFactory;
+import com.blackberry.jwteditor.view.rsta.jwt.JWTTokenizerConstants;
 import com.blackberry.jwteditor.view.utils.ErrorLoggingActionListenerFactory;
 import com.blackberry.jwteditor.view.utils.MaxLengthStringComboBoxModel;
 import com.blackberry.jwteditor.view.utils.RunEDTActionOnFirstRenderHierarchyListener;
@@ -42,10 +44,12 @@ import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.util.List;
 
+import static com.blackberry.jwteditor.model.jose.ClaimsType.JSON;
 import static java.awt.Color.RED;
 import static java.awt.EventQueue.invokeLater;
 import static org.exbin.deltahex.EditationAllowed.ALLOWED;
 import static org.exbin.deltahex.EditationAllowed.READ_ONLY;
+import static org.fife.ui.rsyntaxtextarea.SyntaxConstants.SYNTAX_STYLE_NONE;
 
 /**
  * View class for the Editor tab
@@ -189,10 +193,6 @@ public abstract class EditorView {
         );
     }
 
-    /**
-     * Set the JWS header value in the UI
-     * @param header value string
-     */
     public void setJWSHeader(String header) {
         textAreaJWSHeader.setText(header);
     }
@@ -205,11 +205,14 @@ public abstract class EditorView {
         return textAreaJWSHeader.getText();
     }
 
-    /**
-     * Set the payload value in the UI
-     * @param payload value string
-     */
-    public void setPayload(String payload) {
+    public void setPayload(String payload, ClaimsType claimsType) {
+        boolean claimIsJson = claimsType == JSON;
+
+        buttonJWSPayloadFormatJSON.setEnabled(claimIsJson);
+        checkBoxJWSPayloadCompactJSON.setEnabled(claimIsJson);
+
+        String style = claimIsJson ? JWTTokenizerConstants.MAPPING : SYNTAX_STYLE_NONE;
+        textAreaPayload.setSyntaxEditingStyle(style);
         textAreaPayload.setText(payload);
     }
 

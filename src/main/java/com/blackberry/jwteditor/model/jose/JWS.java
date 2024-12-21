@@ -30,11 +30,13 @@ import java.security.Provider;
 import java.security.Security;
 import java.util.List;
 
+import static com.blackberry.jwteditor.model.jose.ClaimsType.JSON;
+
 /**
  * Class representing a JWS
  */
 public class JWS extends JOSEObject {
-    private final Base64URL payload;
+    private final JWSClaims claims;
     private final Base64URL signature;
     private final List<TimeClaim> timeClaims;
 
@@ -46,26 +48,14 @@ public class JWS extends JOSEObject {
      */
     JWS(Base64URL header, Base64URL payload, Base64URL signature) {
         super(header);
-        this.payload = payload;
         this.signature = signature;
+        this.claims = new JWSClaims(payload, JSON);
         this.timeClaims = TimeClaimFactory.fromPayloadJson(payload.decodeToString());
     }
 
-    /**
-     * Get the payload as a String
-     *
-     * @return the decoded payload
-     */
-    public String getPayload() {
-        return payload.decodeToString();
+    public JWSClaims claims() {
+        return claims;
     }
-
-    /**
-     * Get the encoded payload
-     *
-     * @return the base64 encoded payload
-     */
-    public Base64URL getEncodedPayload() { return payload; }
 
     public byte[] getSignature() {
         return signature.decode();
@@ -80,7 +70,7 @@ public class JWS extends JOSEObject {
      */
     @Override
     public String serialize() {
-        return "%s.%s.%s".formatted(header.toString(), payload.toString(), signature.toString());
+        return "%s.%s.%s".formatted(header.toString(), claims.toString(), signature.toString());
     }
 
     @Override
@@ -114,7 +104,7 @@ public class JWS extends JOSEObject {
         // Build the signing input
         // JWS signature input is the ASCII bytes of the base64 encoded header and payload concatenated with a '.'
         byte[] headerBytes = header.toString().getBytes(StandardCharsets.US_ASCII);
-        byte[] payloadBytes = payload.toString().getBytes(StandardCharsets.US_ASCII);
+        byte[] payloadBytes = claims.encoded().toString().getBytes(StandardCharsets.US_ASCII);
         byte[] signingInput = new byte[headerBytes.length + 1 + payloadBytes.length];
         System.arraycopy(headerBytes, 0, signingInput, 0, headerBytes.length);
         signingInput[headerBytes.length] = '.';

@@ -26,6 +26,7 @@ import burp.api.montoya.logging.Logging;
 import com.blackberry.jwteditor.exceptions.SigningException;
 import com.blackberry.jwteditor.model.jose.JOSEObject;
 import com.blackberry.jwteditor.model.jose.JWS;
+import com.blackberry.jwteditor.model.jose.JWSClaims;
 import com.blackberry.jwteditor.model.jose.JWSFactory;
 import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.model.keys.KeysRepository;
@@ -57,7 +58,8 @@ public class JWSPayloadProcessor implements PayloadProcessor {
 
         if (joseObject.isPresent() && (joseObject.get() instanceof JWS jws)) {
             boolean fuzzPayload = intruderConfig.fuzzLocation() == PAYLOAD;
-            String targetData = fuzzPayload ? jws.getPayload() : jws.getHeader();
+            JWSClaims jwsClaims = jws.claims();
+            String targetData = fuzzPayload ? jwsClaims.decoded() : jws.getHeader();
             JSONObject targetJson = new JSONObject(targetData);
 
             if (targetJson.has(intruderConfig.fuzzParameter())) {
@@ -69,7 +71,7 @@ public class JWSPayloadProcessor implements PayloadProcessor {
 
                 Base64URL updatedPayload = fuzzPayload
                         ? Base64URL.encode(targetJson.toString())
-                        : jws.getEncodedPayload();
+                        : jwsClaims.encoded();
 
                 JWS updatedJws = createJWS(updatedHeader, updatedPayload, jws.getEncodedSignature());
                 baseValue = ByteArray.byteArray(updatedJws.serialize());

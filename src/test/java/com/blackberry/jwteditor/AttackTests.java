@@ -68,7 +68,7 @@ class AttackTests {
         JWS modifiedJWS = Attacks.noneSigning(jws, algorithm);
 
         assertThat(modifiedJWS.getHeader()).isEqualTo(String.format("{\"typ\":\"JWT\",\"alg\":\"%s\"}", algorithm));
-        assertThat(modifiedJWS.getEncodedPayload().toString()).isEqualTo(HMAC_KEY_CONFUSION_JWS.split("\\.")[1]);
+        assertThat(modifiedJWS.claims().encoded().toString()).isEqualTo(HMAC_KEY_CONFUSION_JWS.split("\\.")[1]);
         assertThat(modifiedJWS.getSignature()).isEmpty();
     }
 
@@ -105,7 +105,7 @@ class AttackTests {
 
         assertThat(headerJsonMap.get(ALGORITHM)).isEqualTo(alg.getName());
         assertThat(headerJsonMap.get(KEY_ID)).isEqualTo(jwk.getID());
-        assertThat(signedJWS.getEncodedPayload()).isEqualTo(jws.getEncodedPayload());
+        assertThat(signedJWS.claims().encoded()).isEqualTo(jws.claims().encoded());
 
         JWSHeader signingInfo = new JWSHeader.Builder(alg).build();
         assertThat(signedJWS.verify(jwk, signingInfo)).isTrue();
