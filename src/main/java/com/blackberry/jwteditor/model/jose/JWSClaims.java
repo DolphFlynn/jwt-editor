@@ -20,29 +20,15 @@ package com.blackberry.jwteditor.model.jose;
 
 import com.nimbusds.jose.util.Base64URL;
 
-public class JWSClaims {
-    private final Base64URL encodedClaims;
+public class JWSClaims extends Base64Encoded {
     private final ClaimsType type;
 
     public JWSClaims(Base64URL encodedClaims, ClaimsType type) {
-        this.encodedClaims = encodedClaims;
+        super(encodedClaims);
         this.type = type;
-    }
-
-    public Base64URL encoded() {
-        return encodedClaims;
-    }
-
-    public String decoded() {
-        return encodedClaims.decodeToString();
     }
 
     public ClaimsType type() {
         return type;
-    }
-
-    @Override
-    public String toString() {
-        return encodedClaims.toString();
     }
 }

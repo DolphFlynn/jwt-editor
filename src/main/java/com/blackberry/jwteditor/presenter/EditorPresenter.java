@@ -102,9 +102,9 @@ public class EditorPresenter {
         // Check if the header and payload survives compaction without changes (i.e. it was compact when deserialized)
         // If contain whitespace, don't try to pretty print, as the re-compacted version won't match the original
 
-        String header = jws.getHeader();
-        boolean isHeaderJsonCompact = isJsonCompact(header);
-        String jwsHeader = isHeaderJsonCompact ? prettyPrintJSON(header) : header;
+        Header header = jws.header();
+        boolean isHeaderJsonCompact = header.isCompact();
+        String jwsHeader = isHeaderJsonCompact ? header.decodeAndPrettyPrint() : header.decoded();
 
         view.setJWSHeader(jwsHeader);
         view.setJWSHeaderCompact(isHeaderJsonCompact);
@@ -151,10 +151,10 @@ public class EditorPresenter {
      */
     private void setJWE(JWE jwe) {
         // Check if the header survives compaction without changes (i.e. it was compact when deserialized)
-        String header = jwe.getHeader();
+        Header header = jwe.header();
 
-        boolean isHeaderJsonCompact = isJsonCompact(header);
-        String jweHeader = isHeaderJsonCompact ? prettyPrintJSON(header) : header;
+        boolean isHeaderJsonCompact = header.isCompact();
+        String jweHeader = isHeaderJsonCompact ? header.decodeAndPrettyPrint() : header.decoded();
 
         view.setJWEHeader(jweHeader);
         view.setJWEHeaderCompact(isHeaderJsonCompact);

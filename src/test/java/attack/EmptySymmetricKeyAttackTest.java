@@ -61,7 +61,7 @@ class EmptySymmetricKeyAttackTest {
 
         JWS attackJws = Attacks.signWithEmptyKey(jws, HS256);
 
-        assertThat(attackJws.getHeader()).isEqualTo(jws.getHeader());
+        assertThat(attackJws.header().decoded()).isEqualTo(jws.header().decoded());
     }
 
     private static Stream<JWSAlgorithm> unsupportedAlgorithms() {

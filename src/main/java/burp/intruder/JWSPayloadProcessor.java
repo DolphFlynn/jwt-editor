@@ -24,10 +24,7 @@ import burp.api.montoya.intruder.PayloadProcessingResult;
 import burp.api.montoya.intruder.PayloadProcessor;
 import burp.api.montoya.logging.Logging;
 import com.blackberry.jwteditor.exceptions.SigningException;
-import com.blackberry.jwteditor.model.jose.JOSEObject;
-import com.blackberry.jwteditor.model.jose.JWS;
-import com.blackberry.jwteditor.model.jose.JWSClaims;
-import com.blackberry.jwteditor.model.jose.JWSFactory;
+import com.blackberry.jwteditor.model.jose.*;
 import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.model.keys.KeysRepository;
 import com.nimbusds.jose.JWSAlgorithm;
@@ -58,16 +55,15 @@ public class JWSPayloadProcessor implements PayloadProcessor {
 
         if (joseObject.isPresent() && (joseObject.get() instanceof JWS jws)) {
             boolean fuzzPayload = intruderConfig.fuzzLocation() == PAYLOAD;
+            Header header = jws.header();
             JWSClaims jwsClaims = jws.claims();
-            String targetData = fuzzPayload ? jwsClaims.decoded() : jws.getHeader();
+            String targetData = fuzzPayload ? jwsClaims.decoded() : header.decoded();
             JSONObject targetJson = new JSONObject(targetData);
 
             if (targetJson.has(intruderConfig.fuzzParameter())) {
                 targetJson.put(intruderConfig.fuzzParameter(), payloadData.currentPayload().toString());
 
-                Base64URL updatedHeader = fuzzPayload
-                        ? jws.getEncodedHeader()
-                        : Base64URL.encode(targetJson.toString());
+                Base64URL updatedHeader = fuzzPayload ? header.encoded() : Base64URL.encode(targetJson.toString());
 
                 Base64URL updatedPayload = fuzzPayload
                         ? Base64URL.encode(targetJson.toString())

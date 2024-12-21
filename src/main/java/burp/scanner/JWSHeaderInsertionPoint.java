@@ -58,7 +58,7 @@ class JWSHeaderInsertionPoint implements AuditInsertionPoint {
         baseRequestPostfix = endOffset == baseRequestBytes.length() ? new byte[0] : baseRequestBytes.subArray(endOffset, baseRequestBytes.length()).getBytes();
 
         try {
-            headerJsonObject = new JSONObject(jws.getHeader());
+            headerJsonObject = jws.header().json();
         } catch (JSONException e) {
             throw new IllegalStateException("Could not parse JWS header!", e);
         }
