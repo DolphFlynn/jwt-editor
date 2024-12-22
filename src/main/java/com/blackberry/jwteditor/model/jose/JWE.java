@@ -20,6 +20,7 @@ package com.blackberry.jwteditor.model.jose;
 
 import com.blackberry.jwteditor.exceptions.DecryptionException;
 import com.blackberry.jwteditor.model.keys.Key;
+import com.blackberry.jwteditor.presenter.Information;
 import com.nimbusds.jose.JWEDecrypter;
 import com.nimbusds.jose.JWEHeader;
 import com.nimbusds.jose.util.Base64URL;
@@ -68,7 +69,7 @@ public class JWE extends JOSEObject {
     }
 
     @Override
-    public List<TimeClaim> timeClaims() {
+    public List<Information> information() {
         return emptyList();
     }
 
@@ -117,7 +118,7 @@ public class JWE extends JOSEObject {
      */
     public JWS decrypt(Key key) throws DecryptionException, ParseException {
         // Parse the JWE header to get the decryption algorithms
-        JWEHeader header = JWEHeader.parse(this.header.decodeToString());
+        JWEHeader header = JWEHeader.parse(this.header.decoded());
 
         try {
             // Create a new decrypter with the header algs

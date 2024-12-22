@@ -61,7 +61,7 @@ class PsychicSignatureAttackTest {
 
         JWS attackJws = Attacks.signWithPsychicSignature(jws, ES256);
 
-        assertThat(attackJws.getHeader()).isEqualTo(jws.getHeader());
+        assertThat(attackJws.header().decoded()).isEqualTo(jws.header().decoded());
     }
 
     private static Stream<JWSAlgorithm> unsupportedAlgorithms() {

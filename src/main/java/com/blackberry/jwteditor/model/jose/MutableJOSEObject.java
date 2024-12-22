@@ -77,8 +77,6 @@ public class MutableJOSEObject {
     }
 
     public List<Information> information() {
-        return modified.timeClaims().stream()
-                .map(Information::from)
-                .toList();
+        return modified.information();
     }
 }
