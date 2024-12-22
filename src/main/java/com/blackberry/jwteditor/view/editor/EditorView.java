@@ -27,7 +27,6 @@ import com.blackberry.jwteditor.presenter.Information;
 import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.view.hexcodearea.HexCodeAreaFactory;
 import com.blackberry.jwteditor.view.rsta.RstaFactory;
-import com.blackberry.jwteditor.view.rsta.jwt.JWTTokenizerConstants;
 import com.blackberry.jwteditor.view.utils.ErrorLoggingActionListenerFactory;
 import com.blackberry.jwteditor.view.utils.MaxLengthStringComboBoxModel;
 import com.blackberry.jwteditor.view.utils.RunEDTActionOnFirstRenderHierarchyListener;
@@ -49,7 +48,6 @@ import static java.awt.Color.RED;
 import static java.awt.EventQueue.invokeLater;
 import static org.exbin.deltahex.EditationAllowed.ALLOWED;
 import static org.exbin.deltahex.EditationAllowed.READ_ONLY;
-import static org.fife.ui.rsyntaxtextarea.SyntaxConstants.SYNTAX_STYLE_NONE;
 
 /**
  * View class for the Editor tab
@@ -211,8 +209,6 @@ public abstract class EditorView {
         buttonJWSPayloadFormatJSON.setEnabled(claimIsJson);
         checkBoxJWSPayloadCompactJSON.setEnabled(claimIsJson);
 
-        String style = claimIsJson ? JWTTokenizerConstants.MAPPING : SYNTAX_STYLE_NONE;
-        textAreaPayload.setSyntaxEditingStyle(style);
         textAreaPayload.setText(payload);
     }
 
