@@ -18,7 +18,6 @@ limitations under the License.
 
 package com.blackberry.jwteditor.model.jose;
 
-import com.blackberry.jwteditor.presenter.Information;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
