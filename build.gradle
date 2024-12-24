@@ -3,11 +3,10 @@ plugins {
 }
 
 group = 'com.blackberry'
-version = '2.3'
+version = '2.4'
 description = 'jwt-editor'
 
 repositories {
-    mavenLocal()
     mavenCentral()
     maven { url = uri('https://www.jetbrains.com/intellij-repository/releases') }
     maven { url = uri('https://packages.jetbrains.team/maven/p/ij/intellij-dependencies/') }
