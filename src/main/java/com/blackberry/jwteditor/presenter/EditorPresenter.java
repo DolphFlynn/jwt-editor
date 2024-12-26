@@ -210,78 +210,44 @@ public class EditorPresenter {
             return;
         }
 
-        // Create the key confusion attack dialog with the JWS currently in the editor fields
-        KeyConfusionAttackDialog keyConfusionAttackDialog = new KeyConfusionAttackDialog(
+        OperationDialog<JWS> dialog = new KeyConfusionAttackDialog(
                 view.window(),
                 actionListenerFactory,
                 verificationKeys,
                 getJWS()
         );
-        keyConfusionAttackDialog.display();
 
-        // Set the result as the JWS in the editor if the attack succeeds
-        JWS signedJWS = keyConfusionAttackDialog.getJWT();
-        if (signedJWS != null) {
-            setJWS(signedJWS);
-        }
+        showDialogAndUpdateJWS(dialog);
     }
 
-    /**
-     * Handle clicks events from the none Signing algorithm button
-     */
     public void onAttackSignNoneClicked() {
-        // Get the JWS from the editor, strip the signature and set the editor to the new JWS
-        NoneDialog noneDialog = new NoneDialog(view.window(), getJWS());
-        noneDialog.display();
+        OperationDialog<JWS> dialog = new NoneDialog(view.window(), getJWS());
 
-        JWS unsignedJWS = noneDialog.getJWT();
-
-        if (unsignedJWS != null) {
-            setJWS(unsignedJWS);
-        }
+        showDialogAndUpdateJWS(dialog);
     }
 
     public void onAttackSignEmptyKeyClicked() {
-        EmptyKeySigningDialog signingDialog = new EmptyKeySigningDialog(view.window(), actionListenerFactory, getJWS());
-        signingDialog.display();
+        OperationDialog<JWS> dialog = new EmptyKeySigningDialog(view.window(), actionListenerFactory, getJWS());
 
-        JWS signedJWS = signingDialog.getJWT();
-
-        if (signedJWS != null) {
-            setJWS(signedJWS);
-        }
+        showDialogAndUpdateJWS(dialog);
     }
 
     public void onAttackPsychicSignatureClicked() {
-        PsychicSignatureDialog signingDialog = new PsychicSignatureDialog(view.window(), getJWS());
-        signingDialog.display();
+        OperationDialog<JWS> dialog = new PsychicSignatureDialog(view.window(), getJWS());
 
-        JWS signedJWS = signingDialog.getJWT();
-
-        if (signedJWS != null) {
-            setJWS(signedJWS);
-        }
+        showDialogAndUpdateJWS(dialog);
     }
 
     public void onAttackEmbedCollaboratorPayloadClicked() {
-        EmbedCollaboratorPayloadDialog collaboratorPayloadDialog = new EmbedCollaboratorPayloadDialog(
+        OperationDialog<JWS> dialog = new EmbedCollaboratorPayloadDialog(
                 view.window(),
                 getJWS(),
                 collaboratorPayloadGenerator
         );
 
-        collaboratorPayloadDialog.display();
-
-        JWS updatedJWS = collaboratorPayloadDialog.getJWT();
-
-        if (updatedJWS != null) {
-            setJWS(updatedJWS);
-        }
+        showDialogAndUpdateJWS(dialog);
     }
 
-    /**
-     * Handle click events from the Sign button
-     */
     public void onSignClicked() {
         signingDialog(SignDialog.Mode.NORMAL);
     }
@@ -298,13 +264,18 @@ public class EditorPresenter {
             return;
         }
 
-        SignDialog signDialog = new SignDialog(
+        OperationDialog<JWS> signDialog = new SignDialog(
                 view.window(),
                 actionListenerFactory,
                 keysRepository.getSigningKeys(),
                 getJWS(),
                 mode
         );
+
+        showDialogAndUpdateJWS(signDialog);
+    }
+
+    private void showDialogAndUpdateJWS(OperationDialog<JWS> signDialog) {
         signDialog.display();
 
         // If a JWS was created by the dialog, replace the contents of the editor
@@ -342,7 +313,7 @@ public class EditorPresenter {
             return;
         }
 
-        EncryptDialog encryptDialog = new EncryptDialog(
+        OperationDialog<JWE> encryptDialog = new EncryptDialog(
                 view.window(),
                 actionListenerFactory,
                 getJWS(),
