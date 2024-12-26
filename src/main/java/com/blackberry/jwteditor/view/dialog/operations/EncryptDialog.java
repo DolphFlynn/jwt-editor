@@ -24,7 +24,6 @@ import com.blackberry.jwteditor.model.jose.JWEFactory;
 import com.blackberry.jwteditor.model.jose.JWS;
 import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.utils.Utils;
-import com.blackberry.jwteditor.view.dialog.AbstractDialog;
 import com.blackberry.jwteditor.view.utils.ErrorLoggingActionListenerFactory;
 import com.nimbusds.jose.EncryptionMethod;
 import com.nimbusds.jose.JWEAlgorithm;
@@ -37,7 +36,7 @@ import java.util.List;
 /**
  * Encrypt dialog from the Editor tab
  */
-public class EncryptDialog extends AbstractDialog {
+public class EncryptDialog extends OperationDialog<JWE> {
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
@@ -165,12 +164,8 @@ public class EncryptDialog extends AbstractDialog {
         }
     }
 
-    /**
-     * Get the result of the dialog
-     *
-     * @return the encrypted JWS as a JWE
-     */
-    public JWE getJWE() {
+    @Override
+    public JWE getJWT() {
         return jwe;
     }
 }

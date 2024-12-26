@@ -21,7 +21,6 @@ package com.blackberry.jwteditor.view.dialog.operations;
 import burp.api.montoya.collaborator.CollaboratorPayloadGenerator;
 import com.blackberry.jwteditor.model.jose.JWS;
 import com.blackberry.jwteditor.operations.Attacks;
-import com.blackberry.jwteditor.view.dialog.AbstractDialog;
 
 import javax.swing.*;
 import java.awt.*;
@@ -30,7 +29,7 @@ import java.awt.event.KeyEvent;
 import static com.nimbusds.jose.HeaderParameterNames.JWK_SET_URL;
 import static com.nimbusds.jose.HeaderParameterNames.X_509_CERT_URL;
 
-public class EmbedCollaboratorPayloadDialog extends AbstractDialog {
+public class EmbedCollaboratorPayloadDialog extends OperationDialog<JWS> {
     private static final String[] HEADER_LOCATION_VALUES = {JWK_SET_URL, X_509_CERT_URL};
 
     private final CollaboratorPayloadGenerator collaboratorPayloadGenerator;
@@ -63,7 +62,8 @@ public class EmbedCollaboratorPayloadDialog extends AbstractDialog {
         comboBoxAlgorithm.setSelectedIndex(0);
     }
 
-    public JWS getJWS() {
+    @Override
+    public JWS getJWT() {
         return jws;
     }
 

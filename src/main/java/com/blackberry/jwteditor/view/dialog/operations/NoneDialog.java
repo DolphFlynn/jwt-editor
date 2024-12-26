@@ -19,13 +19,12 @@ package com.blackberry.jwteditor.view.dialog.operations;
 
 import com.blackberry.jwteditor.model.jose.JWS;
 import com.blackberry.jwteditor.operations.Attacks;
-import com.blackberry.jwteditor.view.dialog.AbstractDialog;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 
-public class NoneDialog extends AbstractDialog {
+public class NoneDialog extends OperationDialog<JWS> {
     private static final String[] NONE_ALGORITHM_VALUES = {"none", "None", "NONE", "nOnE"};
 
     private JPanel contentPane;
@@ -60,11 +59,8 @@ public class NoneDialog extends AbstractDialog {
         comboBoxAlgorithm.setSelectedIndex(0);
     }
 
-    /**
-     * Get the result of the dialog
-     * @return the unsigned JWS
-     */
-    public JWS getJWS() {
+    @Override
+    public JWS getJWT(){
         return jws;
     }
 

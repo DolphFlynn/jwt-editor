@@ -26,7 +26,6 @@ import com.blackberry.jwteditor.model.keys.JWKKey;
 import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.operations.Attacks;
 import com.blackberry.jwteditor.utils.Utils;
-import com.blackberry.jwteditor.view.dialog.AbstractDialog;
 import com.blackberry.jwteditor.view.utils.ErrorLoggingActionListenerFactory;
 import com.nimbusds.jose.JWSAlgorithm;
 
@@ -41,7 +40,7 @@ import static javax.swing.JOptionPane.WARNING_MESSAGE;
 /**
  * Sign and Attack > Embedded JWK dialog from the Editor tab
  */
-public class SignDialog extends AbstractDialog {
+public class SignDialog extends OperationDialog<JWS> {
 
     public enum Mode {
         NORMAL("sign_dialog_title"),
@@ -114,12 +113,8 @@ public class SignDialog extends AbstractDialog {
         }
     }
 
-    /**
-     * Get the result of the dialog
-     *
-     * @return the header/payload as a signed JWS
-     */
-    public JWS getJWS() {
+    @Override
+    public JWS getJWT() {
         return jws;
     }
 

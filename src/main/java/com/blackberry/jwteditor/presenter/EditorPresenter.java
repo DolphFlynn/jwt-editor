@@ -220,7 +220,7 @@ public class EditorPresenter {
         keyConfusionAttackDialog.display();
 
         // Set the result as the JWS in the editor if the attack succeeds
-        JWS signedJWS = keyConfusionAttackDialog.getJWS();
+        JWS signedJWS = keyConfusionAttackDialog.getJWT();
         if (signedJWS != null) {
             setJWS(signedJWS);
         }
@@ -234,7 +234,7 @@ public class EditorPresenter {
         NoneDialog noneDialog = new NoneDialog(view.window(), getJWS());
         noneDialog.display();
 
-        JWS unsignedJWS = noneDialog.getJWS();
+        JWS unsignedJWS = noneDialog.getJWT();
 
         if (unsignedJWS != null) {
             setJWS(unsignedJWS);
@@ -245,7 +245,7 @@ public class EditorPresenter {
         EmptyKeySigningDialog signingDialog = new EmptyKeySigningDialog(view.window(), actionListenerFactory, getJWS());
         signingDialog.display();
 
-        JWS signedJWS = signingDialog.getJWS();
+        JWS signedJWS = signingDialog.getJWT();
 
         if (signedJWS != null) {
             setJWS(signedJWS);
@@ -256,7 +256,7 @@ public class EditorPresenter {
         PsychicSignatureDialog signingDialog = new PsychicSignatureDialog(view.window(), getJWS());
         signingDialog.display();
 
-        JWS signedJWS = signingDialog.getJWS();
+        JWS signedJWS = signingDialog.getJWT();
 
         if (signedJWS != null) {
             setJWS(signedJWS);
@@ -272,7 +272,7 @@ public class EditorPresenter {
 
         collaboratorPayloadDialog.display();
 
-        JWS updatedJWS = collaboratorPayloadDialog.getJWS();
+        JWS updatedJWS = collaboratorPayloadDialog.getJWT();
 
         if (updatedJWS != null) {
             setJWS(updatedJWS);
@@ -308,7 +308,7 @@ public class EditorPresenter {
         signDialog.display();
 
         // If a JWS was created by the dialog, replace the contents of the editor
-        JWS signedJWS = signDialog.getJWS();
+        JWS signedJWS = signDialog.getJWT();
         if (signedJWS != null) {
             setJWS(signedJWS);
         }
@@ -351,7 +351,7 @@ public class EditorPresenter {
         encryptDialog.display();
 
         // If a JWE was created by the dialog, replace the contents of the editor and change to JWE mode
-        JWE jwe = encryptDialog.getJWE();
+        JWE jwe = encryptDialog.getJWT();
 
         if (jwe != null) {
             view.setMode(EditorMode.JWE);

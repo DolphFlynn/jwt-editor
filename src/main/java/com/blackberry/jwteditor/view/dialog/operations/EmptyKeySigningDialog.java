@@ -22,7 +22,6 @@ import com.blackberry.jwteditor.exceptions.UnsupportedKeyException;
 import com.blackberry.jwteditor.model.jose.JWS;
 import com.blackberry.jwteditor.operations.Attacks;
 import com.blackberry.jwteditor.utils.Utils;
-import com.blackberry.jwteditor.view.dialog.AbstractDialog;
 import com.blackberry.jwteditor.view.utils.ErrorLoggingActionListenerFactory;
 import com.nimbusds.jose.JWSAlgorithm;
 
@@ -32,7 +31,7 @@ import java.awt.event.KeyEvent;
 
 import static com.nimbusds.jose.JWSAlgorithm.*;
 
-public class EmptyKeySigningDialog extends AbstractDialog {
+public class EmptyKeySigningDialog extends OperationDialog<JWS> {
     private static final JWSAlgorithm[] ALGORITHMS = {HS256, HS384, HS512};
 
     private JPanel contentPane;
@@ -62,7 +61,8 @@ public class EmptyKeySigningDialog extends AbstractDialog {
         comboBoxAlgorithm.setSelectedIndex(0);
     }
 
-    public JWS getJWS() {
+    @Override
+    public JWS getJWT() {
         return jws;
     }
 
