@@ -17,19 +17,34 @@ limitations under the License.
 
 package com.blackberry.jwteditor.view.dialog.operations;
 
+import burp.api.montoya.logging.Logging;
 import com.blackberry.jwteditor.utils.Utils;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import static java.awt.Dialog.ModalityType.APPLICATION_MODAL;
+import static javax.swing.JOptionPane.WARNING_MESSAGE;
 
 public abstract class OperationDialog<T> extends JDialog {
+    private final String errorTitleOperationFailed;
+    private final Logging logging;
 
-    protected OperationDialog(Window parent, String titleResourceId) {
+    T jwt;
+
+    OperationDialog(Window parent, Logging logging, String titleResourceId, T jwt) {
+        this(parent, logging, titleResourceId, jwt, "error_title_unable_to_perform_operation");
+    }
+
+    OperationDialog(Window parent, Logging logging, String titleResourceId, T jwt, String errorTitleOperationFailed) {
         super(parent, Utils.getResourceString(titleResourceId), APPLICATION_MODAL);
+
+        this.logging = logging;
+        this.jwt = jwt;
+        this.errorTitleOperationFailed = errorTitleOperationFailed;
 
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 
@@ -41,15 +56,51 @@ public abstract class OperationDialog<T> extends JDialog {
         });
     }
 
+    void configureUI(JPanel contentPane, JButton buttonOK, JButton buttonCancel) {
+        setContentPane(contentPane);
+        getRootPane().setDefaultButton(buttonOK);
+
+        buttonOK.addActionListener(e -> onOK());
+        buttonCancel.addActionListener(e -> onCancel());
+
+        // call onCancel() on ESCAPE
+        contentPane.registerKeyboardAction(
+                e -> onCancel(),
+                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
+        );
+    }
+
+    abstract T performOperation() throws Exception;
+
+    public T getJWT() {
+        return jwt;
+    }
+
     public void display() {
         pack();
         setLocationRelativeTo(getOwner());
         setVisible(true);
     }
 
-    protected void onCancel() {
-        dispose();
+    void onOK() {
+        try {
+            jwt = performOperation();
+        } catch (Exception e) {
+            String title = Utils.getResourceString(errorTitleOperationFailed);
+            logging.logToError(title, e);
+            JOptionPane.showMessageDialog(this,
+                    e.getMessage(),
+                    title,
+                    WARNING_MESSAGE
+            );
+            jwt = null;
+        } finally {
+            dispose();
+        }
     }
 
-    public abstract T getJWT();
+    void onCancel() {
+        dispose();
+    }
 }

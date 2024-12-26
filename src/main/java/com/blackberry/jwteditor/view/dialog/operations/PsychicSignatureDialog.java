@@ -17,13 +17,13 @@ limitations under the License.
 
 package com.blackberry.jwteditor.view.dialog.operations;
 
+import burp.api.montoya.logging.Logging;
 import com.blackberry.jwteditor.model.jose.JWS;
 import com.blackberry.jwteditor.operations.Attacks;
 import com.nimbusds.jose.JWSAlgorithm;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyEvent;
 
 import static com.nimbusds.jose.JWSAlgorithm.*;
 
@@ -34,38 +34,19 @@ public class PsychicSignatureDialog extends OperationDialog<JWS> {
     private JButton buttonOK;
     private JButton buttonCancel;
     private JComboBox<JWSAlgorithm> comboBoxAlgorithm;
-    private JWS jws;
 
-    public PsychicSignatureDialog(Window parent, JWS jws) {
-        super(parent, "psychic_signature_signing_dialog_title");
-        this.jws = jws;
+    public PsychicSignatureDialog(Window parent, Logging logging, JWS jws) {
+        super(parent, logging, "psychic_signature_signing_dialog_title", jws);
 
-        setContentPane(contentPane);
-        getRootPane().setDefaultButton(buttonOK);
-
-        buttonOK.addActionListener(e -> onOK());
-        buttonCancel.addActionListener(e -> onCancel());
-
-        // call onCancel() on ESCAPE
-        contentPane.registerKeyboardAction(
-                e -> onCancel(),
-                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
-        );
+        configureUI(contentPane, buttonOK, buttonCancel);
 
         comboBoxAlgorithm.setModel(new DefaultComboBoxModel<>(ALGORITHMS));
         comboBoxAlgorithm.setSelectedIndex(0);
     }
 
-
     @Override
-    public JWS getJWT(){
-        return jws;
-    }
-
-    private void onOK() {
+    JWS performOperation() {
         JWSAlgorithm selectedAlgorithm = (JWSAlgorithm) comboBoxAlgorithm.getSelectedItem();
-        jws = Attacks.signWithPsychicSignature(jws, selectedAlgorithm);
-        dispose();
+        return Attacks.signWithPsychicSignature(jwt, selectedAlgorithm);
     }
 }

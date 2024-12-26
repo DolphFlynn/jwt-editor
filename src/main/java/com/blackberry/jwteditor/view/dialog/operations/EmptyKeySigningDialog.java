@@ -17,17 +17,15 @@ limitations under the License.
 
 package com.blackberry.jwteditor.view.dialog.operations;
 
+import burp.api.montoya.logging.Logging;
 import com.blackberry.jwteditor.exceptions.SigningException;
 import com.blackberry.jwteditor.exceptions.UnsupportedKeyException;
 import com.blackberry.jwteditor.model.jose.JWS;
 import com.blackberry.jwteditor.operations.Attacks;
-import com.blackberry.jwteditor.utils.Utils;
-import com.blackberry.jwteditor.view.utils.ErrorLoggingActionListenerFactory;
 import com.nimbusds.jose.JWSAlgorithm;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyEvent;
 
 import static com.nimbusds.jose.JWSAlgorithm.*;
 
@@ -38,49 +36,20 @@ public class EmptyKeySigningDialog extends OperationDialog<JWS> {
     private JButton buttonOK;
     private JButton buttonCancel;
     private JComboBox<JWSAlgorithm> comboBoxAlgorithm;
-    private JWS jws;
 
-    public EmptyKeySigningDialog(Window parent, ErrorLoggingActionListenerFactory actionListenerFactory, JWS jws) {
-        super(parent, "empty_key_signing_dialog_title");
-        this.jws = jws;
+    public EmptyKeySigningDialog(Window parent, Logging logging, JWS jws) {
+        super(parent, logging, "empty_key_signing_dialog_title", jws, "error_title_unable_to_sign");
 
-        setContentPane(contentPane);
-        getRootPane().setDefaultButton(buttonOK);
-
-        buttonOK.addActionListener(actionListenerFactory.from(e -> onOK()));
-        buttonCancel.addActionListener(e -> onCancel());
-
-        // call onCancel() on ESCAPE
-        contentPane.registerKeyboardAction(
-                e -> onCancel(),
-                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
-        );
+        configureUI(contentPane, buttonOK, buttonCancel);
 
         comboBoxAlgorithm.setModel(new DefaultComboBoxModel<>(ALGORITHMS));
         comboBoxAlgorithm.setSelectedIndex(0);
     }
 
     @Override
-    public JWS getJWT() {
-        return jws;
-    }
-
-    private void onOK() {
+    JWS performOperation() throws SigningException, UnsupportedKeyException {
         JWSAlgorithm selectedAlgorithm = (JWSAlgorithm) comboBoxAlgorithm.getSelectedItem();
 
-        try {
-            jws = Attacks.signWithEmptyKey(jws, selectedAlgorithm);
-        } catch (SigningException | UnsupportedKeyException e) {
-            jws = null;
-            JOptionPane.showMessageDialog(
-                    this,
-                    e.getMessage(),
-                    Utils.getResourceString("error_title_unable_to_sign"),
-                    JOptionPane.WARNING_MESSAGE
-            );
-        } finally {
-            dispose();
-        }
+        return Attacks.signWithEmptyKey(jwt, selectedAlgorithm);
     }
 }

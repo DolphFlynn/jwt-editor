@@ -19,6 +19,7 @@ limitations under the License.
 package com.blackberry.jwteditor.view.editor;
 
 import burp.api.montoya.collaborator.CollaboratorPayloadGenerator;
+import burp.api.montoya.logging.Logging;
 import burp.api.montoya.ui.Selection;
 import com.blackberry.jwteditor.model.jose.ClaimsType;
 import com.blackberry.jwteditor.model.jose.Information;
@@ -27,7 +28,6 @@ import com.blackberry.jwteditor.presenter.EditorPresenter;
 import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.view.hexcodearea.HexCodeAreaFactory;
 import com.blackberry.jwteditor.view.rsta.RstaFactory;
-import com.blackberry.jwteditor.view.utils.ErrorLoggingActionListenerFactory;
 import com.blackberry.jwteditor.view.utils.MaxLengthStringComboBoxModel;
 import com.blackberry.jwteditor.view.utils.RunEDTActionOnFirstRenderHierarchyListener;
 import org.exbin.deltahex.EditationAllowed;
@@ -106,7 +106,7 @@ public abstract class EditorView {
             RstaFactory rstaFactory,
             HexCodeAreaFactory hexAreaCodeFactory,
             CollaboratorPayloadGenerator collaboratorPayloadGenerator,
-            ErrorLoggingActionListenerFactory actionListenerFactory,
+            Logging logging,
             InformationPanelFactory informationPanelFactory,
             boolean editable,
             boolean isProVersion) {
@@ -114,7 +114,7 @@ public abstract class EditorView {
         this.editable = editable;
         this.hexCodeAreaFactory = hexAreaCodeFactory;
         this.isProVersion = isProVersion;
-        this.presenter = new EditorPresenter(this, collaboratorPayloadGenerator, actionListenerFactory, keysRepository);
+        this.presenter = new EditorPresenter(this, collaboratorPayloadGenerator, logging, keysRepository);
         this.informationPanel = informationPanelFactory.build();
 
         informationScrollPane.setViewportView(informationPanel);
