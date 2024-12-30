@@ -53,8 +53,7 @@ public class JWS extends JOSEObject {
         return claims;
     }
 
-    public Signature signature()
-    {
+    public Signature signature() {
         return signature;
     }
 

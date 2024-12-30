@@ -37,7 +37,7 @@ import static com.blackberry.jwteditor.model.jose.JWSFactory.SigningUpdateMode.*
 /**
  * Sign and Attack > Embedded JWK dialog from the Editor tab
  */
-public class SignDialog extends OperationDialog<JWS> {
+public class SigningDialog extends OperationDialog<JWS> {
 
     public enum Mode {
         NORMAL("sign_dialog_title"),
@@ -61,15 +61,18 @@ public class SignDialog extends OperationDialog<JWS> {
     private JRadioButton radioButtonUpdateGenerateNone;
 
     private final Mode mode;
+    private final LastSigningKeys lastSigningKeys;
 
-    public SignDialog(
+    public SigningDialog(
             Window parent,
             Logging logging,
             List<Key> signingKeys,
             JWS jws,
-            Mode mode) {
+            Mode mode,
+            LastSigningKeys lastSigningKeys) {
         super(parent, logging, mode.titleResourceId, jws, "error_title_unable_to_sign");
         this.mode = mode;
+        this.lastSigningKeys = lastSigningKeys;
 
         configureUI(contentPane, buttonOK, buttonCancel);
 
@@ -88,8 +91,9 @@ public class SignDialog extends OperationDialog<JWS> {
             buttonOK.setEnabled(true);
         });
 
-        // Set the signing key to the first entry, also triggering the event handler
-        comboBoxSigningKey.setSelectedIndex(0);
+        int lastUsedKeyIndex = lastSigningKeys.lastKeyFor(mode).map(signingKeys::indexOf).orElse(-1);
+        lastUsedKeyIndex = lastUsedKeyIndex == -1 ? 0 : lastUsedKeyIndex;
+        comboBoxSigningKey.setSelectedIndex(lastUsedKeyIndex);
 
         // If the dialog is being used for the embedded JWK attack, hide the Header Options
         if (mode != Mode.NORMAL) {
@@ -102,6 +106,8 @@ public class SignDialog extends OperationDialog<JWS> {
         // Get the selected signing key and algorithm
         JWKKey selectedKey = (JWKKey) comboBoxSigningKey.getSelectedItem();
         JWSAlgorithm selectedAlgorithm = (JWSAlgorithm) comboBoxSigningAlgorithm.getSelectedItem();
+
+        lastSigningKeys.recordKeyUse(mode, selectedKey);
 
         // Get the header update mode based on the selected radio button, convert to the associated enum value
         SigningUpdateMode signingUpdateMode;
@@ -118,6 +124,5 @@ public class SignDialog extends OperationDialog<JWS> {
             case NORMAL -> JWSFactory.sign(selectedKey, selectedAlgorithm, signingUpdateMode, jwt);
             case EMBED_JWK -> Attacks.embeddedJWK(jwt, selectedKey, selectedAlgorithm);
         };
-
     }
 }

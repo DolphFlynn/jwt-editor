@@ -45,7 +45,7 @@ import static com.blackberry.jwteditor.model.jose.JWSFactory.jwsFromParts;
 import static com.blackberry.jwteditor.utils.Base64URLUtils.base64UrlEncodeJson;
 import static com.blackberry.jwteditor.utils.JSONUtils.isJsonCompact;
 import static com.blackberry.jwteditor.utils.JSONUtils.prettyPrintJSON;
-import static com.blackberry.jwteditor.view.dialog.operations.SignDialog.Mode.EMBED_JWK;
+import static com.blackberry.jwteditor.view.dialog.operations.SigningDialog.Mode.EMBED_JWK;
 
 /**
  * Presenter class for the Editor tab
@@ -58,6 +58,7 @@ public class EditorPresenter {
     private final Logging logging;
     private final MessageDialogFactory messageDialogFactory;
     private final EditorModel model;
+    private final LastSigningKeys lastSigningKeys;
 
     private boolean selectionChanging;
 
@@ -72,6 +73,7 @@ public class EditorPresenter {
         this.keysRepository = keysRepository;
         this.model = new EditorModel();
         this.messageDialogFactory = new MessageDialogFactory(view.uiComponent());
+        this.lastSigningKeys = new LastSigningKeys();
     }
 
     /**
@@ -251,7 +253,7 @@ public class EditorPresenter {
     }
 
     public void onSignClicked() {
-        signingDialog(SignDialog.Mode.NORMAL);
+        signingDialog(SigningDialog.Mode.NORMAL);
     }
 
     /**
@@ -259,19 +261,20 @@ public class EditorPresenter {
      *
      * @param mode mode of the signing dialog to display
      */
-    private void signingDialog(SignDialog.Mode mode) {
+    private void signingDialog(SigningDialog.Mode mode) {
         // Check there are signing keys in the keystore
         if (keysRepository.getSigningKeys().isEmpty()) {
             messageDialogFactory.showWarningDialog("error_title_no_signing_keys", "error_no_signing_keys");
             return;
         }
 
-        OperationDialog<JWS> signDialog = new SignDialog(
+        OperationDialog<JWS> signDialog = new SigningDialog(
                 view.window(),
                 logging,
                 keysRepository.getSigningKeys(),
                 getJWS(),
-                mode
+                mode,
+                lastSigningKeys
         );
 
         showDialogAndUpdateJWS(signDialog);
