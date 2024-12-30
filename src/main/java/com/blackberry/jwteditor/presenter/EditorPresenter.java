@@ -277,13 +277,13 @@ public class EditorPresenter {
         showDialogAndUpdateJWS(signDialog);
     }
 
-    private void showDialogAndUpdateJWS(OperationDialog<JWS> signDialog) {
-        signDialog.display();
+    private void showDialogAndUpdateJWS(OperationDialog<JWS> dialog) {
+        dialog.display();
 
-        // If a JWS was created by the dialog, replace the contents of the editor
-        JWS signedJWS = signDialog.getJWT();
-        if (signedJWS != null) {
-            setJWS(signedJWS);
+        JWS updatedJWS = dialog.getJWT();
+
+        if (updatedJWS != null) {
+            setJWS(updatedJWS);
         }
     }
 
