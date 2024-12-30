@@ -18,6 +18,7 @@ limitations under the License.
 
 package com.blackberry.jwteditor.view.dialog.operations;
 
+import burp.api.montoya.logging.Logging;
 import com.blackberry.jwteditor.exceptions.SigningException;
 import com.blackberry.jwteditor.model.jose.JWS;
 import com.blackberry.jwteditor.model.jose.JWSFactory;
@@ -25,23 +26,18 @@ import com.blackberry.jwteditor.model.jose.JWSFactory.SigningUpdateMode;
 import com.blackberry.jwteditor.model.keys.JWKKey;
 import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.operations.Attacks;
-import com.blackberry.jwteditor.utils.Utils;
-import com.blackberry.jwteditor.view.dialog.AbstractDialog;
-import com.blackberry.jwteditor.view.utils.ErrorLoggingActionListenerFactory;
 import com.nimbusds.jose.JWSAlgorithm;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyEvent;
 import java.util.List;
 
 import static com.blackberry.jwteditor.model.jose.JWSFactory.SigningUpdateMode.*;
-import static javax.swing.JOptionPane.WARNING_MESSAGE;
 
 /**
  * Sign and Attack > Embedded JWK dialog from the Editor tab
  */
-public class SignDialog extends AbstractDialog {
+public class SignDialog extends OperationDialog<JWS> {
 
     public enum Mode {
         NORMAL("sign_dialog_title"),
@@ -65,30 +61,17 @@ public class SignDialog extends AbstractDialog {
     private JRadioButton radioButtonUpdateGenerateNone;
 
     private final Mode mode;
-    private JWS jws;
 
     public SignDialog(
             Window parent,
-            ErrorLoggingActionListenerFactory actionListenerFactory,
+            Logging logging,
             List<Key> signingKeys,
             JWS jws,
             Mode mode) {
-        super(parent, mode.titleResourceId);
-        this.jws = jws;
+        super(parent, logging, mode.titleResourceId, jws, "error_title_unable_to_sign");
         this.mode = mode;
 
-        setContentPane(contentPane);
-        getRootPane().setDefaultButton(buttonOK);
-
-        buttonOK.addActionListener(actionListenerFactory.from(e -> onOK()));
-        buttonCancel.addActionListener(e -> onCancel());
-
-        // call onCancel() on ESCAPE
-        contentPane.registerKeyboardAction(
-                e -> onCancel(),
-                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
-        );
+        configureUI(contentPane, buttonOK, buttonCancel);
 
         // Convert the signingKeys from a List to an Array
         Key[] signingKeysArray = new Key[signingKeys.size()];
@@ -114,17 +97,8 @@ public class SignDialog extends AbstractDialog {
         }
     }
 
-    /**
-     * Get the result of the dialog
-     *
-     * @return the header/payload as a signed JWS
-     */
-    public JWS getJWS() {
-        return jws;
-    }
-
-    @SuppressWarnings("ConstantConditions")
-    private void onOK() {
+    @Override
+    JWS performOperation() throws SigningException, NoSuchFieldException, IllegalAccessException {
         // Get the selected signing key and algorithm
         JWKKey selectedKey = (JWKKey) comboBoxSigningKey.getSelectedItem();
         JWSAlgorithm selectedAlgorithm = (JWSAlgorithm) comboBoxSigningAlgorithm.getSelectedItem();
@@ -140,23 +114,10 @@ public class SignDialog extends AbstractDialog {
             signingUpdateMode = DO_NOT_MODIFY_HEADER;
         }
 
-        // Perform a signing operation or the embedded JWK attack based on the dialog mode
-        try {
-            if (mode == Mode.NORMAL) {
-                jws = JWSFactory.sign(selectedKey, selectedAlgorithm, signingUpdateMode, jws);
-            } else if (mode == Mode.EMBED_JWK) {
-                jws = Attacks.embeddedJWK(jws, selectedKey, selectedAlgorithm);
-            }
-        } catch (SigningException | NoSuchFieldException | IllegalAccessException e) {
-            jws = null;
-            JOptionPane.showMessageDialog(
-                    this,
-                    e.getMessage(),
-                    Utils.getResourceString("error_title_unable_to_sign"),
-                    WARNING_MESSAGE
-            );
-        } finally {
-            dispose();
-        }
+        return switch (mode) {
+            case NORMAL -> JWSFactory.sign(selectedKey, selectedAlgorithm, signingUpdateMode, jwt);
+            case EMBED_JWK -> Attacks.embeddedJWK(jwt, selectedKey, selectedAlgorithm);
+        };
+
     }
 }

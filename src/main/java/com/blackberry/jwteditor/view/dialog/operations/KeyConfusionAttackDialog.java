@@ -18,6 +18,7 @@ limitations under the License.
 
 package com.blackberry.jwteditor.view.dialog.operations;
 
+import burp.api.montoya.logging.Logging;
 import com.blackberry.jwteditor.exceptions.PemException;
 import com.blackberry.jwteditor.exceptions.SigningException;
 import com.blackberry.jwteditor.exceptions.UnsupportedKeyException;
@@ -25,20 +26,16 @@ import com.blackberry.jwteditor.model.jose.JWS;
 import com.blackberry.jwteditor.model.keys.JWKKey;
 import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.operations.Attacks;
-import com.blackberry.jwteditor.utils.Utils;
-import com.blackberry.jwteditor.view.dialog.AbstractDialog;
-import com.blackberry.jwteditor.view.utils.ErrorLoggingActionListenerFactory;
 import com.nimbusds.jose.JWSAlgorithm;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyEvent;
 import java.util.List;
 
 /**
  * Attack > HMAC Key Confusion dialog from the Editor tab
  */
-public class KeyConfusionAttackDialog extends AbstractDialog {
+public class KeyConfusionAttackDialog extends OperationDialog<JWS> {
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
@@ -46,28 +43,14 @@ public class KeyConfusionAttackDialog extends AbstractDialog {
     private JComboBox<JWSAlgorithm> comboBoxSigningAlgorithm;
     private JCheckBox checkBoxTrailingNewline;
 
-    private JWS jws;
-
     public KeyConfusionAttackDialog(
             Window parent,
-            ErrorLoggingActionListenerFactory actionListenerFactory,
+            Logging logging,
             List<Key> signingKeys,
             JWS jws) {
-        super(parent, "key_confusion_attack_dialog_title");
-        this.jws = jws;
+        super(parent, logging, "key_confusion_attack_dialog_title", jws, "error_title_unable_to_sign");
 
-        setContentPane(contentPane);
-        getRootPane().setDefaultButton(buttonOK);
-
-        buttonOK.addActionListener(actionListenerFactory.from(e -> onOK()));
-        buttonCancel.addActionListener(e -> onCancel());
-
-        // call onCancel() on ESCAPE
-        contentPane.registerKeyboardAction(
-                e -> onCancel(),
-                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
-        );
+        configureUI(contentPane, buttonOK, buttonCancel);
 
         // Convert appropriate signingKeys List to an Array
         Key[] signingKeysArray = signingKeys
@@ -85,28 +68,11 @@ public class KeyConfusionAttackDialog extends AbstractDialog {
         comboBoxSigningKey.setSelectedIndex(0);
     }
 
-    @SuppressWarnings("ConstantConditions")
-    private void onOK() {
-        // Get the selected key and algorithm
+    @Override
+    JWS performOperation() throws SigningException, PemException, UnsupportedKeyException {
         JWKKey selectedKey = (JWKKey) comboBoxSigningKey.getSelectedItem();
         JWSAlgorithm selectedAlgorithm = (JWSAlgorithm) comboBoxSigningAlgorithm.getSelectedItem();
 
-        // Try to perform the attack, show dialog if this fails
-        try{
-            jws = Attacks.hmacKeyConfusion(jws, selectedKey, selectedAlgorithm, checkBoxTrailingNewline.isSelected());
-        } catch (SigningException | PemException | UnsupportedKeyException e) {
-            jws = null;
-            JOptionPane.showMessageDialog(this, e.getMessage(), Utils.getResourceString("error_title_unable_to_sign"), JOptionPane.WARNING_MESSAGE);
-        } finally {
-            dispose();
-        }
-    }
-
-    /**
-     * Get the result of the dialog
-     * @return the JWS modified by the attack
-     */
-    public JWS getJWS(){
-        return jws;
+        return Attacks.hmacKeyConfusion(jwt, selectedKey, selectedAlgorithm, checkBoxTrailingNewline.isSelected());
     }
 }

@@ -17,65 +17,33 @@ limitations under the License.
 
 package com.blackberry.jwteditor.view.dialog.operations;
 
+import burp.api.montoya.logging.Logging;
 import com.blackberry.jwteditor.model.jose.JWS;
 import com.blackberry.jwteditor.operations.Attacks;
-import com.blackberry.jwteditor.view.dialog.AbstractDialog;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyEvent;
 
-public class NoneDialog extends AbstractDialog {
+public class NoneDialog extends OperationDialog<JWS> {
     private static final String[] NONE_ALGORITHM_VALUES = {"none", "None", "NONE", "nOnE"};
 
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
     private JComboBox<String> comboBoxAlgorithm;
-    private JWS jws;
 
-    /**
-     * Show the none attack dialog
-     * @param parent the parent for the dialog
-     * @param jws the content to remove signature from
-     */
-    public NoneDialog(Window parent, JWS jws) {
-        super(parent, "none_attack_dialog_title");
-        this.jws = jws;
+    public NoneDialog(Window parent, Logging logging, JWS jws) {
+        super(parent, logging, "none_attack_dialog_title", jws);
 
-        setContentPane(contentPane);
-        getRootPane().setDefaultButton(buttonOK);
-
-        buttonOK.addActionListener(e -> onOK());
-        buttonCancel.addActionListener(e -> onCancel());
-
-        // call onCancel() on ESCAPE
-        contentPane.registerKeyboardAction(
-                e -> onCancel(),
-                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
-        );
+        configureUI(contentPane, buttonOK, buttonCancel);
 
         comboBoxAlgorithm.setModel(new DefaultComboBoxModel<>(NONE_ALGORITHM_VALUES));
         comboBoxAlgorithm.setSelectedIndex(0);
     }
 
-    /**
-     * Get the result of the dialog
-     * @return the unsigned JWS
-     */
-    public JWS getJWS() {
-        return jws;
-    }
-
-    /**
-     * Handler for OK button pressed. Remove signature and update 'alg' to selected parameter
-     */
-    private void onOK() {
+    @Override
+    JWS performOperation() {
         String selectedAlgorithm = (String) comboBoxAlgorithm.getSelectedItem();
-
-        jws = Attacks.noneSigning(jws, selectedAlgorithm);
-
-        dispose();
+        return Attacks.noneSigning(jwt, selectedAlgorithm);
     }
 }

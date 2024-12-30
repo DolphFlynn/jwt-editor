@@ -19,6 +19,7 @@ limitations under the License.
 package com.blackberry.jwteditor.presenter;
 
 import burp.api.montoya.collaborator.CollaboratorPayloadGenerator;
+import burp.api.montoya.logging.Logging;
 import com.blackberry.jwteditor.model.jose.*;
 import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.model.keys.KeyRing;
@@ -28,7 +29,6 @@ import com.blackberry.jwteditor.view.dialog.MessageDialogFactory;
 import com.blackberry.jwteditor.view.dialog.operations.*;
 import com.blackberry.jwteditor.view.editor.EditorMode;
 import com.blackberry.jwteditor.view.editor.EditorView;
-import com.blackberry.jwteditor.view.utils.ErrorLoggingActionListenerFactory;
 import com.nimbusds.jose.util.Base64URL;
 import org.json.JSONException;
 
@@ -45,6 +45,7 @@ import static com.blackberry.jwteditor.model.jose.JWSFactory.jwsFromParts;
 import static com.blackberry.jwteditor.utils.Base64URLUtils.base64UrlEncodeJson;
 import static com.blackberry.jwteditor.utils.JSONUtils.isJsonCompact;
 import static com.blackberry.jwteditor.utils.JSONUtils.prettyPrintJSON;
+import static com.blackberry.jwteditor.view.dialog.operations.SignDialog.Mode.EMBED_JWK;
 
 /**
  * Presenter class for the Editor tab
@@ -54,7 +55,7 @@ public class EditorPresenter {
     private final KeysRepository keysRepository;
     private final EditorView view;
     private final CollaboratorPayloadGenerator collaboratorPayloadGenerator;
-    private final ErrorLoggingActionListenerFactory actionListenerFactory;
+    private final Logging logging;
     private final MessageDialogFactory messageDialogFactory;
     private final EditorModel model;
 
@@ -63,11 +64,11 @@ public class EditorPresenter {
     public EditorPresenter(
             EditorView view,
             CollaboratorPayloadGenerator collaboratorPayloadGenerator,
-            ErrorLoggingActionListenerFactory actionListenerFactory,
+            Logging logging,
             KeysRepository keysRepository) {
         this.view = view;
         this.collaboratorPayloadGenerator = collaboratorPayloadGenerator;
-        this.actionListenerFactory = actionListenerFactory;
+        this.logging = logging;
         this.keysRepository = keysRepository;
         this.model = new EditorModel();
         this.messageDialogFactory = new MessageDialogFactory(view.uiComponent());
@@ -188,7 +189,7 @@ public class EditorPresenter {
      * Handle clicks events from the Embedded JWK Attack button
      */
     public void onAttackEmbedJWKClicked() {
-        signingDialog(SignDialog.Mode.EMBED_JWK);
+        signingDialog(EMBED_JWK);
     }
 
     /**
@@ -210,78 +211,45 @@ public class EditorPresenter {
             return;
         }
 
-        // Create the key confusion attack dialog with the JWS currently in the editor fields
-        KeyConfusionAttackDialog keyConfusionAttackDialog = new KeyConfusionAttackDialog(
+        OperationDialog<JWS> dialog = new KeyConfusionAttackDialog(
                 view.window(),
-                actionListenerFactory,
+                logging,
                 verificationKeys,
                 getJWS()
         );
-        keyConfusionAttackDialog.display();
 
-        // Set the result as the JWS in the editor if the attack succeeds
-        JWS signedJWS = keyConfusionAttackDialog.getJWS();
-        if (signedJWS != null) {
-            setJWS(signedJWS);
-        }
+        showDialogAndUpdateJWS(dialog);
     }
 
-    /**
-     * Handle clicks events from the none Signing algorithm button
-     */
     public void onAttackSignNoneClicked() {
-        // Get the JWS from the editor, strip the signature and set the editor to the new JWS
-        NoneDialog noneDialog = new NoneDialog(view.window(), getJWS());
-        noneDialog.display();
+        OperationDialog<JWS> dialog = new NoneDialog(view.window(), logging, getJWS());
 
-        JWS unsignedJWS = noneDialog.getJWS();
-
-        if (unsignedJWS != null) {
-            setJWS(unsignedJWS);
-        }
+        showDialogAndUpdateJWS(dialog);
     }
 
     public void onAttackSignEmptyKeyClicked() {
-        EmptyKeySigningDialog signingDialog = new EmptyKeySigningDialog(view.window(), actionListenerFactory, getJWS());
-        signingDialog.display();
+        OperationDialog<JWS> dialog = new EmptyKeySigningDialog(view.window(), logging, getJWS());
 
-        JWS signedJWS = signingDialog.getJWS();
-
-        if (signedJWS != null) {
-            setJWS(signedJWS);
-        }
+        showDialogAndUpdateJWS(dialog);
     }
 
     public void onAttackPsychicSignatureClicked() {
-        PsychicSignatureDialog signingDialog = new PsychicSignatureDialog(view.window(), getJWS());
-        signingDialog.display();
+        OperationDialog<JWS> dialog = new PsychicSignatureDialog(view.window(), logging, getJWS());
 
-        JWS signedJWS = signingDialog.getJWS();
-
-        if (signedJWS != null) {
-            setJWS(signedJWS);
-        }
+        showDialogAndUpdateJWS(dialog);
     }
 
     public void onAttackEmbedCollaboratorPayloadClicked() {
-        EmbedCollaboratorPayloadDialog collaboratorPayloadDialog = new EmbedCollaboratorPayloadDialog(
+        OperationDialog<JWS> dialog = new EmbedCollaboratorPayloadDialog(
                 view.window(),
+                logging,
                 getJWS(),
                 collaboratorPayloadGenerator
         );
 
-        collaboratorPayloadDialog.display();
-
-        JWS updatedJWS = collaboratorPayloadDialog.getJWS();
-
-        if (updatedJWS != null) {
-            setJWS(updatedJWS);
-        }
+        showDialogAndUpdateJWS(dialog);
     }
 
-    /**
-     * Handle click events from the Sign button
-     */
     public void onSignClicked() {
         signingDialog(SignDialog.Mode.NORMAL);
     }
@@ -298,19 +266,24 @@ public class EditorPresenter {
             return;
         }
 
-        SignDialog signDialog = new SignDialog(
+        OperationDialog<JWS> signDialog = new SignDialog(
                 view.window(),
-                actionListenerFactory,
+                logging,
                 keysRepository.getSigningKeys(),
                 getJWS(),
                 mode
         );
-        signDialog.display();
 
-        // If a JWS was created by the dialog, replace the contents of the editor
-        JWS signedJWS = signDialog.getJWS();
-        if (signedJWS != null) {
-            setJWS(signedJWS);
+        showDialogAndUpdateJWS(signDialog);
+    }
+
+    private void showDialogAndUpdateJWS(OperationDialog<JWS> dialog) {
+        dialog.display();
+
+        JWS updatedJWS = dialog.getJWT();
+
+        if (updatedJWS != null) {
+            setJWS(updatedJWS);
         }
     }
 
@@ -342,16 +315,16 @@ public class EditorPresenter {
             return;
         }
 
-        EncryptDialog encryptDialog = new EncryptDialog(
+        OperationDialog<JWE> encryptDialog = new EncryptDialog(
                 view.window(),
-                actionListenerFactory,
+                logging,
                 getJWS(),
                 keysRepository.getEncryptionKeys()
         );
         encryptDialog.display();
 
         // If a JWE was created by the dialog, replace the contents of the editor and change to JWE mode
-        JWE jwe = encryptDialog.getJWE();
+        JWE jwe = encryptDialog.getJWT();
 
         if (jwe != null) {
             view.setMode(EditorMode.JWE);

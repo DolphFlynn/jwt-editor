@@ -19,18 +19,17 @@ limitations under the License.
 package com.blackberry.jwteditor.view.dialog.operations;
 
 import burp.api.montoya.collaborator.CollaboratorPayloadGenerator;
+import burp.api.montoya.logging.Logging;
 import com.blackberry.jwteditor.model.jose.JWS;
 import com.blackberry.jwteditor.operations.Attacks;
-import com.blackberry.jwteditor.view.dialog.AbstractDialog;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyEvent;
 
 import static com.nimbusds.jose.HeaderParameterNames.JWK_SET_URL;
 import static com.nimbusds.jose.HeaderParameterNames.X_509_CERT_URL;
 
-public class EmbedCollaboratorPayloadDialog extends AbstractDialog {
+public class EmbedCollaboratorPayloadDialog extends OperationDialog<JWS> {
     private static final String[] HEADER_LOCATION_VALUES = {JWK_SET_URL, X_509_CERT_URL};
 
     private final CollaboratorPayloadGenerator collaboratorPayloadGenerator;
@@ -39,43 +38,25 @@ public class EmbedCollaboratorPayloadDialog extends AbstractDialog {
     private JButton buttonOK;
     private JButton buttonCancel;
     private JComboBox<String> comboBoxAlgorithm;
-    private JWS jws;
 
-    public EmbedCollaboratorPayloadDialog(Window parent, JWS jws, CollaboratorPayloadGenerator collaboratorPayloadGenerator) {
-        super(parent, "embed_collaborator_payload_attack_dialog_title");
-        this.jws = jws;
+    public EmbedCollaboratorPayloadDialog(Window parent, Logging logging, JWS jws, CollaboratorPayloadGenerator collaboratorPayloadGenerator) {
+        super(parent, logging, "embed_collaborator_payload_attack_dialog_title", jws);
         this.collaboratorPayloadGenerator = collaboratorPayloadGenerator;
 
-        setContentPane(contentPane);
-        getRootPane().setDefaultButton(buttonOK);
-
-        buttonOK.addActionListener(e -> onOK());
-        buttonCancel.addActionListener(e -> onCancel());
-
-        // call onCancel() on ESCAPE
-        contentPane.registerKeyboardAction(
-                e -> onCancel(),
-                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
-        );
+        configureUI(contentPane, buttonOK, buttonCancel);
 
         comboBoxAlgorithm.setModel(new DefaultComboBoxModel<>(HEADER_LOCATION_VALUES));
         comboBoxAlgorithm.setSelectedIndex(0);
     }
 
-    public JWS getJWS() {
-        return jws;
-    }
-
-    private void onOK() {
+    @Override
+    JWS performOperation() {
         String selectedLocation = (String) comboBoxAlgorithm.getSelectedItem();
 
-        jws = Attacks.embedCollaboratorPayload(
-                jws,
+        return Attacks.embedCollaboratorPayload(
+                jwt,
                 selectedLocation,
                 collaboratorPayloadGenerator.generatePayload().toString()
         );
-
-        dispose();
     }
 }
