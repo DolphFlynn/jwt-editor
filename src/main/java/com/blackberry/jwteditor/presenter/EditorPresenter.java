@@ -58,6 +58,7 @@ public class EditorPresenter {
     private final Logging logging;
     private final MessageDialogFactory messageDialogFactory;
     private final EditorModel model;
+    private final LastSigningKeys lastSigningKeys;
 
     private boolean selectionChanging;
 
@@ -72,6 +73,7 @@ public class EditorPresenter {
         this.keysRepository = keysRepository;
         this.model = new EditorModel();
         this.messageDialogFactory = new MessageDialogFactory(view.uiComponent());
+        this.lastSigningKeys = new LastSigningKeys();
     }
 
     /**
@@ -271,7 +273,8 @@ public class EditorPresenter {
                 logging,
                 keysRepository.getSigningKeys(),
                 getJWS(),
-                mode
+                mode,
+                lastSigningKeys
         );
 
         showDialogAndUpdateJWS(signDialog);
