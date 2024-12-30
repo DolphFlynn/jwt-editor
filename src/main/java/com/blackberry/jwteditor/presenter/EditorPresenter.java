@@ -119,15 +119,15 @@ public class EditorPresenter {
                 String jwsPayload = isPayloadJsonCompact ? prettyPrintJSON(payload) : payload;
 
                 view.setJWSPayloadCompact(isPayloadJsonCompact);
-                view.setPayload(jwsPayload, JSON);
+                view.setJWSPayload(jwsPayload, JSON);
             }
 
-            case TEXT -> view.setPayload(claim.decoded(), TEXT);
+            case TEXT -> view.setJWSPayload(claim.decoded(), TEXT);
 
             default -> throw new IllegalStateException("Unsupported claim type: " + claim.type());
         }
 
-        view.setSignature(jws.signature().data());
+        view.setJWSSignature(jws.signature().data());
     }
 
     /**
@@ -140,9 +140,9 @@ public class EditorPresenter {
         // Return the entry encoded as-is if this fails, or the corresponding compact checkbox is unticked
 
         Base64URL header = base64UrlEncodeJson(view.getJWSHeader(), view.getJWSHeaderCompact());
-        Base64URL payload = base64UrlEncodeJson(view.getPayload(), view.getJWSPayloadCompact());
+        Base64URL payload = base64UrlEncodeJson(view.getJWSPayload(), view.getJWSPayloadCompact());
 
-        return jwsFromParts(header, payload, Base64URL.encode(view.getSignature()));
+        return jwsFromParts(header, payload, Base64URL.encode(view.getJWSSignature()));
     }
 
     /**
@@ -161,10 +161,10 @@ public class EditorPresenter {
         view.setJWEHeaderCompact(isHeaderJsonCompact);
 
         // Set the other JWE fields - these are all byte arrays
-        view.setEncryptedKey(jwe.getEncryptedKey());
-        view.setCiphertext(jwe.getCiphertext());
-        view.setIV(jwe.getIV());
-        view.setTag(jwe.getTag());
+        view.setJWEEncryptedKey(jwe.getEncryptedKey());
+        view.setJWECiphertext(jwe.getCiphertext());
+        view.setJWEIV(jwe.getIV());
+        view.setJWETag(jwe.getTag());
     }
 
     /**
@@ -177,10 +177,10 @@ public class EditorPresenter {
         // Return the entry encoded as-is if this fails, or the compact checkbox is unticked
         Base64URL header = base64UrlEncodeJson(view.getJWEHeader(), view.getJWEHeaderCompact());
 
-        Base64URL encryptedKey = Base64URL.encode(view.getEncryptedKey());
-        Base64URL iv = Base64URL.encode(view.getIV());
-        Base64URL ciphertext = Base64URL.encode(view.getCiphertext());
-        Base64URL tag = Base64URL.encode(view.getTag());
+        Base64URL encryptedKey = Base64URL.encode(view.getJWEEncryptedKey());
+        Base64URL iv = Base64URL.encode(view.getJWEIV());
+        Base64URL ciphertext = Base64URL.encode(view.getJWECiphertext());
+        Base64URL tag = Base64URL.encode(view.getJWETag());
 
         return jweFromParts(header, encryptedKey, iv, ciphertext, tag);
     }
@@ -327,7 +327,6 @@ public class EditorPresenter {
         JWE jwe = encryptDialog.getJWT();
 
         if (jwe != null) {
-            view.setMode(EditorMode.JWE);
             setJWE(jwe);
         }
     }
@@ -348,7 +347,6 @@ public class EditorPresenter {
 
             // If decryption was successful, set the contents of the editor to the decrypted JWS and set the editor mode to JWS
             if (jws.isPresent()) {
-                view.setMode(EditorMode.JWS);
                 setJWS(jws.get());
             } else {
                 messageDialogFactory.showWarningDialog("error_title_unable_to_decrypt", "error_decryption_all_keys_failed");
@@ -396,10 +394,8 @@ public class EditorPresenter {
 
         // Change to JWE/JWS mode based on the newly selected JOSEObject
         if (joseObject instanceof JWS) {
-            view.setMode(EditorMode.JWS);
             setJWS((JWS) joseObject);
         } else {
-            view.setMode(EditorMode.JWE);
             setJWE((JWE) joseObject);
         }
 
@@ -451,7 +447,7 @@ public class EditorPresenter {
      */
     public void formatJWSPayload() {
         try {
-            view.setPayload(prettyPrintJSON(view.getPayload()), JSON);
+            view.setJWSPayload(prettyPrintJSON(view.getJWSPayload()), JSON);
         } catch (JSONException e) {
             messageDialogFactory.showErrorDialog("error_title_unable_to_format_json", "error_format_json");
         }

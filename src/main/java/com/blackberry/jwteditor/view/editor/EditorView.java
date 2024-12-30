@@ -28,6 +28,7 @@ import com.blackberry.jwteditor.presenter.EditorPresenter;
 import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.view.hexcodearea.HexCodeAreaFactory;
 import com.blackberry.jwteditor.view.rsta.RstaFactory;
+import com.blackberry.jwteditor.view.utils.DocumentAdapter;
 import com.blackberry.jwteditor.view.utils.MaxLengthStringComboBoxModel;
 import com.blackberry.jwteditor.view.utils.RunEDTActionOnFirstRenderHierarchyListener;
 import org.exbin.deltahex.EditationAllowed;
@@ -38,12 +39,12 @@ import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
-import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.util.List;
 
 import static com.blackberry.jwteditor.model.jose.ClaimsType.JSON;
+import static com.blackberry.jwteditor.view.editor.EditorMode.JWS;
 import static java.awt.Color.RED;
 import static java.awt.EventQueue.invokeLater;
 import static org.exbin.deltahex.EditationAllowed.ALLOWED;
@@ -129,22 +130,7 @@ public abstract class EditorView {
         ));
 
         // Event handler for Header / JWS payload change events
-        DocumentListener documentListener = new DocumentListener() {
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                presenter.componentChanged();
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                presenter.componentChanged();
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                presenter.componentChanged();
-            }
-        };
+        DocumentListener documentListener = new DocumentAdapter(e -> presenter.componentChanged());
 
         // Attach event handlers for form elements changing, forward to presenter
         textAreaJWSHeader.getDocument().addDocumentListener(documentListener);
@@ -192,6 +178,7 @@ public abstract class EditorView {
     }
 
     public void setJWSHeader(String header) {
+        setMode(JWS);
         textAreaJWSHeader.setText(header);
     }
 
@@ -203,7 +190,9 @@ public abstract class EditorView {
         return textAreaJWSHeader.getText();
     }
 
-    public void setPayload(String payload, ClaimsType claimsType) {
+    public void setJWSPayload(String payload, ClaimsType claimsType) {
+        setMode(JWS);
+
         boolean claimIsJson = claimsType == JSON;
 
         buttonJWSPayloadFormatJSON.setEnabled(claimIsJson);
@@ -216,7 +205,7 @@ public abstract class EditorView {
      * Get the payload value from the UI
      * @return value string
      */
-    public String getPayload() {
+    public String getJWSPayload() {
         return textAreaPayload.getText();
     }
 
@@ -224,7 +213,7 @@ public abstract class EditorView {
      * Set the JWS signature in the UI
      * @param signature signature bytes
      */
-    public void setSignature(byte[] signature) {
+    public void setJWSSignature(byte[] signature) {
         codeAreaSignature.setData(new ByteArrayEditableData(signature));
     }
 
@@ -233,6 +222,7 @@ public abstract class EditorView {
      * @param header value string
      */
     public void setJWEHeader(String header) {
+        setMode(EditorMode.JWE);
         textAreaJWEHeader.setText(header);
     }
 
@@ -248,7 +238,8 @@ public abstract class EditorView {
      * Set the encrypted key in the UI
      * @param encryptionKey value bytes
      */
-    public void setEncryptedKey(byte[] encryptionKey) {
+    public void setJWEEncryptedKey(byte[] encryptionKey) {
+        setMode(EditorMode.JWE);
         codeAreaEncryptedKey.setData(new ByteArrayEditableData(encryptionKey));
     }
 
@@ -256,7 +247,7 @@ public abstract class EditorView {
      * Get the encrypted key from the UI
      * @return encrypted key bytes
      */
-    public byte[] getEncryptedKey() {
+    public byte[] getJWEEncryptedKey() {
         return Utils.getCodeAreaData(codeAreaEncryptedKey);
     }
 
@@ -264,7 +255,8 @@ public abstract class EditorView {
      * Set the ciphertext in the UI
      * @param ciphertext ciphertext bytes
      */
-    public void setCiphertext(byte[] ciphertext) {
+    public void setJWECiphertext(byte[] ciphertext) {
+        setMode(EditorMode.JWE);
         codeAreaCiphertext.setData(new ByteArrayEditableData(ciphertext));
     }
 
@@ -272,7 +264,7 @@ public abstract class EditorView {
      * Get the ciphertext from the UI
      * @return ciphertext bytes
      */
-    public byte[] getCiphertext() {
+    public byte[] getJWECiphertext() {
         return Utils.getCodeAreaData(codeAreaCiphertext);
     }
 
@@ -280,7 +272,7 @@ public abstract class EditorView {
      * Set the tag in the UI
      * @param tag tag bytes
      */
-    public void setTag(byte[] tag) {
+    public void setJWETag(byte[] tag) {
         codeAreaTag.setData(new ByteArrayEditableData(tag));
     }
 
@@ -288,7 +280,7 @@ public abstract class EditorView {
      * Get the tag from the UI
      * @return tag bytes
      */
-    public byte[] getTag() {
+    public byte[] getJWETag() {
         return Utils.getCodeAreaData(codeAreaTag);
     }
 
@@ -296,7 +288,7 @@ public abstract class EditorView {
      * Set the IV value in the UI
      * @param iv iv bytes
      */
-    public void setIV(byte[] iv) {
+    public void setJWEIV(byte[] iv) {
         codeAreaIV.setData(new ByteArrayEditableData(iv));
     }
 
@@ -304,7 +296,7 @@ public abstract class EditorView {
      * Get the IV value from the UI
      * @return iv bytes
      */
-    public byte[] getIV() {
+    public byte[] getJWEIV() {
         return Utils.getCodeAreaData(codeAreaIV);
     }
 
@@ -312,7 +304,7 @@ public abstract class EditorView {
      * Get the signature value from the UI
      * @return signature bytes
      */
-    public byte[] getSignature() {
+    public byte[] getJWSSignature() {
         return Utils.getCodeAreaData(codeAreaSignature);
     }
 
@@ -351,22 +343,21 @@ public abstract class EditorView {
         return comboBoxJOSEObject.getSelectedIndex();
     }
 
-    /**
-     * Get the UI mode - JWS or JWE
-     * @return UI mode value
-     */
     public EditorMode getMode() {
         return mode;
     }
 
-    public void setMode(EditorMode mode)
+    private void setMode(EditorMode mode)
     {
+        if (mode == this.mode) {
+            return;
+        }
+
         this.mode = mode;
 
-        if (mode == EditorMode.JWS) {
-            configureUIForJWS();
-        } else {
-            configureUIForJWE();
+        switch (mode) {
+            case JWS -> configureUIForJWS();
+            case JWE ->  configureUIForJWE();
         }
     }
 
@@ -422,6 +413,7 @@ public abstract class EditorView {
      * @param compact the compact value
      */
     public void setJWSHeaderCompact(boolean compact) {
+        setMode(JWS);
         checkBoxJWSHeaderCompactJSON.setSelected(compact);
     }
 
@@ -438,6 +430,7 @@ public abstract class EditorView {
      * @param compact the compact value
      */
     public void setJWSPayloadCompact(boolean compact) {
+        setMode(JWS);
         checkBoxJWSPayloadCompactJSON.setSelected(compact);
     }
 
@@ -454,6 +447,7 @@ public abstract class EditorView {
      * @param compact the compact value
      */
     public void setJWEHeaderCompact(boolean compact) {
+        setMode(EditorMode.JWE);
         checkBoxJWEHeaderCompactJSON.setSelected(compact);
     }
 
