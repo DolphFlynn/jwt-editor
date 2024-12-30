@@ -37,7 +37,7 @@ import static com.blackberry.jwteditor.model.jose.JWSFactory.SigningUpdateMode.*
 /**
  * Sign and Attack > Embedded JWK dialog from the Editor tab
  */
-public class SignDialog extends OperationDialog<JWS> {
+public class SigningDialog extends OperationDialog<JWS> {
 
     public enum Mode {
         NORMAL("sign_dialog_title"),
@@ -62,7 +62,7 @@ public class SignDialog extends OperationDialog<JWS> {
 
     private final Mode mode;
 
-    public SignDialog(
+    public SigningDialog(
             Window parent,
             Logging logging,
             List<Key> signingKeys,
@@ -118,6 +118,5 @@ public class SignDialog extends OperationDialog<JWS> {
             case NORMAL -> JWSFactory.sign(selectedKey, selectedAlgorithm, signingUpdateMode, jwt);
             case EMBED_JWK -> Attacks.embeddedJWK(jwt, selectedKey, selectedAlgorithm);
         };
-
     }
 }
