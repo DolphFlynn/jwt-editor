@@ -46,7 +46,7 @@ public class Header extends Base64Encoded {
         return new JSONObject(decoded());
     }
 
-    String algorithm() {
+    public String algorithm() {
         JSONObject json = json();
         return json.has(ALGORITHM) ? json.getString(ALGORITHM) : "";
     }

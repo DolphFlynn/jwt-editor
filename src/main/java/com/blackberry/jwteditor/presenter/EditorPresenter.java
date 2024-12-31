@@ -252,6 +252,15 @@ public class EditorPresenter {
         showDialogAndUpdateJWS(dialog);
     }
 
+    public void onAttackWeakHMACSecret() {
+        JWS jws = getJWS();
+
+        if (!jws.header().algorithm().startsWith("HS")) {
+            messageDialogFactory.showWarningDialog("error_title_unable_to_attack_weak_symmetric", "error_unable_to_attack_weak_symmetric");
+            return;
+        }
+    }
+
     public void onSignClicked() {
         signingDialog(SigningDialog.Mode.NORMAL);
     }

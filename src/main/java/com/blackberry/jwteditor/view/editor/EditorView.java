@@ -519,6 +519,7 @@ public abstract class EditorView {
         JMenuItem menuItemAttackSignEmptyKey = new JMenuItem(Utils.getResourceString("editor_view_button_attack_sign_empty_key"));
         JMenuItem menuItemAttackSignPsychicSignature = new JMenuItem(Utils.getResourceString("editor_view_button_attack_sign_psychic_signature"));
         JMenuItem menuItemAttackEmbedCollaboratorPayload = new JMenuItem(Utils.getResourceString("editor_view_button_attack_embed_collaborator_payload"));
+        JMenuItem menuItemAttackWeakSymmetricKey = new JMenuItem(Utils.getResourceString("editor_view_button_attack_weak_symmetric_key"));
 
         // Attach the event handlers to the popup menu click events
         menuItemAttackEmbedJWK.addActionListener(e -> presenter.onAttackEmbedJWKClicked());
@@ -527,6 +528,7 @@ public abstract class EditorView {
         menuItemAttackSignEmptyKey.addActionListener(e -> presenter.onAttackSignEmptyKeyClicked());
         menuItemAttackSignPsychicSignature.addActionListener(e -> presenter.onAttackPsychicSignatureClicked());
         menuItemAttackEmbedCollaboratorPayload.addActionListener(e -> presenter.onAttackEmbedCollaboratorPayloadClicked());
+        menuItemAttackWeakSymmetricKey.addActionListener(e -> presenter.onAttackWeakHMACSecret());
 
         menuItemAttackEmbedCollaboratorPayload.setEnabled(isProVersion);
 
@@ -537,6 +539,7 @@ public abstract class EditorView {
         popupMenuAttack.add(menuItemAttackSignEmptyKey);
         popupMenuAttack.add(menuItemAttackSignPsychicSignature);
         popupMenuAttack.add(menuItemAttackEmbedCollaboratorPayload);
+        popupMenuAttack.add(menuItemAttackWeakSymmetricKey);
 
         // Associate the popup menu to the Attack button
         buttonAttack = new JButton();
