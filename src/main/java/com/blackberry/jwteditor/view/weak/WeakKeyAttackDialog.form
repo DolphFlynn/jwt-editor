@@ -77,7 +77,7 @@
               <color color="-4473925"/>
             </border>
             <children>
-              <component id="38e50" class="javax.swing.JLabel" binding="statusLabel">
+              <component id="38e50" class="javax.swing.JLabel">
                 <constraints>
                   <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="0" anchor="8" fill="2" indent="0" use-parent-layout="false"/>
                 </constraints>

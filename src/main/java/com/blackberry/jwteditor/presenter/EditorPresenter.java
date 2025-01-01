@@ -261,7 +261,7 @@ public class EditorPresenter {
             return;
         }
 
-        WeakKeyAttackDialog dialog = new WeakKeyAttackDialog(view.window(), getJWS());
+        WeakKeyAttackDialog dialog = new WeakKeyAttackDialog(view.window(), logging, getJWS());
         dialog.display();
     }
 

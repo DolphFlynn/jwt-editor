@@ -19,6 +19,7 @@ limitations under the License.
 package com.blackberry.jwteditor.operations.weak;
 
 import java.io.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -28,16 +29,20 @@ class WeakSecrets {
 
     private final BufferedReader bufferedReader;
     private final Object lock;
+    private final AtomicInteger counter;
 
     WeakSecrets() {
         InputStream inputStream = this.getClass().getResourceAsStream("/jwt.secrets.list.txt");
 
         this.bufferedReader = new BufferedReader(new InputStreamReader(inputStream, UTF_8));
         this.lock = new Object();
+        this.counter = new AtomicInteger();
     }
 
     String next() {
         synchronized (lock) {
+            counter.incrementAndGet();
+
             try {
                 return bufferedReader.readLine();
             } catch (IOException e) {
@@ -46,7 +51,8 @@ class WeakSecrets {
         }
     }
 
-    int total() {
-        return TOTAL_NUMBER_OF_SECRETS;
+    int progress() {
+        double progress = (100.0 * counter.get()) / TOTAL_NUMBER_OF_SECRETS;
+        return (int) progress;
     }
 }

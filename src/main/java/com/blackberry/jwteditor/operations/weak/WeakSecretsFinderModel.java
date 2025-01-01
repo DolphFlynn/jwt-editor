@@ -21,7 +21,6 @@ package com.blackberry.jwteditor.operations.weak;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static com.blackberry.jwteditor.operations.weak.WeakSecretsFinderStatus.CANCELLED;
 import static com.blackberry.jwteditor.operations.weak.WeakSecretsFinderStatus.RUNNING;
 
 public class WeakSecretsFinderModel {
@@ -35,15 +34,27 @@ public class WeakSecretsFinderModel {
         this.secret = new AtomicReference<>();
     }
 
+    void setProgress(int percentageComplete) {
+        this.percentageComplete.set(percentageComplete);
+    }
+
     public int progress() {
         return percentageComplete.get();
+    }
+
+    void setSecret(String secret) {
+        this.secret.set(secret);
     }
 
     public String secret() {
         return secret.get();
     }
 
-    public void cancel() {
-        status.compareAndSet(RUNNING, CANCELLED);
+    public void setStatus(WeakSecretsFinderStatus status) {
+        this.status.set(status);
+    }
+
+    public WeakSecretsFinderStatus status() {
+        return status.get();
     }
 }

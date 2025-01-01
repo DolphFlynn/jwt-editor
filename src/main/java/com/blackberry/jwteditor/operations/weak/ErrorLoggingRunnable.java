@@ -18,6 +18,27 @@ limitations under the License.
 
 package com.blackberry.jwteditor.operations.weak;
 
-public enum WeakSecretsFinderStatus {
-    RUNNING, SUCCESS, CANCELLED, FAILED
+import burp.api.montoya.logging.Logging;
+
+class ErrorLoggingRunnable implements Runnable {
+    interface Task {
+        void action() throws Exception;
+    }
+
+    private final Logging logging;
+    private final Task task;
+
+    ErrorLoggingRunnable(Logging logging, Task task) {
+        this.logging = logging;
+        this.task = task;
+    }
+
+    @Override
+    public void run() {
+        try {
+            task.action();
+        } catch (Exception e) {
+            logging.logToError(e);
+        }
+    }
 }
