@@ -52,7 +52,6 @@ public class WeakSecretFinder implements Closeable {
         private final WeakSecretsFinderModel model;
         private final WeakSecretTester tester;
 
-
         private Worker(WeakSecretsFinderModel model, JWS jws) {
             this.model = model;
             this.weakSecrets = new WeakSecrets();
