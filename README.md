@@ -17,6 +17,10 @@ Additionally it facilitates several well-known attacks against JWT implementatio
 
 ## Changelog
 
+**Unreleased**
+- Add ability to test for HMAC signatures using [weak secrets](https://github.com/wallarm/jwt-secrets).
+- Remember last used key within Signing dialog.
+
 **2.4 2024-12-24**
 - Add support for non-JSON claims within JWS (Thanks to [@Hannah-PortSwigger](https://github.com/Hannah-PortSwigger) for suggesting this).
 
@@ -150,6 +154,7 @@ The `Attack` option implements several well-known attacks against JSON Web Signa
 * Signing with an empty HMAC key
 * Signing with a *Psychic signature*
 * Embedding a Collaborator payload
+* Weak HMAC secret
 
 These are described in more detail [below](#Attacks).
 
@@ -217,6 +222,9 @@ CVE-2022-21449.
 Burp Suite's [Collaborator](https://portswigger.net/burp/documentation/collaborator) can be used to check if a server 
 is fetching content based on the `x5u` or `jku` headers. 
 Note that this functionality is only available in Burp Suite Professional.
+
+### Weak HMAC secret
+Attempt to brute-force the signing key for JWS with HMAC signatures using known [JWT secrets](https://github.com/wallarm/jwt-secrets).
 
 ## Issues / Enhancements
 If you have found a bug or think that a particular feature is missing, please raise an issue on the [GitHub repository](https://github.com/DolphFlynn/jwt-editor/issues).

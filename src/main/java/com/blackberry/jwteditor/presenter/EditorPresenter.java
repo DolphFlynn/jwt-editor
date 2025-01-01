@@ -29,6 +29,7 @@ import com.blackberry.jwteditor.view.dialog.MessageDialogFactory;
 import com.blackberry.jwteditor.view.dialog.operations.*;
 import com.blackberry.jwteditor.view.editor.EditorMode;
 import com.blackberry.jwteditor.view.editor.EditorView;
+import com.blackberry.jwteditor.view.weak.WeakKeyAttackDialog;
 import com.nimbusds.jose.util.Base64URL;
 import org.json.JSONException;
 
@@ -250,6 +251,18 @@ public class EditorPresenter {
         );
 
         showDialogAndUpdateJWS(dialog);
+    }
+
+    public void onAttackWeakHMACSecret() {
+        JWS jws = getJWS();
+
+        if (!jws.header().algorithm().startsWith("HS")) {
+            messageDialogFactory.showWarningDialog("error_title_unable_to_attack_weak_symmetric", "error_unable_to_attack_weak_symmetric");
+            return;
+        }
+
+        WeakKeyAttackDialog dialog = new WeakKeyAttackDialog(view.window(), logging, getJWS());
+        dialog.display();
     }
 
     public void onSignClicked() {
