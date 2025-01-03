@@ -98,6 +98,7 @@ public class JWKSImportDialog extends JDialog {
             try {
                 List<Key> parsedKeys = new JWKSetParser().parse(textAreaKeysJson.getText());
                 keys.addAll(parsedKeys);
+                buttonImport.setEnabled(true);
             } catch (ParseException e) {
                 textAreaKeysJson.setBackground(PINK);
                 textAreaKeysJson.setCurrentLineHighlightColor(PINK);

@@ -18,13 +18,27 @@ limitations under the License.
 
 package com.blackberry.jwteditor.model.keys;
 
+import com.blackberry.jwteditor.exceptions.UnsupportedKeyException;
+import com.nimbusds.jose.jwk.JWKSet;
+
 import java.text.ParseException;
 import java.util.List;
-
-import static java.util.Collections.emptyList;
+import java.util.Objects;
 
 public class JWKSetParser {
     public List<Key> parse(String json) throws ParseException {
-        return emptyList();
+        return JWKSet.parse(json)
+                .getKeys()
+                .stream()
+                .map(jwk -> {
+                    try {
+                        return JWKKeyFactory.from(jwk);
+                    } catch (UnsupportedKeyException e) {
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .map(key -> (Key) key)
+                .toList();
     }
 }
