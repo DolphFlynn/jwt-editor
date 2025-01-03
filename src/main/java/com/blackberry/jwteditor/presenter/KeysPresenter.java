@@ -24,9 +24,11 @@ import com.blackberry.jwteditor.model.keys.*;
 import com.blackberry.jwteditor.model.persistence.KeysModelPersistence;
 import com.blackberry.jwteditor.utils.PEMUtils;
 import com.blackberry.jwteditor.utils.Utils;
+import com.blackberry.jwteditor.view.dialog.jwks.JWKSImportDialog;
 import com.blackberry.jwteditor.view.dialog.keys.KeyDialog;
 import com.blackberry.jwteditor.view.dialog.keys.KeysDialogFactory;
 import com.blackberry.jwteditor.view.keys.KeysView;
+import com.blackberry.jwteditor.view.rsta.RstaFactory;
 import com.nimbusds.jose.jwk.JWK;
 
 import javax.swing.*;
@@ -44,14 +46,17 @@ public class KeysPresenter {
     private final KeysModel model;
     private final KeysView view;
     private final KeysDialogFactory keysDialogFactory;
+    private final RstaFactory rstaFactory;
 
     public KeysPresenter(KeysView view,
                          KeysModelPersistence keysModelPersistence,
                          KeysModel keysModel,
-                         KeysDialogFactory keysDialogFactory) {
+                         KeysDialogFactory keysDialogFactory,
+                         RstaFactory rstaFactory) {
         this.view = view;
         this.model = keysModel;
         this.keysDialogFactory = keysDialogFactory;
+        this.rstaFactory = rstaFactory;
 
         model.addKeyModelListener(new KeysModelListener() {
             @Override
@@ -140,6 +145,13 @@ public class KeysPresenter {
      */
     public void onButtonNewPasswordClick() {
         onButtonNewClicked(keysDialogFactory.passwordDialog());
+    }
+
+    public void onButtonImportJWKSet() {
+        JWKSImportDialog dialog = new JWKSImportDialog(view.getParent(), model, rstaFactory);
+        dialog.display();
+
+        dialog.getKeys().forEach(model::addKey);
     }
 
     /**
