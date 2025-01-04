@@ -45,6 +45,7 @@ public class SuiteView {
     private JPanel panel;
     private KeysView keysView;
     private ConfigView configView;
+    private TokensView tokensView;
 
     public SuiteView(
             Window parent,
@@ -90,5 +91,6 @@ public class SuiteView {
                 rstaFactory
         );
         configView = new ConfigView(burpConfig, userInterface, isProVersion, keysModel);
+        tokensView = new TokensView();
     }
 }
