@@ -52,14 +52,7 @@ public class KeyConfusionAttackDialog extends OperationDialog<JWS> {
 
         configureUI(contentPane, buttonOK, buttonCancel);
 
-        // Convert appropriate signingKeys List to an Array
-        Key[] signingKeysArray = signingKeys
-                .stream()
-                .filter(Key::canConvertToPem)
-                .toArray(Key[]::new);
-
-        // Populate the dropdown with the signing keys
-        comboBoxSigningKey.setModel(new DefaultComboBoxModel<>(signingKeysArray));
+        comboBoxSigningKey.setModel(new DefaultComboBoxModel<>(signingKeys.toArray(Key[]::new)));
 
         // Populate the Signing Algorithm dropdown
         comboBoxSigningAlgorithm.setModel(new DefaultComboBoxModel<>(new JWSAlgorithm[] {JWSAlgorithm.HS256, JWSAlgorithm.HS384, JWSAlgorithm.HS512}));
