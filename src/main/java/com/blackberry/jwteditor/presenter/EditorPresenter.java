@@ -34,7 +34,6 @@ import com.nimbusds.jose.util.Base64URL;
 import org.json.JSONException;
 
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -199,15 +198,10 @@ public class EditorPresenter {
      * Handle click events from the HMAC Key Confusion button
      */
     public void onAttackKeyConfusionClicked() {
-        List<Key> attackKeys = new ArrayList<>();
-
         // Get a list of verification capable public keys
-        List<Key> verificationKeys = keysRepository.getVerificationKeys();
-        for (Key signingKey : verificationKeys) {
-            if (signingKey.isPublic() && signingKey.hasPEM()) {
-                attackKeys.add(signingKey);
-            }
-        }
+        List<Key> attackKeys = keysRepository.getVerificationKeys().stream()
+                .filter(key -> key.isPublic() && key.canConvertToPem())
+                .toList();
 
         if (attackKeys.isEmpty()) {
             messageDialogFactory.showWarningDialog("error_title_no_signing_keys", "error_no_signing_keys");
@@ -217,7 +211,7 @@ public class EditorPresenter {
         OperationDialog<JWS> dialog = new KeyConfusionAttackDialog(
                 view.window(),
                 logging,
-                verificationKeys,
+                attackKeys,
                 getJWS()
         );
 
