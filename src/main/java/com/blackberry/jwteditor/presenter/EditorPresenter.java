@@ -204,7 +204,7 @@ public class EditorPresenter {
         // Get a list of verification capable public keys
         List<Key> verificationKeys = keysRepository.getVerificationKeys();
         for (Key signingKey : verificationKeys) {
-            if (signingKey.isPublic() && signingKey.hasPEM()) {
+            if (signingKey.isPublic() && signingKey.canConvertToPem()) {
                 attackKeys.add(signingKey);
             }
         }

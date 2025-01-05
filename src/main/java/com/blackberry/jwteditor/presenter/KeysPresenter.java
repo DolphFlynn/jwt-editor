@@ -173,7 +173,7 @@ public class KeysPresenter {
      */
     public boolean canCopyPEM(int row) {
         Key key = model.getKey(row);
-        return key.hasPEM() && key.isPrivate();
+        return key.canConvertToPem() && key.isPrivate();
     }
 
     /**
@@ -195,7 +195,7 @@ public class KeysPresenter {
      */
     public boolean canCopyPublicPEM(int row) {
         Key key = model.getKey(row);
-        return key.hasPEM() && key.isPublic();
+        return key.canConvertToPem() && key.isPublic();
     }
 
     /**
