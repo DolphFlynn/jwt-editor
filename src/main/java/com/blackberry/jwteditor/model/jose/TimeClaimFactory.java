@@ -21,6 +21,7 @@ package com.blackberry.jwteditor.model.jose;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
@@ -34,8 +35,8 @@ import static java.util.Collections.emptyList;
 
 public class TimeClaimFactory {
 
-    public static TimeClaim fromEpochSeconds(TimeClaimType type, String value, Long epochSeconds) {
-        return new TimeClaim(type, value, dateTimeValue(epochSeconds));
+    public static TimeClaim fromEpochSeconds(TimeClaimType type, String value) {
+        return new TimeClaim(type, value, dateTimeValue(value));
     }
 
     public static TimeClaim fromIsoDateTime(TimeClaimType type, String value) {
@@ -56,10 +57,8 @@ public class TimeClaimFactory {
                 .map(type -> {
                             String value = jsonObject.get(type.name).toString();
 
-                            if (value.matches("\\d+")) {
-                                Long epochSeconds = numberValue(jsonObject, type.name);
-
-                                return fromEpochSeconds(type, value, epochSeconds);
+                            if (value.matches("\\d+(.\\d+)?")) {
+                                return fromEpochSeconds(type, value);
                             } else {
                                 return fromIsoDateTime(type, value);
                             }
@@ -76,21 +75,26 @@ public class TimeClaimFactory {
         }
     }
 
-    private static Long numberValue(JSONObject jsonObject, String name) {
-        try {
-            return jsonObject.getLong(name);
-        } catch (JSONException e) {
-            return null;
-        }
-    }
-
-    private static ZonedDateTime dateTimeValue(Long numberValue) {
-        if (numberValue == null || numberValue < 0) {
+    private static ZonedDateTime dateTimeValue(String numberValue) {
+        if (numberValue == null) {
             return null;
         }
 
-        Instant instant = Instant.ofEpochSecond(numberValue);
+        // Try to parse string time value as BigDecimal to keep the floating point precision
+        BigDecimal epochSecondsDecimal = new BigDecimal(numberValue);
 
+        // Truncate decimal part of the value to get the seconds
+        long seconds = epochSecondsDecimal.longValue();
+        if (seconds < 0) {
+            return null;
+        }
+
+        // Get decimal part as nanoseconds
+        long nanoseconds = epochSecondsDecimal.subtract(new BigDecimal(seconds))
+                .movePointRight(9)
+                .longValue();
+
+        Instant instant = Instant.ofEpochSecond(seconds, nanoseconds);
         return ZonedDateTime.ofInstant(instant, UTC);
     }
 

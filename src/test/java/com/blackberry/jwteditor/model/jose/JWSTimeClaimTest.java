@@ -46,7 +46,7 @@ class JWSTimeClaimTest {
     void givenJWSWithExpTimeClaims_thenTimeClaimsCorrect(String data) throws ParseException {
         JWS jws = JWSFactory.parse(data);
 
-        assertThat(jws.claims().timeClaims()).containsExactly(TimeClaimFactory.fromEpochSeconds(EXPIRATION_TIME, "1716239022", 1716239022L));
+        assertThat(jws.claims().timeClaims()).containsExactly(TimeClaimFactory.fromEpochSeconds(EXPIRATION_TIME, "1716239022"));
     }
 
     private static Stream<String> jwsWithValidExpValues() {
@@ -113,7 +113,7 @@ class JWSTimeClaimTest {
     void givenJWSWithNbfTimeClaims_thenTimeClaimsCorrect(String data) throws ParseException {
         JWS jws = JWSFactory.parse(data);
 
-        assertThat(jws.claims().timeClaims()).containsExactly(TimeClaimFactory.fromEpochSeconds(NOT_BEFORE_TIME, "1716239022", 1716239022L));
+        assertThat(jws.claims().timeClaims()).containsExactly(TimeClaimFactory.fromEpochSeconds(NOT_BEFORE_TIME, "1716239022"));
     }
 
     private static Stream<String> jwsWithValidNbfValues() {
@@ -186,7 +186,7 @@ class JWSTimeClaimTest {
     void givenJWSWithIatTimeClaims_thenTimeClaimsCorrect(String data) throws ParseException {
         JWS jws = JWSFactory.parse(data);
 
-        assertThat(jws.claims().timeClaims()).containsExactly(TimeClaimFactory.fromEpochSeconds(ISSUED_AT_TIME, "1716239022", 1716239022L));
+        assertThat(jws.claims().timeClaims()).containsExactly(TimeClaimFactory.fromEpochSeconds(ISSUED_AT_TIME, "1716239022"));
     }
 
     private static Stream<String> jwsWithValidIatDatesInThePast() {
