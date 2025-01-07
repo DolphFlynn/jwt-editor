@@ -32,10 +32,16 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
+import static com.blackberry.jwteditor.view.dialog.operations.LastSigningKeys.Signer.KEY_CONFUSION;
+
 /**
  * Attack > HMAC Key Confusion dialog from the Editor tab
  */
 public class KeyConfusionAttackDialog extends OperationDialog<JWS> {
+    private static final JWSAlgorithm[] ALGORITHMS = {JWSAlgorithm.HS256, JWSAlgorithm.HS384, JWSAlgorithm.HS512};
+
+    private final LastSigningKeys lastSigningKeys;
+
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
@@ -47,24 +53,29 @@ public class KeyConfusionAttackDialog extends OperationDialog<JWS> {
             Window parent,
             Logging logging,
             List<Key> signingKeys,
+            LastSigningKeys lastSigningKeys,
             JWS jws) {
         super(parent, logging, "key_confusion_attack_dialog_title", jws, "error_title_unable_to_sign");
 
+        this.lastSigningKeys = lastSigningKeys;
+
         configureUI(contentPane, buttonOK, buttonCancel);
 
+        int lastUsedKeyIndex = lastSigningKeys.lastKeyFor(KEY_CONFUSION).map(signingKeys::indexOf).orElse(-1);
+        lastUsedKeyIndex = lastUsedKeyIndex == -1 ? 0 : lastUsedKeyIndex;
+
         comboBoxSigningKey.setModel(new DefaultComboBoxModel<>(signingKeys.toArray(Key[]::new)));
+        comboBoxSigningKey.setSelectedIndex(lastUsedKeyIndex);
 
-        // Populate the Signing Algorithm dropdown
-        comboBoxSigningAlgorithm.setModel(new DefaultComboBoxModel<>(new JWSAlgorithm[] {JWSAlgorithm.HS256, JWSAlgorithm.HS384, JWSAlgorithm.HS512}));
-
-        // Select the first signing key
-        comboBoxSigningKey.setSelectedIndex(0);
+        comboBoxSigningAlgorithm.setModel(new DefaultComboBoxModel<>(ALGORITHMS));
     }
 
     @Override
     JWS performOperation() throws SigningException, PemException, UnsupportedKeyException {
         JWKKey selectedKey = (JWKKey) comboBoxSigningKey.getSelectedItem();
         JWSAlgorithm selectedAlgorithm = (JWSAlgorithm) comboBoxSigningAlgorithm.getSelectedItem();
+
+        lastSigningKeys.recordKeyUse(KEY_CONFUSION, selectedKey);
 
         return Attacks.hmacKeyConfusion(jwt, selectedKey, selectedAlgorithm, checkBoxTrailingNewline.isSelected());
     }
