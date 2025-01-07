@@ -212,6 +212,7 @@ public class EditorPresenter {
                 view.window(),
                 logging,
                 attackKeys,
+                lastSigningKeys,
                 getJWS()
         );
 

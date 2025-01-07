@@ -26,6 +26,7 @@ import com.blackberry.jwteditor.model.jose.JWSFactory.SigningUpdateMode;
 import com.blackberry.jwteditor.model.keys.JWKKey;
 import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.operations.Attacks;
+import com.blackberry.jwteditor.view.dialog.operations.LastSigningKeys.Signer;
 import com.nimbusds.jose.JWSAlgorithm;
 
 import javax.swing.*;
@@ -40,13 +41,16 @@ import static com.blackberry.jwteditor.model.jose.JWSFactory.SigningUpdateMode.*
 public class SigningDialog extends OperationDialog<JWS> {
 
     public enum Mode {
-        NORMAL("sign_dialog_title"),
-        EMBED_JWK("embed_jwk_attack_dialog_title");
+        NORMAL("sign_dialog_title", Signer.NORMAL),
+        EMBED_JWK("embed_jwk_attack_dialog_title", Signer.EMBED_JWK);
+
+        final Signer signer;
 
         private final String titleResourceId;
 
-        Mode(String titleResourceId) {
+        Mode(String titleResourceId, Signer embedJwk) {
             this.titleResourceId = titleResourceId;
+            this.signer = embedJwk;
         }
     }
 
@@ -91,7 +95,7 @@ public class SigningDialog extends OperationDialog<JWS> {
             buttonOK.setEnabled(true);
         });
 
-        int lastUsedKeyIndex = lastSigningKeys.lastKeyFor(mode).map(signingKeys::indexOf).orElse(-1);
+        int lastUsedKeyIndex = lastSigningKeys.lastKeyFor(mode.signer).map(signingKeys::indexOf).orElse(-1);
         lastUsedKeyIndex = lastUsedKeyIndex == -1 ? 0 : lastUsedKeyIndex;
         comboBoxSigningKey.setSelectedIndex(lastUsedKeyIndex);
 
@@ -107,7 +111,7 @@ public class SigningDialog extends OperationDialog<JWS> {
         JWKKey selectedKey = (JWKKey) comboBoxSigningKey.getSelectedItem();
         JWSAlgorithm selectedAlgorithm = (JWSAlgorithm) comboBoxSigningAlgorithm.getSelectedItem();
 
-        lastSigningKeys.recordKeyUse(mode, selectedKey);
+        lastSigningKeys.recordKeyUse(mode.signer, selectedKey);
 
         // Get the header update mode based on the selected radio button, convert to the associated enum value
         SigningUpdateMode signingUpdateMode;
