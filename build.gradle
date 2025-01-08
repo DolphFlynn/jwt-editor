@@ -32,7 +32,7 @@ dependencies {
     )
     api(
             "com.jetbrains.intellij.java:java-gui-forms-rt:${gui_designer_version}",
-            'com.nimbusds:nimbus-jose-jwt:9.21',
+            'com.nimbusds:nimbus-jose-jwt:10.0.1',
             'org.exbin.deltahex:deltahex-swing:0.1.2',
             'com.fifesoft:rsyntaxtextarea:3.5.3',
             'org.json:json:20250107'
