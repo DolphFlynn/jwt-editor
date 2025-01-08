@@ -42,7 +42,7 @@ dependencies {
             "org.bouncycastle:bcpkix-jdk18on:${bouncycastle_version}",
             "net.portswigger.burp.extensions:montoya-api:${extender_version}",
             'org.junit.jupiter:junit-jupiter:5.11.4',
-            'org.assertj:assertj-core:3.26.3',
+            'org.assertj:assertj-core:3.27.2',
             'org.mockito:mockito-core:5.14.1'
     )
 }
