@@ -6,4 +6,3 @@ updates:
       interval: "weekly"
     ignore:
       - dependency-name: "com.nimbusds:nimbus-jose-jwt"
-        versions: ["9.21"]
