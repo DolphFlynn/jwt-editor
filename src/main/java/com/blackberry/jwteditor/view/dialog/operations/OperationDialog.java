@@ -25,38 +25,36 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
+import static com.blackberry.jwteditor.view.dialog.operations.OperationPanel.VALIDITY_EVENT;
 import static java.awt.Dialog.ModalityType.APPLICATION_MODAL;
 import static javax.swing.JOptionPane.WARNING_MESSAGE;
 
-public abstract class OperationDialog<T> extends JDialog {
+public class OperationDialog<T, U> extends JDialog {
     private final String errorTitleOperationFailed;
     private final Logging logging;
+    private final Operation<T, U> operation;
+    private final U originalJwt;
+    private final JPanel panel;
+    private final PropertyChangeListener propertyChangeListener;
 
-    T jwt;
+    private JPanel contentPane;
+    private JPanel mainPanel;
+    private JButton buttonOK;
+    private JButton buttonCancel;
 
-    OperationDialog(Window parent, Logging logging, String titleResourceId, T jwt) {
-        this(parent, logging, titleResourceId, jwt, "error_title_unable_to_perform_operation");
-    }
+    private T jwt;
 
-    OperationDialog(Window parent, Logging logging, String titleResourceId, T jwt, String errorTitleOperationFailed) {
-        super(parent, Utils.getResourceString(titleResourceId), APPLICATION_MODAL);
+    public OperationDialog(Window parent, Logging logging, Operation<T, U> operation, U jwt) {
+        super(parent, Utils.getResourceString(operation.titleResourceId()), APPLICATION_MODAL);
 
         this.logging = logging;
-        this.jwt = jwt;
-        this.errorTitleOperationFailed = errorTitleOperationFailed;
+        this.operation = operation;
+        this.originalJwt = jwt;
+        this.errorTitleOperationFailed = operation.operationFailedResourceId();
 
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                onCancel();
-            }
-        });
-    }
-
-    void configureUI(JPanel contentPane, JButton buttonOK, JButton buttonCancel) {
         setContentPane(contentPane);
         getRootPane().setDefaultButton(buttonOK);
 
@@ -69,9 +67,24 @@ public abstract class OperationDialog<T> extends JDialog {
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
         );
-    }
 
-    abstract T performOperation() throws Exception;
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+
+        setMinimumSize(operation.dimension());
+        setPreferredSize(operation.dimension());
+        panel = operation.configPanel();
+        propertyChangeListener = new ValidityWatcher();
+        mainPanel.add(panel);
+
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                onCancel();
+            }
+        });
+
+        panel.addPropertyChangeListener(VALIDITY_EVENT, propertyChangeListener);
+    }
 
     public T getJWT() {
         return jwt;
@@ -85,22 +98,36 @@ public abstract class OperationDialog<T> extends JDialog {
 
     void onOK() {
         try {
-            jwt = performOperation();
+            jwt = operation.performOperation(originalJwt);
         } catch (Exception e) {
             String title = Utils.getResourceString(errorTitleOperationFailed);
             logging.logToError(title, e);
-            JOptionPane.showMessageDialog(this,
+            JOptionPane.showMessageDialog(
+                    this,
                     e.getMessage(),
                     title,
                     WARNING_MESSAGE
             );
             jwt = null;
         } finally {
-            dispose();
+            onCancel();
         }
     }
 
     void onCancel() {
         dispose();
+        panel.removePropertyChangeListener(VALIDITY_EVENT, propertyChangeListener);
+    }
+
+    private class ValidityWatcher implements PropertyChangeListener {
+        @Override
+        public void propertyChange(PropertyChangeEvent evt) {
+            if (!evt.getPropertyName().equals(VALIDITY_EVENT) || !(evt.getNewValue() instanceof Boolean)) {
+                return;
+            }
+
+            boolean isValid = (Boolean) evt.getNewValue();
+            buttonOK.setEnabled(isValid);
+        }
     }
 }

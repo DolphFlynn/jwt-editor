@@ -17,33 +17,30 @@ limitations under the License.
 
 package com.blackberry.jwteditor.view.dialog.operations;
 
-import burp.api.montoya.logging.Logging;
 import com.blackberry.jwteditor.model.jose.JWS;
 import com.blackberry.jwteditor.operations.Attacks;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class NoneDialog extends OperationDialog<JWS> {
+public class NoneOperation extends OperationPanel<JWS, JWS> {
     private static final String[] NONE_ALGORITHM_VALUES = {"none", "None", "NONE", "nOnE"};
 
-    private JPanel contentPane;
-    private JButton buttonOK;
-    private JButton buttonCancel;
+    private JPanel panel;
     private JComboBox<String> comboBoxAlgorithm;
 
-    public NoneDialog(Window parent, Logging logging, JWS jws) {
-        super(parent, logging, "none_attack_dialog_title", jws);
-
-        configureUI(contentPane, buttonOK, buttonCancel);
+    public NoneOperation() {
+        super("none_attack_dialog_title");
 
         comboBoxAlgorithm.setModel(new DefaultComboBoxModel<>(NONE_ALGORITHM_VALUES));
         comboBoxAlgorithm.setSelectedIndex(0);
+
+        add(panel, BorderLayout.CENTER);
     }
 
     @Override
-    JWS performOperation() {
+    public JWS performOperation(JWS originalJwt) {
         String selectedAlgorithm = (String) comboBoxAlgorithm.getSelectedItem();
-        return Attacks.noneSigning(jwt, selectedAlgorithm);
+        return Attacks.noneSigning(originalJwt, selectedAlgorithm);
     }
 }

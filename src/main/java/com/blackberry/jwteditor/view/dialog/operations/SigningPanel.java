@@ -18,7 +18,6 @@ limitations under the License.
 
 package com.blackberry.jwteditor.view.dialog.operations;
 
-import burp.api.montoya.logging.Logging;
 import com.blackberry.jwteditor.exceptions.SigningException;
 import com.blackberry.jwteditor.model.jose.JWS;
 import com.blackberry.jwteditor.model.jose.JWSFactory;
@@ -34,11 +33,9 @@ import java.awt.*;
 import java.util.List;
 
 import static com.blackberry.jwteditor.model.jose.JWSFactory.SigningUpdateMode.*;
+import static java.awt.BorderLayout.CENTER;
 
-/**
- * Sign and Attack > Embedded JWK dialog from the Editor tab
- */
-public class SigningDialog extends OperationDialog<JWS> {
+public class SigningPanel extends OperationPanel<JWS, JWS> {
 
     public enum Mode {
         NORMAL("sign_dialog_title", Signer.NORMAL),
@@ -54,9 +51,7 @@ public class SigningDialog extends OperationDialog<JWS> {
         }
     }
 
-    private JPanel contentPane;
-    private JButton buttonOK;
-    private JButton buttonCancel;
+    private JPanel panel;
     private JComboBox<Key> comboBoxSigningKey;
     private JComboBox<JWSAlgorithm> comboBoxSigningAlgorithm;
     private JPanel panelOptions;
@@ -67,18 +62,10 @@ public class SigningDialog extends OperationDialog<JWS> {
     private final Mode mode;
     private final LastSigningKeys lastSigningKeys;
 
-    public SigningDialog(
-            Window parent,
-            Logging logging,
-            List<Key> signingKeys,
-            JWS jws,
-            Mode mode,
-            LastSigningKeys lastSigningKeys) {
-        super(parent, logging, mode.titleResourceId, jws, "error_title_unable_to_sign");
+    public SigningPanel(List<Key> signingKeys, Mode mode, LastSigningKeys lastSigningKeys) {
+        super(mode.titleResourceId, new Dimension(500, 375));
         this.mode = mode;
         this.lastSigningKeys = lastSigningKeys;
-
-        configureUI(contentPane, buttonOK, buttonCancel);
 
         // Convert the signingKeys from a List to an Array
         Key[] signingKeysArray = new Key[signingKeys.size()];
@@ -92,7 +79,6 @@ public class SigningDialog extends OperationDialog<JWS> {
             Key selectedKey = (Key) comboBoxSigningKey.getSelectedItem();
             //noinspection ConstantConditions
             comboBoxSigningAlgorithm.setModel(new DefaultComboBoxModel<>(selectedKey.getSigningAlgorithms()));
-            buttonOK.setEnabled(true);
         });
 
         int lastUsedKeyIndex = lastSigningKeys.lastKeyFor(mode.signer).map(signingKeys::indexOf).orElse(-1);
@@ -103,10 +89,12 @@ public class SigningDialog extends OperationDialog<JWS> {
         if (mode != Mode.NORMAL) {
             panelOptions.setVisible(false);
         }
+
+        add(panel, CENTER);
     }
 
     @Override
-    JWS performOperation() throws SigningException, NoSuchFieldException, IllegalAccessException {
+    public JWS performOperation(JWS originalJwt) throws SigningException, NoSuchFieldException, IllegalAccessException {
         // Get the selected signing key and algorithm
         JWKKey selectedKey = (JWKKey) comboBoxSigningKey.getSelectedItem();
         JWSAlgorithm selectedAlgorithm = (JWSAlgorithm) comboBoxSigningAlgorithm.getSelectedItem();
@@ -125,8 +113,13 @@ public class SigningDialog extends OperationDialog<JWS> {
         }
 
         return switch (mode) {
-            case NORMAL -> JWSFactory.sign(selectedKey, selectedAlgorithm, signingUpdateMode, jwt);
-            case EMBED_JWK -> Attacks.embeddedJWK(jwt, selectedKey, selectedAlgorithm);
+            case NORMAL -> JWSFactory.sign(selectedKey, selectedAlgorithm, signingUpdateMode, originalJwt);
+            case EMBED_JWK -> Attacks.embeddedJWK(originalJwt, selectedKey, selectedAlgorithm);
         };
+    }
+
+    @Override
+    public String operationFailedResourceId() {
+        return "error_title_unable_to_sign";
     }
 }

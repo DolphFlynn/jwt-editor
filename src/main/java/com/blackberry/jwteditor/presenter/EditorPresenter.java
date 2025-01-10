@@ -45,7 +45,7 @@ import static com.blackberry.jwteditor.model.jose.JWSFactory.jwsFromParts;
 import static com.blackberry.jwteditor.utils.Base64URLUtils.base64UrlEncodeJson;
 import static com.blackberry.jwteditor.utils.JSONUtils.isJsonCompact;
 import static com.blackberry.jwteditor.utils.JSONUtils.prettyPrintJSON;
-import static com.blackberry.jwteditor.view.dialog.operations.SigningDialog.Mode.EMBED_JWK;
+import static com.blackberry.jwteditor.view.dialog.operations.SigningPanel.Mode.EMBED_JWK;
 
 /**
  * Presenter class for the Editor tab
@@ -208,44 +208,23 @@ public class EditorPresenter {
             return;
         }
 
-        OperationDialog<JWS> dialog = new KeyConfusionAttackDialog(
-                view.window(),
-                logging,
-                attackKeys,
-                lastSigningKeys,
-                getJWS()
-        );
-
-        showDialogAndUpdateJWS(dialog);
+        showDialogAndUpdateJWS(new KeyConfusionAttackPanel(attackKeys, lastSigningKeys));
     }
 
     public void onAttackSignNoneClicked() {
-        OperationDialog<JWS> dialog = new NoneDialog(view.window(), logging, getJWS());
-
-        showDialogAndUpdateJWS(dialog);
+        showDialogAndUpdateJWS(new NoneOperation());
     }
 
     public void onAttackSignEmptyKeyClicked() {
-        OperationDialog<JWS> dialog = new EmptyKeySigningDialog(view.window(), logging, getJWS());
-
-        showDialogAndUpdateJWS(dialog);
+        showDialogAndUpdateJWS(new EmptyKeySigningPanel());
     }
 
     public void onAttackPsychicSignatureClicked() {
-        OperationDialog<JWS> dialog = new PsychicSignatureDialog(view.window(), logging, getJWS());
-
-        showDialogAndUpdateJWS(dialog);
+        showDialogAndUpdateJWS(new PsychicSignaturePanel());
     }
 
     public void onAttackEmbedCollaboratorPayloadClicked() {
-        OperationDialog<JWS> dialog = new EmbedCollaboratorPayloadDialog(
-                view.window(),
-                logging,
-                getJWS(),
-                collaboratorPayloadGenerator
-        );
-
-        showDialogAndUpdateJWS(dialog);
+        showDialogAndUpdateJWS(new EmbedCollaboratorPayloadPanel(collaboratorPayloadGenerator));
     }
 
     public void onAttackWeakHMACSecret() {
@@ -261,7 +240,7 @@ public class EditorPresenter {
     }
 
     public void onSignClicked() {
-        signingDialog(SigningDialog.Mode.NORMAL);
+        signingDialog(SigningPanel.Mode.NORMAL);
     }
 
     /**
@@ -269,26 +248,24 @@ public class EditorPresenter {
      *
      * @param mode mode of the signing dialog to display
      */
-    private void signingDialog(SigningDialog.Mode mode) {
+    private void signingDialog(SigningPanel.Mode mode) {
         // Check there are signing keys in the keystore
         if (keysRepository.getSigningKeys().isEmpty()) {
             messageDialogFactory.showWarningDialog("error_title_no_signing_keys", "error_no_signing_keys");
             return;
         }
 
-        OperationDialog<JWS> signDialog = new SigningDialog(
-                view.window(),
-                logging,
-                keysRepository.getSigningKeys(),
-                getJWS(),
-                mode,
-                lastSigningKeys
-        );
-
-        showDialogAndUpdateJWS(signDialog);
+        showDialogAndUpdateJWS(new SigningPanel(keysRepository.getSigningKeys(), mode, lastSigningKeys));
     }
 
-    private void showDialogAndUpdateJWS(OperationDialog<JWS> dialog) {
+    private void showDialogAndUpdateJWS(Operation<JWS, JWS> operation) {
+        OperationDialog<JWS, JWS> dialog = new OperationDialog<>(
+                view.window(),
+                logging,
+                operation,
+                getJWS()
+        );
+
         dialog.display();
 
         JWS updatedJWS = dialog.getJWT();
@@ -298,9 +275,6 @@ public class EditorPresenter {
         }
     }
 
-    /**
-     * Handle click events from the Verify button
-     */
     public void onVerifyClicked() {
         List<Key> keys = keysRepository.getVerificationKeys();
 
@@ -326,11 +300,11 @@ public class EditorPresenter {
             return;
         }
 
-        OperationDialog<JWE> encryptDialog = new EncryptDialog(
+        OperationDialog<JWE, JWS> encryptDialog = new OperationDialog<>(
                 view.window(),
                 logging,
-                getJWS(),
-                keysRepository.getEncryptionKeys()
+                new EncryptPanel(keysRepository.getEncryptionKeys()),
+                getJWS()
         );
         encryptDialog.display();
 

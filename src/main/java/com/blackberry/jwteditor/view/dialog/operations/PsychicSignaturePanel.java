@@ -17,39 +17,33 @@ limitations under the License.
 
 package com.blackberry.jwteditor.view.dialog.operations;
 
-import burp.api.montoya.logging.Logging;
-import com.blackberry.jwteditor.exceptions.SigningException;
-import com.blackberry.jwteditor.exceptions.UnsupportedKeyException;
 import com.blackberry.jwteditor.model.jose.JWS;
 import com.blackberry.jwteditor.operations.Attacks;
 import com.nimbusds.jose.JWSAlgorithm;
 
 import javax.swing.*;
-import java.awt.*;
 
 import static com.nimbusds.jose.JWSAlgorithm.*;
+import static java.awt.BorderLayout.CENTER;
 
-public class EmptyKeySigningDialog extends OperationDialog<JWS> {
-    private static final JWSAlgorithm[] ALGORITHMS = {HS256, HS384, HS512};
+public class PsychicSignaturePanel extends OperationPanel<JWS, JWS> {
+    private static final JWSAlgorithm[] ALGORITHMS = {ES256, ES384, ES512};
 
-    private JPanel contentPane;
-    private JButton buttonOK;
-    private JButton buttonCancel;
+    private JPanel panel;
     private JComboBox<JWSAlgorithm> comboBoxAlgorithm;
 
-    public EmptyKeySigningDialog(Window parent, Logging logging, JWS jws) {
-        super(parent, logging, "empty_key_signing_dialog_title", jws, "error_title_unable_to_sign");
-
-        configureUI(contentPane, buttonOK, buttonCancel);
+    public PsychicSignaturePanel() {
+        super("psychic_signature_signing_dialog_title");
 
         comboBoxAlgorithm.setModel(new DefaultComboBoxModel<>(ALGORITHMS));
         comboBoxAlgorithm.setSelectedIndex(0);
+
+        add(panel, CENTER);
     }
 
     @Override
-    JWS performOperation() throws SigningException, UnsupportedKeyException {
+    public JWS performOperation(JWS originalJwt) throws Exception {
         JWSAlgorithm selectedAlgorithm = (JWSAlgorithm) comboBoxAlgorithm.getSelectedItem();
-
-        return Attacks.signWithEmptyKey(jwt, selectedAlgorithm);
+        return Attacks.signWithPsychicSignature(originalJwt, selectedAlgorithm);
     }
 }
