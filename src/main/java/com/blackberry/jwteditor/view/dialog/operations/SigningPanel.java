@@ -49,6 +49,13 @@ public class SigningPanel extends OperationPanel<JWS, JWS> {
             this.titleResourceId = titleResourceId;
             this.signer = embedJwk;
         }
+
+        Dimension dimension() {
+            return switch (this) {
+                case NORMAL -> new Dimension(500, 375);
+                case EMBED_JWK -> new Dimension(500, 250);
+            };
+        }
     }
 
     private JPanel panel;
@@ -63,7 +70,7 @@ public class SigningPanel extends OperationPanel<JWS, JWS> {
     private final LastSigningKeys lastSigningKeys;
 
     public SigningPanel(List<Key> signingKeys, Mode mode, LastSigningKeys lastSigningKeys) {
-        super(mode.titleResourceId, new Dimension(500, 375));
+        super(mode.titleResourceId, mode.dimension());
         this.mode = mode;
         this.lastSigningKeys = lastSigningKeys;
 
