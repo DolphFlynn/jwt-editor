@@ -18,7 +18,6 @@ limitations under the License.
 
 package com.blackberry.jwteditor.view.dialog.operations;
 
-import burp.api.montoya.logging.Logging;
 import com.blackberry.jwteditor.exceptions.EncryptionException;
 import com.blackberry.jwteditor.model.jose.JWE;
 import com.blackberry.jwteditor.model.jose.JWEFactory;
@@ -31,28 +30,16 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
-/**
- * Encrypt dialog from the Editor tab
- */
-public class EncryptDialog extends OperationDialog<JWE> {
-    private JPanel contentPane;
-    private JButton buttonOK;
-    private JButton buttonCancel;
+import static java.awt.BorderLayout.CENTER;
+
+public class EncryptPanel extends OperationPanel<JWE, JWS> {
+    private JPanel panel;
     private JComboBox<EncryptionMethod> comboBoxCEK;
     private JComboBox<JWEAlgorithm> comboBoxKEK;
     private JComboBox<Key> comboBoxEncryptionKey;
 
-    private final JWS jws;
-
-    public EncryptDialog(
-            Window parent,
-            Logging logging,
-            JWS jws,
-            List<Key> encryptionKeys) {
-        super(parent, logging, "encrypt_dialog_title", null, "error_title_unable_to_encrypt");
-        this.jws = jws;
-
-        configureUI(contentPane, buttonOK, buttonCancel);
+    public EncryptPanel(List<Key> encryptionKeys) {
+        super("encrypt_dialog_title", new Dimension(600, 325));
 
         // Convert encryptionKeys List to Array
         Key[] encryptionKeysArray = new Key[encryptionKeys.size()];
@@ -67,6 +54,8 @@ public class EncryptDialog extends OperationDialog<JWE> {
 
         // Set the encryption key to be the first value. This will trigger the event handlers setting the other two dropdowns
         comboBoxEncryptionKey.setSelectedIndex(0);
+
+        add(panel, CENTER);
     }
 
     /**
@@ -118,7 +107,7 @@ public class EncryptDialog extends OperationDialog<JWE> {
                 if (cekAlgorithms.length > 0) {
                     comboBoxCEK.setSelectedIndex(0);
                     comboBoxCEK.setEnabled(true);
-                    buttonOK.setEnabled(true);
+                    fireValidityEvent(true);
                 } else {
                     comboBoxCEK.setEnabled(false);
                 }
@@ -126,22 +115,31 @@ public class EncryptDialog extends OperationDialog<JWE> {
                 // Disable the form and the Content Encryption Algorithm dropdown if there is no Key Encryption Algorithm selected
                 comboBoxCEK.setModel(new DefaultComboBoxModel<>());
                 comboBoxCEK.setEnabled(false);
-                buttonOK.setEnabled(false);
+                fireValidityEvent(false);
             }
         } else {
             // Disable the form and the Content Encryption Algorithm dropdown if there is no Encryption Key selected
             comboBoxCEK.setModel(new DefaultComboBoxModel<>());
             comboBoxCEK.setEnabled(false);
-            buttonOK.setEnabled(false);
+            fireValidityEvent(false);
         }
     }
 
+    private void fireValidityEvent(boolean isValid) {
+        firePropertyChange(VALIDITY_EVENT, !isValid, isValid);
+    }
+
     @Override
-    JWE performOperation() throws EncryptionException {
+    public JWE performOperation(JWS originalJwt) throws EncryptionException {
         Key selectedKey = (Key) comboBoxEncryptionKey.getSelectedItem();
         JWEAlgorithm selectedKek = (JWEAlgorithm) comboBoxKEK.getSelectedItem();
         EncryptionMethod selectedCek = (EncryptionMethod) comboBoxCEK.getSelectedItem();
 
-        return JWEFactory.encrypt(jws, selectedKey, selectedKek, selectedCek);
+        return JWEFactory.encrypt(originalJwt, selectedKey, selectedKek, selectedCek);
+    }
+
+    @Override
+    public String operationFailedResourceId() {
+        return "error_title_unable_to_encrypt";
     }
 }
