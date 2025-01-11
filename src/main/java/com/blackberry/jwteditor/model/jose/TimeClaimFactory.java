@@ -80,22 +80,26 @@ public class TimeClaimFactory {
             return null;
         }
 
-        // Try to parse string time value as BigDecimal to keep the floating point precision
-        BigDecimal epochSecondsDecimal = new BigDecimal(numberValue);
+        try {
+            // Try to parse string time value as BigDecimal to keep the floating point precision
+            BigDecimal epochSecondsDecimal = new BigDecimal(numberValue);
 
-        // Truncate decimal part of the value to get the seconds
-        long seconds = epochSecondsDecimal.longValue();
-        if (seconds < 0) {
+            // Truncate decimal part of the value to get the seconds
+            long seconds = epochSecondsDecimal.longValue();
+            if (seconds < 0) {
+                return null;
+            }
+
+            // Get decimal part as nanoseconds
+            long nanoseconds = epochSecondsDecimal.subtract(new BigDecimal(seconds))
+                    .movePointRight(9)
+                    .longValue();
+
+            Instant instant = Instant.ofEpochSecond(seconds, nanoseconds);
+            return ZonedDateTime.ofInstant(instant, UTC);
+        } catch (NumberFormatException | ArithmeticException e) {
             return null;
         }
-
-        // Get decimal part as nanoseconds
-        long nanoseconds = epochSecondsDecimal.subtract(new BigDecimal(seconds))
-                .movePointRight(9)
-                .longValue();
-
-        Instant instant = Instant.ofEpochSecond(seconds, nanoseconds);
-        return ZonedDateTime.ofInstant(instant, UTC);
     }
 
     private static ZonedDateTime parseDateTime(String value) {
