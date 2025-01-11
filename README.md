@@ -20,6 +20,7 @@ Additionally it facilitates several well-known attacks against JWT implementatio
 **Unreleased**
 - Add ability to test for HMAC signatures using [weak secrets](https://github.com/wallarm/jwt-secrets).
 - Add import capability for JWK data.
+- Add support for decimal TimeClaims (Thanks to [Nirusu](https://github.com/Nirusu)).
 - Remember last used key within Signing dialog.
 
 **2.4 2024-12-24**
