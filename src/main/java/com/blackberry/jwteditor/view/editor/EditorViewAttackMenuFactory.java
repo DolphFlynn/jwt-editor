@@ -34,7 +34,7 @@ class EditorViewAttackMenuFactory {
     JPopupMenu buildAttackPopupMenu() {
         JPopupMenu popupMenuAttack = new JPopupMenu();
 
-        for (Operation attack : Operation.values()) {
+        for (Attack attack : Attack.values()) {
             JMenuItem item = new JMenuItem(attack.label(), attack.mnemonic());
             item.addActionListener(e -> attack.performOperation(presenter));
 
