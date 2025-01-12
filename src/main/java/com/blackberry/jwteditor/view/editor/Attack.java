@@ -22,7 +22,7 @@ import com.blackberry.jwteditor.utils.Utils;
 
 import static java.awt.event.KeyEvent.*;
 
-public enum Operation {
+public enum Attack {
     EmbedJWK("editor_view_button_attack_embed_jwk", VK_J),
     SignNone("editor_view_button_attack_sign_none", VK_N),
     KeyConfusion("editor_view_button_attack_key_confusion", VK_H),
@@ -34,7 +34,7 @@ public enum Operation {
     private final String labelResourceId;
     private final int mnemonic;
 
-    Operation(String labelResourceId, int mnemonic) {
+    Attack(String labelResourceId, int mnemonic) {
         this.labelResourceId = labelResourceId;
         this.mnemonic = mnemonic;
     }
