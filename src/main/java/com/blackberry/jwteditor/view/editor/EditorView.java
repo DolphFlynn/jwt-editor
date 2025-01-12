@@ -64,7 +64,6 @@ public abstract class EditorView {
     private final boolean editable;
     private final HexCodeAreaFactory hexCodeAreaFactory;
     private final InformationPanel informationPanel;
-    private final boolean isProVersion;
 
     private EditorMode mode;
     private JTabbedPane tabbedPane;
@@ -114,9 +113,14 @@ public abstract class EditorView {
         this.rstaFactory = rstaFactory;
         this.editable = editable;
         this.hexCodeAreaFactory = hexAreaCodeFactory;
-        this.isProVersion = isProVersion;
+
+        // IntelliJ generated code inserted here
+
         this.presenter = new EditorPresenter(this, collaboratorPayloadGenerator, logging, keysRepository);
         this.informationPanel = informationPanelFactory.build();
+
+        EditorViewAttackMenuFactory attackMenuFactory = new EditorViewAttackMenuFactory(presenter, isProVersion);
+        buttonAttack.setComponentPopupMenu(attackMenuFactory.buildAttackPopupMenu());
 
         informationScrollPane.setViewportView(informationPanel);
 
@@ -159,6 +163,7 @@ public abstract class EditorView {
         buttonEncrypt.addActionListener(e -> presenter.onEncryptClicked());
         buttonDecrypt.addActionListener(e -> presenter.onDecryptClicked());
         buttonCopy.addActionListener(e -> presenter.onCopyClicked());
+        buttonAttack.addActionListener(e -> onAttackClicked());
     }
 
     /**
@@ -510,41 +515,6 @@ public abstract class EditorView {
         panelTag = new JPanel(new BorderLayout());
         codeAreaTag = hexCodeAreaFactory.build();
         panelTag.add(codeAreaTag, BorderLayout.CENTER);
-
-        // Create the Attack popup menu
-        JPopupMenu popupMenuAttack = new JPopupMenu();
-        JMenuItem menuItemAttackEmbedJWK = new JMenuItem(Utils.getResourceString("editor_view_button_attack_embed_jwk"));
-        JMenuItem menuItemAttackSignNone = new JMenuItem(Utils.getResourceString("editor_view_button_attack_sign_none"));
-        JMenuItem menuItemAttackKeyConfusion = new JMenuItem(Utils.getResourceString("editor_view_button_attack_key_confusion"));
-        JMenuItem menuItemAttackSignEmptyKey = new JMenuItem(Utils.getResourceString("editor_view_button_attack_sign_empty_key"));
-        JMenuItem menuItemAttackSignPsychicSignature = new JMenuItem(Utils.getResourceString("editor_view_button_attack_sign_psychic_signature"));
-        JMenuItem menuItemAttackEmbedCollaboratorPayload = new JMenuItem(Utils.getResourceString("editor_view_button_attack_embed_collaborator_payload"));
-        JMenuItem menuItemAttackWeakSymmetricKey = new JMenuItem(Utils.getResourceString("editor_view_button_attack_weak_symmetric_key"));
-
-        // Attach the event handlers to the popup menu click events
-        menuItemAttackEmbedJWK.addActionListener(e -> presenter.onAttackEmbedJWKClicked());
-        menuItemAttackKeyConfusion.addActionListener(e -> presenter.onAttackKeyConfusionClicked());
-        menuItemAttackSignNone.addActionListener(e -> presenter.onAttackSignNoneClicked());
-        menuItemAttackSignEmptyKey.addActionListener(e -> presenter.onAttackSignEmptyKeyClicked());
-        menuItemAttackSignPsychicSignature.addActionListener(e -> presenter.onAttackPsychicSignatureClicked());
-        menuItemAttackEmbedCollaboratorPayload.addActionListener(e -> presenter.onAttackEmbedCollaboratorPayloadClicked());
-        menuItemAttackWeakSymmetricKey.addActionListener(e -> presenter.onAttackWeakHMACSecret());
-
-        menuItemAttackEmbedCollaboratorPayload.setEnabled(isProVersion);
-
-        // Add the buttons to the popup menu
-        popupMenuAttack.add(menuItemAttackEmbedJWK);
-        popupMenuAttack.add(menuItemAttackSignNone);
-        popupMenuAttack.add(menuItemAttackKeyConfusion);
-        popupMenuAttack.add(menuItemAttackSignEmptyKey);
-        popupMenuAttack.add(menuItemAttackSignPsychicSignature);
-        popupMenuAttack.add(menuItemAttackEmbedCollaboratorPayload);
-        popupMenuAttack.add(menuItemAttackWeakSymmetricKey);
-
-        // Associate the popup menu to the Attack button
-        buttonAttack = new JButton();
-        buttonAttack.setComponentPopupMenu(popupMenuAttack);
-        buttonAttack.addActionListener(e -> onAttackClicked());
 
         textAreaSerialized = rstaFactory.buildSerializedJWTTextArea();
         textAreaJWEHeader = rstaFactory.buildDefaultTextArea();
