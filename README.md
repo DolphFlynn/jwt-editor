@@ -17,11 +17,11 @@ Additionally it facilitates several well-known attacks against JWT implementatio
 
 ## Changelog
 
-**Unreleased**
+**2.5 2025-01-13**
 - Add ability to test for HMAC signatures using [weak secrets](https://github.com/wallarm/jwt-secrets).
 - Add import capability for JWK data.
 - Add support for decimal TimeClaims (Thanks to [@Nirusu](https://github.com/Nirusu)).
-- Remember last used key within Signing dialog.
+- Remember last used key within signing dialogs.
 
 **2.4 2024-12-24**
 - Add support for non-JSON claims within JWS (Thanks to [@Hannah-PortSwigger](https://github.com/Hannah-PortSwigger) for suggesting this).
@@ -174,7 +174,7 @@ This option is automatically enabled if it is detected that the original JWT did
 *JWT Editor* can be built from source.
 * Ensure that Java JDK 21 or newer is installed
 * From root of project, run the command `./gradlew jar`
-* This should place the JAR file `jwt-editor-2.4.jar` within the `build/libs` directory
+* This should place the JAR file `jwt-editor-2.5.jar` within the `build/libs` directory
 * This can be loaded into Burp Suite by navigating to the `Extensions` tab, `Installed` sub-tab, clicking `Add` and loading the JAR file
 * This BApp is using the newer Montoya API so it's best to use the latest version of Burp Suite (try the earlier adopter channel if there are issues with the latest stable release)
 
