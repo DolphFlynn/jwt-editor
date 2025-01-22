@@ -492,9 +492,6 @@ public abstract class EditorView {
         return SwingUtilities.getWindowAncestor(panel);
     }
 
-    /**
-     * Custom view initialisation
-     */
     private void createUIComponents() {
         panelSignature = new JPanel(new BorderLayout());
         codeAreaSignature = hexCodeAreaFactory.build();

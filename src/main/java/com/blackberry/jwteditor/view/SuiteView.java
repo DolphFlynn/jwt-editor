@@ -26,6 +26,7 @@ import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.view.config.ConfigView;
 import com.blackberry.jwteditor.view.keys.KeysView;
 import com.blackberry.jwteditor.view.rsta.RstaFactory;
+import com.blackberry.jwteditor.view.tokens.TokensView;
 
 import javax.swing.*;
 import java.awt.*;
@@ -80,9 +81,6 @@ public class SuiteView {
         return panel;
     }
 
-    /**
-     * Custom form initialisation
-     */
     private void createUIComponents() {
         keysView = new KeysView(
                 parent,
@@ -91,6 +89,6 @@ public class SuiteView {
                 rstaFactory
         );
         configView = new ConfigView(burpConfig, userInterface, isProVersion, keysModel);
-        tokensView = new TokensView();
+        tokensView = new TokensView(rstaFactory);
     }
 }
