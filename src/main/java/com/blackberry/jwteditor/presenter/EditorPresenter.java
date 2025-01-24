@@ -27,6 +27,7 @@ import com.blackberry.jwteditor.model.keys.KeysRepository;
 import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.view.dialog.MessageDialogFactory;
 import com.blackberry.jwteditor.view.dialog.operations.*;
+import com.blackberry.jwteditor.view.dialog.operations.SigningPanel.Mode;
 import com.blackberry.jwteditor.view.editor.Attack;
 import com.blackberry.jwteditor.view.editor.EditorMode;
 import com.blackberry.jwteditor.view.editor.EditorView;
@@ -40,13 +41,13 @@ import java.util.Optional;
 
 import static com.blackberry.jwteditor.model.jose.ClaimsType.JSON;
 import static com.blackberry.jwteditor.model.jose.ClaimsType.TEXT;
-import static com.blackberry.jwteditor.model.jose.JOSEObjectFinder.containsJOSEObjects;
 import static com.blackberry.jwteditor.model.jose.JWEFactory.jweFromParts;
 import static com.blackberry.jwteditor.model.jose.JWSFactory.jwsFromParts;
 import static com.blackberry.jwteditor.utils.Base64URLUtils.base64UrlEncodeJson;
 import static com.blackberry.jwteditor.utils.JSONUtils.isJsonCompact;
 import static com.blackberry.jwteditor.utils.JSONUtils.prettyPrintJSON;
 import static com.blackberry.jwteditor.view.dialog.operations.SigningPanel.Mode.EMBED_JWK;
+import static com.blackberry.jwteditor.view.dialog.operations.SigningPanel.Mode.NORMAL;
 
 /**
  * Presenter class for the Editor tab
@@ -75,16 +76,6 @@ public class EditorPresenter {
         this.model = new EditorModel();
         this.messageDialogFactory = new MessageDialogFactory(view.uiComponent());
         this.lastSigningKeys = new LastSigningKeys();
-    }
-
-    /**
-     * Determine if the tab should be enabled based on whether a block of text contains JWE/JWSs
-     *
-     * @param content text that may contain a serialized JWE/JWS
-     * @return true if the content contains a JWE/JWS that can be edited
-     */
-    public boolean isEnabled(String content) {
-        return containsJOSEObjects(content);
     }
 
     /**
@@ -227,10 +218,10 @@ public class EditorPresenter {
     }
 
     public void onSignClicked() {
-        signingDialog(SigningPanel.Mode.NORMAL);
+        signingDialog(NORMAL);
     }
 
-    private void signingDialog(SigningPanel.Mode mode) {
+    private void signingDialog(Mode mode) {
         // Check there are signing keys in the keystore
         if (keysRepository.getSigningKeys().isEmpty()) {
             messageDialogFactory.showWarningDialog("error_title_no_signing_keys", "error_no_signing_keys");

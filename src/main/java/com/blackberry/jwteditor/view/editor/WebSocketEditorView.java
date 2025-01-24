@@ -27,6 +27,8 @@ import com.blackberry.jwteditor.model.keys.KeysRepository;
 import com.blackberry.jwteditor.view.hexcodearea.HexCodeAreaFactory;
 import com.blackberry.jwteditor.view.rsta.RstaFactory;
 
+import static com.blackberry.jwteditor.model.jose.JOSEObjectFinder.containsJOSEObjects;
+
 public class WebSocketEditorView extends EditorView implements ExtensionProvidedWebSocketMessageEditor {
 
     public WebSocketEditorView(KeysRepository keysRepository,
@@ -62,6 +64,6 @@ public class WebSocketEditorView extends EditorView implements ExtensionProvided
     @Override
     public boolean isEnabledFor(WebSocketMessage message) {
         String content = message.payload().toString();
-        return presenter.isEnabled(content);
+        return containsJOSEObjects(content);
     }
 }
