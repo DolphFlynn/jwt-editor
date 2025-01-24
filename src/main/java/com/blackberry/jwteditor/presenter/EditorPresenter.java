@@ -27,6 +27,7 @@ import com.blackberry.jwteditor.model.keys.KeysRepository;
 import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.view.dialog.MessageDialogFactory;
 import com.blackberry.jwteditor.view.dialog.operations.*;
+import com.blackberry.jwteditor.view.editor.Attack;
 import com.blackberry.jwteditor.view.editor.EditorMode;
 import com.blackberry.jwteditor.view.editor.EditorView;
 import com.blackberry.jwteditor.view.weak.WeakKeyAttackDialog;
@@ -187,17 +188,19 @@ public class EditorPresenter {
         return jweFromParts(header, encryptedKey, iv, ciphertext, tag);
     }
 
-    /**
-     * Handle clicks events from the Embedded JWK Attack button
-     */
-    public void onAttackEmbedJWKClicked() {
-        signingDialog(EMBED_JWK);
+    public void perform(Attack attack) {
+        switch (attack) {
+            case EmbedJWK -> signingDialog(EMBED_JWK);
+            case SignNone -> showDialogAndUpdateJWS(new NoneOperation());
+            case KeyConfusion -> onAttackKeyConfusionClicked();
+            case SignEmptyKey -> showDialogAndUpdateJWS(new EmptyKeySigningPanel());
+            case SignPsychicSignature -> showDialogAndUpdateJWS(new PsychicSignaturePanel());
+            case EmbedCollaboratorPayload -> showDialogAndUpdateJWS(new EmbedCollaboratorPayloadPanel(collaboratorPayloadGenerator));
+            case WeakSymmetricKey -> onAttackWeakHMACSecret();
+        }
     }
 
-    /**
-     * Handle click events from the HMAC Key Confusion button
-     */
-    public void onAttackKeyConfusionClicked() {
+    private void onAttackKeyConfusionClicked() {
         // Get a list of verification capable public keys
         List<Key> attackKeys = keysRepository.getVerificationKeys().stream()
                 .filter(key -> key.isPublic() && key.canConvertToPem())
@@ -211,23 +214,7 @@ public class EditorPresenter {
         showDialogAndUpdateJWS(new KeyConfusionAttackPanel(attackKeys, lastSigningKeys));
     }
 
-    public void onAttackSignNoneClicked() {
-        showDialogAndUpdateJWS(new NoneOperation());
-    }
-
-    public void onAttackSignEmptyKeyClicked() {
-        showDialogAndUpdateJWS(new EmptyKeySigningPanel());
-    }
-
-    public void onAttackPsychicSignatureClicked() {
-        showDialogAndUpdateJWS(new PsychicSignaturePanel());
-    }
-
-    public void onAttackEmbedCollaboratorPayloadClicked() {
-        showDialogAndUpdateJWS(new EmbedCollaboratorPayloadPanel(collaboratorPayloadGenerator));
-    }
-
-    public void onAttackWeakHMACSecret() {
+    private void onAttackWeakHMACSecret() {
         JWS jws = getJWS();
 
         if (!jws.header().algorithm().startsWith("HS")) {
@@ -243,11 +230,6 @@ public class EditorPresenter {
         signingDialog(SigningPanel.Mode.NORMAL);
     }
 
-    /**
-     * Create a signing dialog based on the provided mode
-     *
-     * @param mode mode of the signing dialog to display
-     */
     private void signingDialog(SigningPanel.Mode mode) {
         // Check there are signing keys in the keystore
         if (keysRepository.getSigningKeys().isEmpty()) {
