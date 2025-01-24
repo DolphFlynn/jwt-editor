@@ -29,6 +29,7 @@ import com.blackberry.jwteditor.view.hexcodearea.HexCodeAreaFactory;
 import com.blackberry.jwteditor.view.rsta.RstaFactory;
 
 import static burp.api.montoya.internal.ObjectFactoryLocator.FACTORY;
+import static com.blackberry.jwteditor.model.jose.JOSEObjectFinder.containsJOSEObjects;
 
 public class HttpRequestEditorView extends HttpEditorView implements ExtensionProvidedHttpRequestEditor {
     private volatile HttpService httpService;
@@ -64,7 +65,7 @@ public class HttpRequestEditorView extends HttpEditorView implements ExtensionPr
     @Override
     public boolean isEnabledFor(HttpRequestResponse requestResponse) {
         String content = requestResponse.request().toByteArray().toString();
-        return presenter.isEnabled(content);
+        return containsJOSEObjects(content);
     }
 
     @Override
