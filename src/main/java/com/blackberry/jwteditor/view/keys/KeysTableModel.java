@@ -24,9 +24,6 @@ import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Model for the keys table
- */
 class KeysTableModel extends AbstractTableModel {
     private final List<Key> data;
 
