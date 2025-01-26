@@ -49,14 +49,16 @@ dependencies {
 }
 
 tasks.withType(JavaCompile).configureEach {
+    def mainSourceSets = project.sourceSets.main
+
     doLast {
-        project.sourceSets.main.output.classesDirs.each { project.mkdir(it) }
+        mainSourceSets.output.classesDirs.each { mkdir(it) }
 
         ant.taskdef name: 'javac2', classname: 'com.intellij.ant.Javac2', classpath: configurations.guiGenerationTask.asPath
 
-        ant.javac2 srcdir: project.sourceSets.main.java.srcDirs.join(':'),
-                classpath: project.sourceSets.main.compileClasspath.asPath,
-                destdir: project.sourceSets.main.output.classesDirs.getSingleFile(),
+        ant.javac2 srcdir: mainSourceSets.java.srcDirs.join(':'),
+                classpath: mainSourceSets.compileClasspath.asPath,
+                destdir: mainSourceSets.output.classesDirs.getSingleFile(),
                 release: targetCompatibility,
                 includeAntRuntime: false
     }
