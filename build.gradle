@@ -45,28 +45,36 @@ dependencies {
             'org.assertj:assertj-core:3.27.3',
             'org.mockito:mockito-core:5.15.2'
     )
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 tasks.withType(JavaCompile).configureEach {
+    def mainSourceSets = project.sourceSets.main
+
     doLast {
-        project.sourceSets.main.output.classesDirs.each { project.mkdir(it) }
+        mainSourceSets.output.classesDirs.each { mkdir(it) }
 
-        ant.taskdef name: 'javac2', classname: 'com.intellij.ant.Javac2', classpath: configurations.guiGenerationTask.asPath
+        ant.taskdef(
+                name: 'javac2',
+                classname: 'com.intellij.ant.Javac2',
+                classpath: configurations.guiGenerationTask.asPath
+        )
 
-        ant.javac2 srcdir: project.sourceSets.main.java.srcDirs.join(':'),
-                classpath: project.sourceSets.main.compileClasspath.asPath,
-                destdir: project.sourceSets.main.output.classesDirs.getSingleFile(),
-                source: sourceCompatibility,
-                target: targetCompatibility,
+        ant.javac2(
+                srcdir: mainSourceSets.java.srcDirs.join(':'),
+                classpath: mainSourceSets.compileClasspath.asPath,
+                destdir: mainSourceSets.output.classesDirs.getSingleFile(),
+                release: targetCompatibility,
                 includeAntRuntime: false
+        )
     }
 }
 
-test {
+tasks.named('test', Test) {
     useJUnitPlatform()
 }
 
-jar {
+tasks.named('jar', Jar) {
     dependsOn test
     archiveBaseName = project.name
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
