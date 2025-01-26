@@ -46,14 +46,14 @@
               </scrollpane>
             </children>
           </grid>
-          <scrollpane id="22717">
+          <scrollpane id="22717" binding="scrollPane">
             <constraints>
               <splitpane position="left"/>
             </constraints>
             <properties/>
             <border type="none"/>
             <children>
-              <component id="216a" class="javax.swing.JTable" binding="tokenTable">
+              <component id="216a" class="javax.swing.JTable" binding="tokenTable" custom-create="true">
                 <constraints/>
                 <properties/>
               </component>

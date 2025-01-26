@@ -20,9 +20,16 @@ package com.blackberry.jwteditor.view.tokens;
 
 import com.blackberry.jwteditor.view.rsta.RstaFactory;
 import com.blackberry.jwteditor.view.utils.RunEDTActionOnFirstRenderHierarchyListener;
+import com.blackberry.jwteditor.view.utils.table.PercentageBasedColumnWidthTable;
+import com.blackberry.jwteditor.view.utils.table.RowHeightDecoratingTableCellRenderer;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 
 import javax.swing.*;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableModel;
+
+import static com.blackberry.jwteditor.view.tokens.TokensTableColumnConfiguration.TokensTableColumns.columnWidthPercentages;
+import static java.util.Collections.emptyList;
 
 public class TokensView {
 
@@ -32,6 +39,7 @@ public class TokensView {
     private JTable tokenTable;
     private RSyntaxTextArea textAreaPayload;
     private JSplitPane splitPane;
+    private JScrollPane scrollPane;
 
     public TokensView(RstaFactory rstaFactory) {
         this.rstaFactory = rstaFactory;
@@ -40,6 +48,9 @@ public class TokensView {
                 panel,
                 () -> splitPane.setDividerLocation(0.5)
         ));
+
+        TableModel tokensTableModel = new TokensTableModel(emptyList());
+        tokenTable.setModel(tokensTableModel);
 
         textAreaPayload.setEditable(false);
         textAreaPayload.setText("""
@@ -52,5 +63,9 @@ public class TokensView {
 
     private void createUIComponents() {
         textAreaPayload = rstaFactory.buildDefaultTextArea();
+        tokenTable = new PercentageBasedColumnWidthTable(columnWidthPercentages());
+
+        TableCellRenderer stringCellRender = tokenTable.getDefaultRenderer(String.class);
+        tokenTable.setDefaultRenderer(String.class, new RowHeightDecoratingTableCellRenderer(stringCellRender));
     }
 }
