@@ -36,7 +36,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import static com.blackberry.jwteditor.view.keys.KeysTableColumns.columnWidthPercentages;
+import static com.blackberry.jwteditor.view.keys.KeysTableColumnConfiguration.KeysTableColumns.columnWidthPercentages;
 
 /**
  * View class for the Keys tab
