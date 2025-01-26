@@ -45,6 +45,7 @@ dependencies {
             'org.assertj:assertj-core:3.27.3',
             'org.mockito:mockito-core:5.15.2'
     )
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 tasks.withType(JavaCompile).configureEach {
@@ -62,11 +63,11 @@ tasks.withType(JavaCompile).configureEach {
     }
 }
 
-test {
+tasks.named('test', Test) {
     useJUnitPlatform()
 }
 
-jar {
+tasks.named('jar', Jar) {
     dependsOn test
     archiveBaseName = project.name
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
