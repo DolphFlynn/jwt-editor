@@ -352,8 +352,7 @@ public abstract class EditorView {
         return mode;
     }
 
-    private void setMode(EditorMode mode)
-    {
+    private void setMode(EditorMode mode) {
         if (mode == this.mode) {
             return;
         }

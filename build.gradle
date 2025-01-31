@@ -1,5 +1,6 @@
 plugins {
     id 'java-library'
+    id("checkstyle")
 }
 
 group = 'com.blackberry'
@@ -15,6 +16,10 @@ repositories {
 java {
     sourceCompatibility = JavaVersion.VERSION_21
     targetCompatibility = JavaVersion.VERSION_21
+}
+
+checkstyle {
+    toolVersion = "10.12.4"
 }
 
 configurations {
@@ -48,6 +53,13 @@ dependencies {
     testRuntimeOnly(
             'org.junit.platform:junit-platform-launcher'
     )
+}
+
+tasks.withType(Checkstyle).configureEach {
+    reports {
+        xml.required = false
+        html.required = true
+    }
 }
 
 tasks.withType(JavaCompile).configureEach {
