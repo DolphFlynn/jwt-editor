@@ -54,7 +54,7 @@ public class HttpResponseEditorView extends HttpEditorView implements ExtensionP
     }
 
     @Override
-    public void setRequestResponse(HttpRequestResponse requestResponse) {
+    void setMessage(HttpRequestResponse requestResponse) {
         HttpResponse httpResponse = requestResponse.response();
         presenter.setMessage(httpResponse.toByteArray().toString());
     }

@@ -19,7 +19,6 @@ limitations under the License.
 package com.blackberry.jwteditor.view.editor;
 
 import burp.api.montoya.collaborator.CollaboratorPayloadGenerator;
-import burp.api.montoya.http.HttpService;
 import burp.api.montoya.http.message.HttpRequestResponse;
 import burp.api.montoya.http.message.requests.HttpRequest;
 import burp.api.montoya.logging.Logging;
@@ -32,7 +31,6 @@ import static burp.api.montoya.internal.ObjectFactoryLocator.FACTORY;
 import static com.blackberry.jwteditor.model.jose.JOSEObjectFinder.containsJOSEObjects;
 
 public class HttpRequestEditorView extends HttpEditorView implements ExtensionProvidedHttpRequestEditor {
-    private volatile HttpService httpService;
 
     public HttpRequestEditorView(
             KeysRepository keysRepository,
@@ -56,9 +54,8 @@ public class HttpRequestEditorView extends HttpEditorView implements ExtensionPr
     }
 
     @Override
-    public void setRequestResponse(HttpRequestResponse requestResponse) {
+    void setMessage(HttpRequestResponse requestResponse) {
         HttpRequest httpRequest = requestResponse.request();
-        httpService = httpRequest.httpService();
         presenter.setMessage(httpRequest.toByteArray().toString());
     }
 

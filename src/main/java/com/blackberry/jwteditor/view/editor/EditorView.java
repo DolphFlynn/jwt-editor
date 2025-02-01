@@ -166,9 +166,10 @@ public abstract class EditorView {
         buttonAttack.addActionListener(e -> onAttackClicked());
     }
 
-    /**
-     * Handler for Attack button
-     */
+    public abstract String getHost();
+
+    public abstract String getPath();
+
     private void onAttackClicked() {
         // Display the attack popup menu
         JPopupMenu popupMenu = buttonAttack.getComponentPopupMenu();
