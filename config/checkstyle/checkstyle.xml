@@ -4,10 +4,12 @@
   "https://www.puppycrawl.com/dtds/configuration_1_3.dtd">
 <module name="Checker">
     <module name="TreeWalker">
+        <module name="AvoidNoArgumentSuperConstructorCall" />
+        <module name="EmptyStatement" />
         <module name="LeftCurly">
             <property name="option" value="eol" />
             <property name="tokens" value="CLASS_DEF, METHOD_DEF" />
         </module>
-        <module name="UnusedImports"/>
+        <module name="UnusedImports" />
     </module>
 </module>
