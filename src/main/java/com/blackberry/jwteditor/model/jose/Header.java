@@ -31,18 +31,15 @@ public class Header extends Base64Encoded {
         super(header);
     }
 
-    public boolean isCompact()
-    {
+    public boolean isCompact() {
         return isJsonCompact(decoded());
     }
 
-    public String decodeAndPrettyPrint()
-    {
+    public String decodeAndPrettyPrint() {
         return prettyPrintJSON(decoded());
     }
 
-    public JSONObject json()
-    {
+    public JSONObject json() {
         return new JSONObject(decoded());
     }
 
