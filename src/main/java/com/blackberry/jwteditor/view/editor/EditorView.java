@@ -123,6 +123,7 @@ public abstract class EditorView {
         buttonAttack.setComponentPopupMenu(attackMenuFactory.buildAttackPopupMenu());
 
         informationScrollPane.setViewportView(informationPanel);
+        informationScrollPane.setBorder(null);
 
         panel.addHierarchyListener(new RunEDTActionOnFirstRenderHierarchyListener(
                 panel,
