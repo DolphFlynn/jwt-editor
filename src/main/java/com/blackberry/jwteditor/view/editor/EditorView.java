@@ -94,6 +94,7 @@ public abstract class EditorView {
     private JSplitPane midSplitPane;
     private JSplitPane lowerSplitPane;
     private JScrollPane informationScrollPane;
+    private JButton buttonTokens;
 
     private CodeArea codeAreaSignature;
     private CodeArea codeAreaEncryptedKey;
@@ -164,6 +165,7 @@ public abstract class EditorView {
         buttonDecrypt.addActionListener(e -> presenter.onDecryptClicked());
         buttonCopy.addActionListener(e -> presenter.onCopyClicked());
         buttonAttack.addActionListener(e -> onAttackClicked());
+        buttonTokens.addActionListener(e -> presenter.onSendToTokensClicked());
     }
 
     public abstract String getHost();
@@ -378,6 +380,7 @@ public abstract class EditorView {
         buttonJWEHeaderFormatJSON.setEnabled(false);
         buttonJWSHeaderFormatJSON.setEnabled(editable);
         buttonJWSPayloadFormatJSON.setEnabled(editable);
+        buttonTokens.setEnabled(true);
         checkBoxJWEHeaderCompactJSON.setEnabled(false);
         checkBoxJWSHeaderCompactJSON.setEnabled(editable);
         checkBoxJWSPayloadCompactJSON.setEnabled(editable);
@@ -398,6 +401,7 @@ public abstract class EditorView {
         buttonJWEHeaderFormatJSON.setEnabled(editable);
         buttonJWSHeaderFormatJSON.setEnabled(false);
         buttonJWSPayloadFormatJSON.setEnabled(false);
+        buttonTokens.setEnabled(false);
         checkBoxJWEHeaderCompactJSON.setEnabled(editable);
         checkBoxJWSHeaderCompactJSON.setEnabled(false);
         checkBoxJWSPayloadCompactJSON.setEnabled(false);

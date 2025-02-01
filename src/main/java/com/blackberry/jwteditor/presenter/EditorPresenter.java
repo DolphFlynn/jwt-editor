@@ -321,6 +321,10 @@ public class EditorPresenter {
         Utils.copyToClipboard(view.getSerialized());
     }
 
+    public void onSendToTokensClicked() {
+
+    }
+
     /**
      * Get the message set by setMessage with the changes made by the editor
      *
