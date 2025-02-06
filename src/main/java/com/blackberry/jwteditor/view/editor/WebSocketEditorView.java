@@ -25,6 +25,7 @@ import burp.api.montoya.logging.Logging;
 import burp.api.montoya.ui.contextmenu.WebSocketMessage;
 import burp.api.montoya.ui.editor.extension.ExtensionProvidedWebSocketMessageEditor;
 import com.blackberry.jwteditor.model.keys.KeysRepository;
+import com.blackberry.jwteditor.model.tokens.TokenRepository;
 import com.blackberry.jwteditor.view.hexcodearea.HexCodeAreaFactory;
 import com.blackberry.jwteditor.view.rsta.RstaFactory;
 
@@ -35,6 +36,7 @@ public class WebSocketEditorView extends EditorView implements ExtensionProvided
     private volatile String path;
 
     public WebSocketEditorView(KeysRepository keysRepository,
+                               TokenRepository tokenRepository,
                                RstaFactory rstaFactory,
                                CollaboratorPayloadGenerator collaboratorPayloadGenerator,
                                HexCodeAreaFactory hexAreaCodeFactory,
@@ -44,6 +46,7 @@ public class WebSocketEditorView extends EditorView implements ExtensionProvided
                                boolean isProVersion) {
         super(
                 keysRepository,
+                tokenRepository,
                 rstaFactory,
                 hexAreaCodeFactory,
                 collaboratorPayloadGenerator,

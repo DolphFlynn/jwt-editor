@@ -18,6 +18,7 @@ limitations under the License.
 
 package com.blackberry.jwteditor.view.tokens;
 
+import com.blackberry.jwteditor.model.tokens.TokensModel;
 import com.blackberry.jwteditor.view.rsta.RstaFactory;
 import com.blackberry.jwteditor.view.utils.RunEDTActionOnFirstRenderHierarchyListener;
 import com.blackberry.jwteditor.view.utils.table.PercentageBasedColumnWidthTable;
@@ -29,7 +30,6 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 
 import static com.blackberry.jwteditor.view.tokens.TokensTableColumnConfiguration.TokensTableColumns.columnWidthPercentages;
-import static java.util.Collections.emptyList;
 
 public class TokensView {
 
@@ -39,9 +39,8 @@ public class TokensView {
     private JTable tokenTable;
     private RSyntaxTextArea textAreaPayload;
     private JSplitPane splitPane;
-    private JScrollPane scrollPane;
 
-    public TokensView(RstaFactory rstaFactory) {
+    public TokensView(TokensModel tokensModel, RstaFactory rstaFactory) {
         this.rstaFactory = rstaFactory;
 
         panel.addHierarchyListener(new RunEDTActionOnFirstRenderHierarchyListener(
@@ -49,7 +48,7 @@ public class TokensView {
                 () -> splitPane.setDividerLocation(0.5)
         ));
 
-        TableModel tokensTableModel = new TokensTableModel(emptyList());
+        TableModel tokensTableModel = new TokensTableModel(tokensModel.tokens(), tokensModel::addTokensModelListener);
         tokenTable.setModel(tokensTableModel);
 
         textAreaPayload.setEditable(false);

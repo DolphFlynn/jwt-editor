@@ -24,6 +24,7 @@ import burp.api.montoya.ui.Selection;
 import com.blackberry.jwteditor.model.jose.ClaimsType;
 import com.blackberry.jwteditor.model.jose.Information;
 import com.blackberry.jwteditor.model.keys.KeysRepository;
+import com.blackberry.jwteditor.model.tokens.TokenRepository;
 import com.blackberry.jwteditor.presenter.EditorPresenter;
 import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.view.hexcodearea.HexCodeAreaFactory;
@@ -104,6 +105,7 @@ public abstract class EditorView {
 
     EditorView(
             KeysRepository keysRepository,
+            TokenRepository tokenRepository,
             RstaFactory rstaFactory,
             HexCodeAreaFactory hexAreaCodeFactory,
             CollaboratorPayloadGenerator collaboratorPayloadGenerator,
@@ -117,7 +119,12 @@ public abstract class EditorView {
 
         // IntelliJ generated code inserted here
 
-        this.presenter = new EditorPresenter(this, collaboratorPayloadGenerator, logging, keysRepository);
+        this.presenter = new EditorPresenter(this,
+                collaboratorPayloadGenerator,
+                logging,
+                keysRepository,
+                tokenRepository
+        );
         this.informationPanel = informationPanelFactory.build();
 
         EditorViewAttackMenuFactory attackMenuFactory = new EditorViewAttackMenuFactory(presenter, isProVersion);
