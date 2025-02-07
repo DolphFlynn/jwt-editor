@@ -30,7 +30,7 @@ public record RowHeightDecoratingTableCellRenderer(TableCellRenderer tableCellRe
         Component component = tableCellRenderer.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
         int componentHeight = component.getPreferredSize().height;
 
-        if (table.getRowHeight() != componentHeight + ADDITIONAL_HEIGHT_PIXELS) {
+        if (table.getRowHeight() < componentHeight + ADDITIONAL_HEIGHT_PIXELS) {
             table.setRowHeight(componentHeight + ADDITIONAL_HEIGHT_PIXELS);
         }
 

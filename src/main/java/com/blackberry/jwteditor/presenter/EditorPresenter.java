@@ -24,6 +24,8 @@ import com.blackberry.jwteditor.model.jose.*;
 import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.model.keys.KeyRing;
 import com.blackberry.jwteditor.model.keys.KeysRepository;
+import com.blackberry.jwteditor.model.tokens.Token;
+import com.blackberry.jwteditor.model.tokens.TokenRepository;
 import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.view.dialog.MessageDialogFactory;
 import com.blackberry.jwteditor.view.dialog.operations.*;
@@ -49,12 +51,10 @@ import static com.blackberry.jwteditor.utils.JSONUtils.prettyPrintJSON;
 import static com.blackberry.jwteditor.view.dialog.operations.SigningPanel.Mode.EMBED_JWK;
 import static com.blackberry.jwteditor.view.dialog.operations.SigningPanel.Mode.NORMAL;
 
-/**
- * Presenter class for the Editor tab
- */
 public class EditorPresenter {
 
     private final KeysRepository keysRepository;
+    private final TokenRepository tokenRepository;
     private final EditorView view;
     private final CollaboratorPayloadGenerator collaboratorPayloadGenerator;
     private final Logging logging;
@@ -68,11 +68,13 @@ public class EditorPresenter {
             EditorView view,
             CollaboratorPayloadGenerator collaboratorPayloadGenerator,
             Logging logging,
-            KeysRepository keysRepository) {
+            KeysRepository keysRepository,
+            TokenRepository tokenRepository) {
         this.view = view;
         this.collaboratorPayloadGenerator = collaboratorPayloadGenerator;
         this.logging = logging;
         this.keysRepository = keysRepository;
+        this.tokenRepository = tokenRepository;
         this.model = new EditorModel();
         this.messageDialogFactory = new MessageDialogFactory(view.uiComponent());
         this.lastSigningKeys = new LastSigningKeys();
@@ -319,6 +321,12 @@ public class EditorPresenter {
      */
     public void onCopyClicked() {
         Utils.copyToClipboard(view.getSerialized());
+    }
+
+    public void onSendToTokensClicked() {
+        Token token = new Token(view.getHost(), view.getPath(), getJWS());
+
+        tokenRepository.add(token);
     }
 
     /**

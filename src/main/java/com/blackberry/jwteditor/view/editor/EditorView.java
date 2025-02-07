@@ -24,6 +24,7 @@ import burp.api.montoya.ui.Selection;
 import com.blackberry.jwteditor.model.jose.ClaimsType;
 import com.blackberry.jwteditor.model.jose.Information;
 import com.blackberry.jwteditor.model.keys.KeysRepository;
+import com.blackberry.jwteditor.model.tokens.TokenRepository;
 import com.blackberry.jwteditor.presenter.EditorPresenter;
 import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.view.hexcodearea.HexCodeAreaFactory;
@@ -95,6 +96,7 @@ public abstract class EditorView {
     private JSplitPane midSplitPane;
     private JSplitPane lowerSplitPane;
     private JScrollPane informationScrollPane;
+    private JButton buttonTokens;
 
     private CodeArea codeAreaSignature;
     private CodeArea codeAreaEncryptedKey;
@@ -104,6 +106,7 @@ public abstract class EditorView {
 
     EditorView(
             KeysRepository keysRepository,
+            TokenRepository tokenRepository,
             RstaFactory rstaFactory,
             HexCodeAreaFactory hexAreaCodeFactory,
             CollaboratorPayloadGenerator collaboratorPayloadGenerator,
@@ -117,7 +120,12 @@ public abstract class EditorView {
 
         // IntelliJ generated code inserted here
 
-        this.presenter = new EditorPresenter(this, collaboratorPayloadGenerator, logging, keysRepository);
+        this.presenter = new EditorPresenter(this,
+                collaboratorPayloadGenerator,
+                logging,
+                keysRepository,
+                tokenRepository
+        );
         this.informationPanel = informationPanelFactory.build();
         this.attackMenuFactory = new EditorViewAttackMenuFactory(presenter, isProVersion);
 
@@ -164,7 +172,12 @@ public abstract class EditorView {
         buttonDecrypt.addActionListener(e -> presenter.onDecryptClicked());
         buttonCopy.addActionListener(e -> presenter.onCopyClicked());
         buttonAttack.addActionListener(e -> onAttackClicked());
+        buttonTokens.addActionListener(e -> presenter.onSendToTokensClicked());
     }
+
+    public abstract String getHost();
+
+    public abstract String getPath();
 
     private void onAttackClicked() {
         JPopupMenu popupMenu = attackMenuFactory.buildAttackPopupMenu();
@@ -372,6 +385,7 @@ public abstract class EditorView {
         buttonJWEHeaderFormatJSON.setEnabled(false);
         buttonJWSHeaderFormatJSON.setEnabled(editable);
         buttonJWSPayloadFormatJSON.setEnabled(editable);
+        buttonTokens.setEnabled(true);
         checkBoxJWEHeaderCompactJSON.setEnabled(false);
         checkBoxJWSHeaderCompactJSON.setEnabled(editable);
         checkBoxJWSPayloadCompactJSON.setEnabled(editable);
@@ -392,6 +406,7 @@ public abstract class EditorView {
         buttonJWEHeaderFormatJSON.setEnabled(editable);
         buttonJWSHeaderFormatJSON.setEnabled(false);
         buttonJWSPayloadFormatJSON.setEnabled(false);
+        buttonTokens.setEnabled(false);
         checkBoxJWEHeaderCompactJSON.setEnabled(editable);
         checkBoxJWSHeaderCompactJSON.setEnabled(false);
         checkBoxJWSPayloadCompactJSON.setEnabled(false);
@@ -486,9 +501,6 @@ public abstract class EditorView {
         return SwingUtilities.getWindowAncestor(panel);
     }
 
-    /**
-     * Custom view initialisation
-     */
     private void createUIComponents() {
         panelSignature = new JPanel(new BorderLayout());
         codeAreaSignature = hexCodeAreaFactory.build();

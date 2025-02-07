@@ -17,6 +17,7 @@ import burp.scanner.JWSHeaderInsertionPointProvider;
 import com.blackberry.jwteditor.model.keys.KeysModel;
 import com.blackberry.jwteditor.model.persistence.BurpKeysModelPersistence;
 import com.blackberry.jwteditor.model.persistence.KeysModelPersistence;
+import com.blackberry.jwteditor.model.tokens.TokensModel;
 import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.view.SuiteView;
 import com.blackberry.jwteditor.view.editor.HttpRequestEditorView;
@@ -43,6 +44,8 @@ public class JWTEditorExtension implements BurpExtension {
         KeysModelPersistence keysModelPersistence = new BurpKeysModelPersistence(preferences);
         KeysModel keysModel = keysModelPersistence.loadOrCreateNew();
 
+        TokensModel tokensModel = new TokensModel();
+
         BurpConfigPersistence burpConfigPersistence = new BurpConfigPersistence(preferences);
         BurpConfig burpConfig = burpConfigPersistence.loadOrCreateNew();
 
@@ -59,6 +62,7 @@ public class JWTEditorExtension implements BurpExtension {
                 suiteWindow,
                 keysModelPersistence,
                 keysModel,
+                tokensModel,
                 rstaFactory,
                 burpConfig,
                 userInterface,
@@ -73,6 +77,7 @@ public class JWTEditorExtension implements BurpExtension {
         userInterface.registerHttpRequestEditorProvider(editorCreationContext ->
                 new HttpRequestEditorView(
                         keysModel,
+                        tokensModel,
                         rstaFactory,
                         api.collaborator().defaultPayloadGenerator(),
                         hexAreaCodeFactory,
@@ -86,6 +91,7 @@ public class JWTEditorExtension implements BurpExtension {
         userInterface.registerHttpResponseEditorProvider(editorCreationContext ->
                 new HttpResponseEditorView(
                         keysModel,
+                        tokensModel,
                         rstaFactory,
                         api.collaborator().defaultPayloadGenerator(),
                         hexAreaCodeFactory,
@@ -99,6 +105,7 @@ public class JWTEditorExtension implements BurpExtension {
         userInterface.registerWebSocketMessageEditorProvider(editorCreationContext ->
                 new WebSocketEditorView(
                         keysModel,
+                        tokensModel,
                         rstaFactory,
                         api.collaborator().defaultPayloadGenerator(),
                         hexAreaCodeFactory,

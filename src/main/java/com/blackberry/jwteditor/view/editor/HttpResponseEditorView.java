@@ -24,6 +24,7 @@ import burp.api.montoya.http.message.responses.HttpResponse;
 import burp.api.montoya.logging.Logging;
 import burp.api.montoya.ui.editor.extension.ExtensionProvidedHttpResponseEditor;
 import com.blackberry.jwteditor.model.keys.KeysRepository;
+import com.blackberry.jwteditor.model.tokens.TokenRepository;
 import com.blackberry.jwteditor.view.hexcodearea.HexCodeAreaFactory;
 import com.blackberry.jwteditor.view.rsta.RstaFactory;
 
@@ -34,6 +35,7 @@ public class HttpResponseEditorView extends HttpEditorView implements ExtensionP
 
     public HttpResponseEditorView(
             KeysRepository keysRepository,
+            TokenRepository tokenRepository,
             RstaFactory rstaFactory,
             CollaboratorPayloadGenerator collaboratorPayloadGenerator,
             HexCodeAreaFactory hexAreaCodeFactory,
@@ -43,6 +45,7 @@ public class HttpResponseEditorView extends HttpEditorView implements ExtensionP
             boolean isProVersion) {
         super(
                 keysRepository,
+                tokenRepository,
                 rstaFactory,
                 hexAreaCodeFactory,
                 collaboratorPayloadGenerator,
@@ -54,7 +57,7 @@ public class HttpResponseEditorView extends HttpEditorView implements ExtensionP
     }
 
     @Override
-    public void setRequestResponse(HttpRequestResponse requestResponse) {
+    void setMessage(HttpRequestResponse requestResponse) {
         HttpResponse httpResponse = requestResponse.response();
         presenter.setMessage(httpResponse.toByteArray().toString());
     }
