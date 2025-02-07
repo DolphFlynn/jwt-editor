@@ -29,7 +29,9 @@
             <children>
               <component id="216a" class="javax.swing.JTable" binding="tokenTable" custom-create="true">
                 <constraints/>
-                <properties/>
+                <properties>
+                  <fillsViewportHeight value="true"/>
+                </properties>
               </component>
             </children>
           </scrollpane>
