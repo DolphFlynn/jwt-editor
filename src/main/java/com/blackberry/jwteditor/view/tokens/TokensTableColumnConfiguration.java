@@ -26,11 +26,11 @@ import static java.util.Arrays.stream;
 public class TokensTableColumnConfiguration implements TableColumnConfiguration {
 
     enum TokensTableColumns {
-        ID("id", 10, String.class),
-        HOST("host", 30, String.class),
-        PATH("path", 30, String.class),
-        ALGORITHM("algorithm", 15, String.class),
-        KEY_ID("key_id", 15, String.class);
+        ID("id", 5, String.class),
+        HOST("host", 35, String.class),
+        PATH("path", 35, String.class),
+        ALGORITHM("algorithm", 5, String.class),
+        KEY_ID("key_id", 20, String.class);
 
         private final String label;
         private final int widthPercentage;
