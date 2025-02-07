@@ -18,6 +18,7 @@ limitations under the License.
 
 package com.blackberry.jwteditor.view.tokens;
 
+import com.blackberry.jwteditor.model.tokens.Token;
 import com.blackberry.jwteditor.model.tokens.TokensModel;
 import com.blackberry.jwteditor.view.rsta.RstaFactory;
 import com.blackberry.jwteditor.view.utils.RunEDTActionOnFirstRenderHierarchyListener;
@@ -30,6 +31,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 
 import static com.blackberry.jwteditor.view.tokens.TokensTableColumnConfiguration.TokensTableColumns.columnWidthPercentages;
+import static javax.swing.ListSelectionModel.SINGLE_SELECTION;
 
 public class TokensView {
 
@@ -51,13 +53,18 @@ public class TokensView {
         TableModel tokensTableModel = new TokensTableModel(tokensModel.tokens(), tokensModel::addTokensModelListener);
         tokenTable.setModel(tokensTableModel);
 
+        ListSelectionModel selectionModel = tokenTable.getSelectionModel();
+        selectionModel.setSelectionMode(SINGLE_SELECTION);
+        selectionModel.addListSelectionListener(e -> {
+            if (e.getValueIsAdjusting()) {
+                return;
+            }
+
+            Token token = tokensModel.tokens().get(selectionModel.getMinSelectionIndex());
+            textAreaPayload.setText(token.claims());
+        });
+
         textAreaPayload.setEditable(false);
-        textAreaPayload.setText("""
-                {
-                  "sub": "1234567890",
-                  "name": "John Doe",
-                  "iat": 1516239022
-                }""");
     }
 
     private void createUIComponents() {

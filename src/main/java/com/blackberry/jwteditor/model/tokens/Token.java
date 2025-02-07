@@ -19,8 +19,12 @@ limitations under the License.
 package com.blackberry.jwteditor.model.tokens;
 
 import com.blackberry.jwteditor.model.jose.JWS;
+import com.blackberry.jwteditor.model.jose.JWSClaims;
 
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static com.blackberry.jwteditor.model.jose.ClaimsType.JSON;
+import static com.blackberry.jwteditor.utils.JSONUtils.prettyPrintJSON;
 
 public class Token {
     private static final AtomicInteger ID_COUNTER = new AtomicInteger();
@@ -55,5 +59,12 @@ public class Token {
 
     public String keyId() {
         return jws.header().keyId();
+    }
+
+    public String claims() {
+        JWSClaims claims = jws.claims();
+        String decodedClaim = claims.decoded();
+
+        return claims.type() == JSON ? prettyPrintJSON(decodedClaim) : decodedClaim;
     }
 }
