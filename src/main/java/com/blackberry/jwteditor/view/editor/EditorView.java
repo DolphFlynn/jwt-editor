@@ -65,6 +65,7 @@ public abstract class EditorView {
     private final boolean editable;
     private final HexCodeAreaFactory hexCodeAreaFactory;
     private final InformationPanel informationPanel;
+    private final EditorViewAttackMenuFactory attackMenuFactory;
 
     private EditorMode mode;
     private JTabbedPane tabbedPane;
@@ -126,11 +127,10 @@ public abstract class EditorView {
                 tokenRepository
         );
         this.informationPanel = informationPanelFactory.build();
-
-        EditorViewAttackMenuFactory attackMenuFactory = new EditorViewAttackMenuFactory(presenter, isProVersion);
-        buttonAttack.setComponentPopupMenu(attackMenuFactory.buildAttackPopupMenu());
+        this.attackMenuFactory = new EditorViewAttackMenuFactory(presenter, isProVersion);
 
         informationScrollPane.setViewportView(informationPanel);
+        informationScrollPane.setBorder(null);
 
         panel.addHierarchyListener(new RunEDTActionOnFirstRenderHierarchyListener(
                 panel,
@@ -180,15 +180,13 @@ public abstract class EditorView {
     public abstract String getPath();
 
     private void onAttackClicked() {
-        // Display the attack popup menu
-        JPopupMenu popupMenu = buttonAttack.getComponentPopupMenu();
-        popupMenu.setVisible(false);
-        // Position to above attack button
-        buttonAttack.getComponentPopupMenu().show(buttonAttack, buttonAttack.getX(), buttonAttack.getY());
-        buttonAttack.getComponentPopupMenu().show(
+        JPopupMenu popupMenu = attackMenuFactory.buildAttackPopupMenu();
+        Dimension popupMenuSize = popupMenu.getPreferredSize();
+
+        popupMenu.show(
                 buttonAttack,
                 buttonAttack.getX(),
-                buttonAttack.getY() - buttonAttack.getComponentPopupMenu().getHeight()
+                buttonAttack.getY() - popupMenuSize.height
         );
     }
 
