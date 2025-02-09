@@ -28,25 +28,25 @@ configurations {
 }
 
 dependencies {
-    val gui_designer_version: String by project
-    val bouncycastle_version: String by project
-    val extender_version: String by project
+    val guiDesignerVersion: String by project
+    val bouncycastleVersion: String by project
+    val extenderVersion: String by project
 
-    "guiGenerationTask"("com.jetbrains.intellij.java:java-compiler-ant-tasks:$gui_designer_version")
+    "guiGenerationTask"("com.jetbrains.intellij.java:java-compiler-ant-tasks:$guiDesignerVersion")
 
-    compileOnly("org.bouncycastle:bcprov-jdk18on:$bouncycastle_version")
-    compileOnly("org.bouncycastle:bcpkix-jdk18on:$bouncycastle_version")
-    compileOnly("net.portswigger.burp.extensions:montoya-api:$extender_version")
+    compileOnly("org.bouncycastle:bcprov-jdk18on:$bouncycastleVersion")
+    compileOnly("org.bouncycastle:bcpkix-jdk18on:$bouncycastleVersion")
+    compileOnly("net.portswigger.burp.extensions:montoya-api:$extenderVersion")
 
-    implementation("com.jetbrains.intellij.java:java-gui-forms-rt:$gui_designer_version")
+    implementation("com.jetbrains.intellij.java:java-gui-forms-rt:$guiDesignerVersion")
     implementation("com.nimbusds:nimbus-jose-jwt:9.21")
     implementation("org.exbin.deltahex:deltahex-swing:0.1.2")
     implementation("com.fifesoft:rsyntaxtextarea:3.5.3")
     implementation("org.json:json:20250107")
 
-    testImplementation("org.bouncycastle:bcprov-jdk18on:$bouncycastle_version")
-    testImplementation("org.bouncycastle:bcpkix-jdk18on:$bouncycastle_version")
-    testImplementation("net.portswigger.burp.extensions:montoya-api:$extender_version")
+    testImplementation("org.bouncycastle:bcprov-jdk18on:$bouncycastleVersion")
+    testImplementation("org.bouncycastle:bcpkix-jdk18on:$bouncycastleVersion")
+    testImplementation("net.portswigger.burp.extensions:montoya-api:$extenderVersion")
     testImplementation("org.junit.jupiter:junit-jupiter:5.11.4")
     testImplementation("org.assertj:assertj-core:3.27.3")
     testImplementation("org.mockito:mockito-core:5.15.2")
@@ -97,22 +97,20 @@ tasks.named<Jar>("jar") {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
     from(
-        configurations.runtimeClasspath.get().map(
-            {
-                if (it.isDirectory) it else zipTree(it)
-                    .matching({
-                        exclude(
-                            "org/exbin/deltahex/swing/DefaultCodeAreaCommandHandler.class",
-                            "org/exbin/deltahex/swing/DefaultCodeAreaCommandHandler\$1.class",
-                            "org/exbin/deltahex/swing/DefaultCodeAreaCommandHandler\$2.class",
-                            "org/exbin/deltahex/swing/DefaultCodeAreaCommandHandler\$BinaryDataClipboardData.class",
-                            "org/exbin/deltahex/swing/DefaultCodeAreaCommandHandler\$ClipboardData.class",
-                            "org/exbin/deltahex/swing/DefaultCodeAreaCommandHandler\$CodeDataClipboardData.class",
-                            "META-INF/LICENSE"
-                        )
-                    })
-            }
-        )
+        configurations.runtimeClasspath.get().map {
+            if (it.isDirectory) it else zipTree(it)
+                .matching {
+                    exclude(
+                        "org/exbin/deltahex/swing/DefaultCodeAreaCommandHandler.class",
+                        "org/exbin/deltahex/swing/DefaultCodeAreaCommandHandler\$1.class",
+                        "org/exbin/deltahex/swing/DefaultCodeAreaCommandHandler\$2.class",
+                        "org/exbin/deltahex/swing/DefaultCodeAreaCommandHandler\$BinaryDataClipboardData.class",
+                        "org/exbin/deltahex/swing/DefaultCodeAreaCommandHandler\$ClipboardData.class",
+                        "org/exbin/deltahex/swing/DefaultCodeAreaCommandHandler\$CodeDataClipboardData.class",
+                        "META-INF/LICENSE"
+                    )
+                }
+        }
     )
 
     from(rootDir) {
