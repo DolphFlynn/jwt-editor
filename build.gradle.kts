@@ -41,7 +41,7 @@ dependencies {
     implementation("com.jetbrains.intellij.java:java-gui-forms-rt:$guiDesignerVersion")
     implementation("com.nimbusds:nimbus-jose-jwt:9.21")
     implementation("org.exbin.deltahex:deltahex-swing:0.1.2")
-    implementation("com.fifesoft:rsyntaxtextarea:3.5.3")
+    implementation("com.fifesoft:rsyntaxtextarea:3.5.4")
     implementation("org.json:json:20250107")
 
     testImplementation("org.bouncycastle:bcprov-jdk18on:$bouncycastleVersion")
