@@ -6,3 +6,8 @@ updates:
       interval: "weekly"
     ignore:
       - dependency-name: "com.nimbusds:nimbus-jose-jwt"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
