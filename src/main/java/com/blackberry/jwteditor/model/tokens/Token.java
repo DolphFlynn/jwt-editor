@@ -35,10 +35,14 @@ public class Token {
     private final JWS jws;
 
     public Token(String host, String path, JWS jws) {
+        this(ID_COUNTER.incrementAndGet(), host, path, jws);
+    }
+
+    public Token(int id, String host, String path, JWS jws) {
         this.host = host;
         this.path = path;
         this.jws = jws;
-        this.id = ID_COUNTER.incrementAndGet();
+        this.id = id;
     }
 
     public int id() {
