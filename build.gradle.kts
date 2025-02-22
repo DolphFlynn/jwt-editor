@@ -28,25 +28,21 @@ configurations {
 }
 
 dependencies {
-    val guiDesignerVersion: String by project
-    val bouncycastleVersion: String by project
-    val extenderVersion: String by project
+    "guiGenerationTask"("com.jetbrains.intellij.java:java-compiler-ant-tasks:243.23654.166")
 
-    "guiGenerationTask"("com.jetbrains.intellij.java:java-compiler-ant-tasks:$guiDesignerVersion")
+    compileOnly("org.bouncycastle:bcprov-jdk18on:1.79")
+    compileOnly("org.bouncycastle:bcpkix-jdk18on:1.79")
+    compileOnly("net.portswigger.burp.extensions:montoya-api:2024.7")
 
-    compileOnly("org.bouncycastle:bcprov-jdk18on:$bouncycastleVersion")
-    compileOnly("org.bouncycastle:bcpkix-jdk18on:$bouncycastleVersion")
-    compileOnly("net.portswigger.burp.extensions:montoya-api:$extenderVersion")
-
-    implementation("com.jetbrains.intellij.java:java-gui-forms-rt:$guiDesignerVersion")
+    implementation("com.jetbrains.intellij.java:java-gui-forms-rt:243.23654.166")
     implementation("com.nimbusds:nimbus-jose-jwt:9.21")
     implementation("org.exbin.deltahex:deltahex-swing:0.1.2")
     implementation("com.fifesoft:rsyntaxtextarea:3.5.4")
     implementation("org.json:json:20250107")
 
-    testImplementation("org.bouncycastle:bcprov-jdk18on:$bouncycastleVersion")
-    testImplementation("org.bouncycastle:bcpkix-jdk18on:$bouncycastleVersion")
-    testImplementation("net.portswigger.burp.extensions:montoya-api:$extenderVersion")
+    testImplementation("org.bouncycastle:bcprov-jdk18on:1.79")
+    testImplementation("org.bouncycastle:bcpkix-jdk18on:1.79")
+    testImplementation("net.portswigger.burp.extensions:montoya-api:2024.7")
     testImplementation("org.junit.jupiter:junit-jupiter:5.12.0")
     testImplementation("org.assertj:assertj-core:3.27.3")
     testImplementation("org.mockito:mockito-core:5.15.2")
