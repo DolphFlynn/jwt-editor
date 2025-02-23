@@ -19,6 +19,7 @@ import burp.scanner.JWSHeaderInsertionPointProvider;
 import com.blackberry.jwteditor.model.keys.KeysModel;
 import com.blackberry.jwteditor.model.persistence.BurpKeysModelPersistence;
 import com.blackberry.jwteditor.model.persistence.KeysModelPersistence;
+import com.blackberry.jwteditor.model.tokens.TokenIdGenerator;
 import com.blackberry.jwteditor.model.tokens.TokensModel;
 import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.view.SuiteView;
@@ -59,6 +60,7 @@ public class JWTEditorExtension implements BurpExtension {
         PersistedObject extensionData = isProVersion ? api.persistence().extensionData() : null;
         TokensModelPersistence tokensModelPersistence = new TokensModelPersistence(isProVersion, extensionData);
         TokensModel tokensModel = tokensModelPersistence.loadOrCreateNew();
+        TokenIdGenerator tokenIdGenerator = new TokenIdGenerator();
 
         SuiteView suiteView = new SuiteView(
                 suiteWindow,
@@ -80,6 +82,7 @@ public class JWTEditorExtension implements BurpExtension {
                 new HttpRequestEditorView(
                         keysModel,
                         tokensModel,
+                        tokenIdGenerator,
                         rstaFactory,
                         api.collaborator().defaultPayloadGenerator(),
                         hexAreaCodeFactory,
@@ -94,6 +97,7 @@ public class JWTEditorExtension implements BurpExtension {
                 new HttpResponseEditorView(
                         keysModel,
                         tokensModel,
+                        tokenIdGenerator,
                         rstaFactory,
                         api.collaborator().defaultPayloadGenerator(),
                         hexAreaCodeFactory,
@@ -108,6 +112,7 @@ public class JWTEditorExtension implements BurpExtension {
                 new WebSocketEditorView(
                         keysModel,
                         tokensModel,
+                        tokenIdGenerator,
                         rstaFactory,
                         api.collaborator().defaultPayloadGenerator(),
                         hexAreaCodeFactory,

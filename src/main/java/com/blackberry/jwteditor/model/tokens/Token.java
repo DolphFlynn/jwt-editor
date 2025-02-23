@@ -21,22 +21,14 @@ package com.blackberry.jwteditor.model.tokens;
 import com.blackberry.jwteditor.model.jose.JWS;
 import com.blackberry.jwteditor.model.jose.JWSClaims;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 import static com.blackberry.jwteditor.model.jose.ClaimsType.JSON;
 import static com.blackberry.jwteditor.utils.JSONUtils.prettyPrintJSON;
 
 public class Token {
-    private static final AtomicInteger ID_COUNTER = new AtomicInteger();
-
     private final int id;
     private final String host;
     private final String path;
     private final JWS jws;
-
-    public Token(String host, String path, JWS jws) {
-        this(ID_COUNTER.incrementAndGet(), host, path, jws);
-    }
 
     public Token(int id, String host, String path, JWS jws) {
         this.host = host;

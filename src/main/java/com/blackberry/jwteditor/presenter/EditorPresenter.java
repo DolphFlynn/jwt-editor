@@ -25,6 +25,7 @@ import com.blackberry.jwteditor.model.keys.Key;
 import com.blackberry.jwteditor.model.keys.KeyRing;
 import com.blackberry.jwteditor.model.keys.KeysRepository;
 import com.blackberry.jwteditor.model.tokens.Token;
+import com.blackberry.jwteditor.model.tokens.TokenIdGenerator;
 import com.blackberry.jwteditor.model.tokens.TokenRepository;
 import com.blackberry.jwteditor.utils.Utils;
 import com.blackberry.jwteditor.view.dialog.MessageDialogFactory;
@@ -55,6 +56,7 @@ public class EditorPresenter {
 
     private final KeysRepository keysRepository;
     private final TokenRepository tokenRepository;
+    private final TokenIdGenerator tokenIdGenerator;
     private final EditorView view;
     private final CollaboratorPayloadGenerator collaboratorPayloadGenerator;
     private final Logging logging;
@@ -69,12 +71,14 @@ public class EditorPresenter {
             CollaboratorPayloadGenerator collaboratorPayloadGenerator,
             Logging logging,
             KeysRepository keysRepository,
-            TokenRepository tokenRepository) {
+            TokenRepository tokenRepository,
+            TokenIdGenerator tokenIdGenerator) {
         this.view = view;
         this.collaboratorPayloadGenerator = collaboratorPayloadGenerator;
         this.logging = logging;
         this.keysRepository = keysRepository;
         this.tokenRepository = tokenRepository;
+        this.tokenIdGenerator = tokenIdGenerator;
         this.model = new EditorModel();
         this.messageDialogFactory = new MessageDialogFactory(view.uiComponent());
         this.lastSigningKeys = new LastSigningKeys();
@@ -324,7 +328,7 @@ public class EditorPresenter {
     }
 
     public void onSendToTokensClicked() {
-        Token token = new Token(view.getHost(), view.getPath(), getJWS());
+        Token token = new Token(tokenIdGenerator.next(), view.getHost(), view.getPath(), getJWS());
 
         tokenRepository.add(token);
     }
