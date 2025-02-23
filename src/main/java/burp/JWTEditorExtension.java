@@ -11,6 +11,7 @@ import burp.api.montoya.utilities.ByteUtils;
 import burp.config.BurpConfig;
 import burp.config.BurpConfigPersistence;
 import burp.intruder.JWSPayloadProcessor;
+import burp.persistence.TokensIdGeneratorPersistence;
 import burp.persistence.TokensModelPersistence;
 import burp.proxy.ProxyConfig;
 import burp.proxy.ProxyHttpMessageHandler;
@@ -58,9 +59,12 @@ public class JWTEditorExtension implements BurpExtension {
         boolean isProVersion = api.burpSuite().version().edition() == PROFESSIONAL;
 
         PersistedObject extensionData = isProVersion ? api.persistence().extensionData() : null;
+
         TokensModelPersistence tokensModelPersistence = new TokensModelPersistence(isProVersion, extensionData);
         TokensModel tokensModel = tokensModelPersistence.loadOrCreateNew();
-        TokenIdGenerator tokenIdGenerator = new TokenIdGenerator();
+
+        TokensIdGeneratorPersistence tokensIdGeneratorPersistence = new TokensIdGeneratorPersistence(isProVersion, extensionData);
+        TokenIdGenerator tokenIdGenerator = tokensIdGeneratorPersistence.loadOrCreateNew();
 
         SuiteView suiteView = new SuiteView(
                 suiteWindow,
@@ -146,6 +150,7 @@ public class JWTEditorExtension implements BurpExtension {
         api.extension().registerUnloadingHandler(() -> {
             burpConfigPersistence.save(burpConfig);
             tokensModelPersistence.save(tokensModel);
+            tokensIdGeneratorPersistence.save(tokenIdGenerator);
         });
     }
 }
