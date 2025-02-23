@@ -44,4 +44,10 @@ class TokenPersistence {
             return null;
         }
     }
+
+    public static String serialize(Token token) {
+        return """
+                {"id":%d,"host":"%s",path:"%s","jws":"%s"}
+                """.formatted(token.id(), token.host(), token.path(), token.jws());
+    }
 }

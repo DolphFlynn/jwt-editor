@@ -65,6 +65,10 @@ public class Token {
         return jws.header().keyId();
     }
 
+    public String jws() {
+        return jws.serialize();
+    }
+
     public String claims() {
         JWSClaims claims = jws.claims();
         String decodedClaim = claims.decoded();
