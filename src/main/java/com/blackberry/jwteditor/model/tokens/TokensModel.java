@@ -30,7 +30,11 @@ public class TokensModel implements TokenRepository {
     private final List<TokensModelListener> modelListeners;
 
     public TokensModel() {
-        this.tokens = new ArrayList<>();
+        this(new ArrayList<>());
+    }
+
+    public TokensModel(List<Token> tokens) {
+        this.tokens = tokens;
         this.lock = new Object();
         this.modelListeners = new CopyOnWriteArrayList<>();
     }

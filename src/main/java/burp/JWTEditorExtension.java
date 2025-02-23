@@ -3,6 +3,7 @@ package burp;
 import burp.api.montoya.BurpExtension;
 import burp.api.montoya.MontoyaApi;
 import burp.api.montoya.intruder.Intruder;
+import burp.api.montoya.persistence.PersistedObject;
 import burp.api.montoya.persistence.Preferences;
 import burp.api.montoya.proxy.Proxy;
 import burp.api.montoya.ui.UserInterface;
@@ -10,6 +11,7 @@ import burp.api.montoya.utilities.ByteUtils;
 import burp.config.BurpConfig;
 import burp.config.BurpConfigPersistence;
 import burp.intruder.JWSPayloadProcessor;
+import burp.persistence.TokensModelPersistence;
 import burp.proxy.ProxyConfig;
 import burp.proxy.ProxyHttpMessageHandler;
 import burp.proxy.ProxyWsMessageHandler;
@@ -44,8 +46,6 @@ public class JWTEditorExtension implements BurpExtension {
         KeysModelPersistence keysModelPersistence = new BurpKeysModelPersistence(preferences);
         KeysModel keysModel = keysModelPersistence.loadOrCreateNew();
 
-        TokensModel tokensModel = new TokensModel();
-
         BurpConfigPersistence burpConfigPersistence = new BurpConfigPersistence(preferences);
         BurpConfig burpConfig = burpConfigPersistence.loadOrCreateNew();
 
@@ -57,6 +57,9 @@ public class JWTEditorExtension implements BurpExtension {
         RstaFactory rstaFactory = new RstaFactory(userInterface, api.logging());
 
         boolean isProVersion = api.burpSuite().version().edition() == PROFESSIONAL;
+
+        PersistedObject extensionData = isProVersion ? api.persistence().extensionData() : null;
+        TokensModel tokensModel = new TokensModelPersistence(isProVersion, extensionData).loadOrCreateNew();
 
         SuiteView suiteView = new SuiteView(
                 suiteWindow,
