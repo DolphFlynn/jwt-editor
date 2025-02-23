@@ -23,6 +23,7 @@ import com.blackberry.jwteditor.model.tokens.Token;
 import com.blackberry.jwteditor.model.tokens.TokensModel;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,5 +60,20 @@ public class TokensModelPersistence {
         }
 
         return new TokensModel(tokenList);
+    }
+
+    public void save(TokensModel tokensModel) {
+        if (!isProVersion) {
+            return;
+        }
+
+        JSONArray tokensArray = new JSONArray();
+
+        tokensModel.tokens().stream()
+                .map(TokenPersistence::serialize)
+                .map(JSONObject::new)
+                .forEach(tokensArray::put);
+
+        extensionData.setString(TOKEN_JSON_KEY, tokensArray.toString());
     }
 }

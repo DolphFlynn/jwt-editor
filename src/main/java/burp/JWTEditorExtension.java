@@ -49,8 +49,6 @@ public class JWTEditorExtension implements BurpExtension {
         BurpConfigPersistence burpConfigPersistence = new BurpConfigPersistence(preferences);
         BurpConfig burpConfig = burpConfigPersistence.loadOrCreateNew();
 
-        api.extension().registerUnloadingHandler(() -> burpConfigPersistence.save(burpConfig));
-
         UserInterface userInterface = api.userInterface();
         Window suiteWindow = userInterface.swingUtils().suiteFrame();
 
@@ -59,7 +57,8 @@ public class JWTEditorExtension implements BurpExtension {
         boolean isProVersion = api.burpSuite().version().edition() == PROFESSIONAL;
 
         PersistedObject extensionData = isProVersion ? api.persistence().extensionData() : null;
-        TokensModel tokensModel = new TokensModelPersistence(isProVersion, extensionData).loadOrCreateNew();
+        TokensModelPersistence tokensModelPersistence = new TokensModelPersistence(isProVersion, extensionData);
+        TokensModel tokensModel = tokensModelPersistence.loadOrCreateNew();
 
         SuiteView suiteView = new SuiteView(
                 suiteWindow,
@@ -138,5 +137,10 @@ public class JWTEditorExtension implements BurpExtension {
         if (api.burpSuite().version().edition() != COMMUNITY_EDITION) {
             api.scanner().registerInsertionPointProvider(new JWSHeaderInsertionPointProvider(burpConfig.scannerConfig()));
         }
+
+        api.extension().registerUnloadingHandler(() -> {
+            burpConfigPersistence.save(burpConfig);
+            tokensModelPersistence.save(tokensModel);
+        });
     }
 }

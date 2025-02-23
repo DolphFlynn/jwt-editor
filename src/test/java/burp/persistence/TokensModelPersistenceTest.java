@@ -19,14 +19,18 @@ limitations under the License.
 package burp.persistence;
 
 import burp.api.montoya.persistence.PersistedObject;
+import com.blackberry.jwteditor.model.jose.JWSFactory;
+import com.blackberry.jwteditor.model.tokens.Token;
 import com.blackberry.jwteditor.model.tokens.TokensModel;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.text.ParseException;
 import java.util.stream.Stream;
 
 import static burp.persistence.TokensModelPersistence.TOKEN_JSON_KEY;
+import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
@@ -124,5 +128,40 @@ class TokensModelPersistenceTest {
 
         assertThat(tokensModel).isNotNull();
         assertThat(tokensModel.tokens()).hasSize(2);
+    }
+
+    @Test
+    void givenNotProVersion_whenSaveTokensModel_thenExtensionDataNotCalled() {
+        TokensModelPersistence tokensPersistence = new TokensModelPersistence(false, extensionData);
+
+        tokensPersistence.save(new TokensModel());
+
+        verifyNoInteractions(extensionData);
+    }
+
+    @Test
+    void givenEmptyModel_whenSaveTokensModel_thenEmptyListSaved() {
+        TokensModelPersistence tokensPersistence = new TokensModelPersistence(true, extensionData);
+
+        tokensPersistence.save(new TokensModel());
+
+        verify(extensionData).setString(TOKEN_JSON_KEY, "[]");
+        verifyNoMoreInteractions(extensionData);
+    }
+
+    @Test
+    void givenNonEmptyModel_whenSaveTokensModel_thenNonEmptyListSaved() throws ParseException {
+        TokensModel model = new TokensModel(
+                asList(
+                        new Token(99, "jwt.io", "/", JWSFactory.parse("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImVtYW5vbiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.ApPRqkKBdZFBOmQpwKnI7Nv2HR4euszd9ReUU-ZJUvc")),
+                        new Token(101, "host", "path", JWSFactory.parse("eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJuYW1lIjoiSm9obiBEb2UifQ."))
+                )
+        );
+        TokensModelPersistence tokensPersistence = new TokensModelPersistence(true, extensionData);
+
+        tokensPersistence.save(model);
+
+        verify(extensionData).setString(TOKEN_JSON_KEY, "[{\"path\":\"/\",\"jws\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImVtYW5vbiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.ApPRqkKBdZFBOmQpwKnI7Nv2HR4euszd9ReUU-ZJUvc\",\"host\":\"jwt.io\",\"id\":99},{\"path\":\"path\",\"jws\":\"eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJuYW1lIjoiSm9obiBEb2UifQ.\",\"host\":\"host\",\"id\":101}]");
+        verifyNoMoreInteractions(extensionData);
     }
 }
