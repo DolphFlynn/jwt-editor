@@ -18,17 +18,18 @@ limitations under the License.
 
 package com.blackberry.jwteditor.model.jose;
 
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 import static java.util.Locale.US;
 
 public record TimeClaim(TimeClaimType type, String value, ZonedDateTime dateTime) {
-    private static final String DATE_TIME_PATTERN = "EEE MMM dd yyyy HH:mm:ss";
+    private static final String DATE_TIME_PATTERN = "EEE MMM dd yyyy HH:mm:ss O";
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(DATE_TIME_PATTERN).withLocale(US);
 
-    public String date() {
-        return dateTime == null ? "" : FORMATTER.format(dateTime);
+    public String date(ZoneId timeZoneId) {
+        return dateTime == null ? "" : FORMATTER.withZone(timeZoneId).format(dateTime);
     }
 
     public boolean hasDate() {

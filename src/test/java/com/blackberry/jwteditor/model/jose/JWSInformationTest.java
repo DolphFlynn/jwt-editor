@@ -25,6 +25,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.text.ParseException;
+import java.time.ZoneId;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -36,7 +37,7 @@ class JWSInformationTest {
     void givenJWSWithNoTimeClaims_thenInformationIsEmpty() throws ParseException {
         JWS jws = JWSFactory.parse("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJUZXN0In0.WVLalefVZ5Rj991Cjgh0qBjKSIQaqC_CgN3b-30GKpQ");
 
-        assertThat(jws.information()).isEmpty();
+        assertThat(jws.information(ZoneId.of("UTC"))).isEmpty();
     }
 
     @ParameterizedTest
@@ -47,17 +48,17 @@ class JWSInformationTest {
     void givenJWSWithExpTimeClaims_thenInformationCorrect(String data) throws ParseException {
         JWS jws = JWSFactory.parse(data);
 
-        Information information = jws.information().getFirst();
+        Information information = jws.information(ZoneId.of("UTC")).getFirst();
 
-        assertThat(information.text()).isEqualTo("Expiration Time - Mon May 20 2024 21:03:42");
+        assertThat(information.text()).isEqualTo("Expiration Time - Mon May 20 2024 21:03:42 GMT");
         assertThat(information.isWarning()).isTrue();
     }
 
     private static Stream<Arguments> jwsWithValidExpValues() {
         return Stream.of(
-                arguments("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiZXhwIjoyMzE2MjM5MDIyfQ.nmCDcUHT-yLgrRG1LKMH9E2FQs2xWcB8CncxoqKdQEQ", "Expiration Time - Tue May 26 2043 07:43:42"),
-                arguments("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiZXhwIjoiMjMxNjIzOTAyMiJ9.kDOLZJTcFVwrSVSDeFK31EIx7Q4e4Ya33iNCk4QZ10c", "Expiration Time - Tue May 26 2043 07:43:42"),
-                arguments("eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiZXhwIjoiMjAzNi0xMi0xOVQxNjozOTo1Ny0wODowMCJ9.", "Expiration Time - Fri Dec 19 2036 16:39:57")
+                arguments("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiZXhwIjoyMzE2MjM5MDIyfQ.nmCDcUHT-yLgrRG1LKMH9E2FQs2xWcB8CncxoqKdQEQ", "Expiration Time - Tue May 26 2043 07:43:42 GMT"),
+                arguments("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiZXhwIjoiMjMxNjIzOTAyMiJ9.kDOLZJTcFVwrSVSDeFK31EIx7Q4e4Ya33iNCk4QZ10c", "Expiration Time - Tue May 26 2043 07:43:42 GMT"),
+                arguments("eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiZXhwIjoiMjAzNi0xMi0xOVQxNjozOTo1Ny0wODowMCJ9.", "Expiration Time - Sat Dec 20 2036 00:39:57 GMT")
         );
     }
 
@@ -66,7 +67,7 @@ class JWSInformationTest {
     void givenJWSWithExpTimeClaims_whenExpiryDateInTheFuture_thenInformationCorrect(String data, String expectedText) throws ParseException {
         JWS jws = JWSFactory.parse(data);
 
-        Information information = jws.information().getFirst();
+        Information information = jws.information(ZoneId.of("UTC")).getFirst();
 
         assertThat(information.text()).isEqualTo(expectedText);
         assertThat(information.isWarning()).isFalse();
@@ -85,7 +86,7 @@ class JWSInformationTest {
     void givenJWSWithExpTimeClaims_whenExpiryDateInvalid_thenInformationCorrect(String data, String expectedText) throws ParseException {
         JWS jws = JWSFactory.parse(data);
 
-        Information information = jws.information().getFirst();
+        Information information = jws.information(ZoneId.of("UTC")).getFirst();
 
         assertThat(information.text()).isEqualTo(expectedText);
         assertThat(information.isWarning()).isTrue();
@@ -93,8 +94,8 @@ class JWSInformationTest {
 
     private static Stream<Arguments> jwsWithExpValuesInThePast() {
         return Stream.of(
-                arguments("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJleHAiOjE1MTYyMzkwMjJ9.mVGXFv3OuwtuZPsdaf_oGUYm2uOH-T-JRTDQE1c10q0", "Expiration Time - Thu Jan 18 2018 01:30:22"),
-                arguments("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJleHAiOjB9.eVVhRMapPD77WuMWIHKBqYw0cjJHC49On-mHEuonYjk", "Expiration Time - Thu Jan 01 1970 00:00:00")
+                arguments("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJleHAiOjE1MTYyMzkwMjJ9.mVGXFv3OuwtuZPsdaf_oGUYm2uOH-T-JRTDQE1c10q0", "Expiration Time - Thu Jan 18 2018 01:30:22 GMT"),
+                arguments("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJleHAiOjB9.eVVhRMapPD77WuMWIHKBqYw0cjJHC49On-mHEuonYjk", "Expiration Time - Thu Jan 01 1970 00:00:00 GMT")
         );
     }
 
@@ -103,7 +104,7 @@ class JWSInformationTest {
     void givenJWSWithExpTimeClaims_whenExpiryDateIsInThePast_thenInformationCorrect(String data, String expectedText) throws ParseException {
         JWS jws = JWSFactory.parse(data);
 
-        Information information = jws.information().getFirst();
+        Information information = jws.information(ZoneId.of("UTC")).getFirst();
 
         assertThat(information.text()).isEqualTo(expectedText);
         assertThat(information.isWarning()).isTrue();
@@ -118,20 +119,20 @@ class JWSInformationTest {
     void givenJWSWithNbfTimeClaims_thenInformationCorrect(String data) throws ParseException {
         JWS jws = JWSFactory.parse(data);
 
-        Information information = jws.information().getFirst();
+        Information information = jws.information(ZoneId.of("UTC")).getFirst();
 
-        assertThat(information.text()).isEqualTo("Not Before - Mon May 20 2024 21:03:42");
+        assertThat(information.text()).isEqualTo("Not Before - Mon May 20 2024 21:03:42 GMT");
         assertThat(information.isWarning()).isFalse();
     }
 
     private static Stream<Arguments> jwsWithValidNbfValues() {
         return Stream.of(
-                arguments("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwibmJmIjoxNzE2MjM5MDIyfQ.mZ_wGwRA0BBp_m6LJOPOBfwMosKrhTf9DbnKZYTzBzg", "Not Before - Mon May 20 2024 21:03:42"),
-                arguments("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwibmJmIjoiMTcxNjIzOTAyMiJ9.JD7t6jE6sOzuaFi5Lj5e3RhnoRDDWW9QHv_U3bFgEKM", "Not Before - Mon May 20 2024 21:03:42"),
-                arguments("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJuYmYiOjE1MTYyMzkwMjJ9.1OhNEYnVM64dytXGZ1kj_Z3fV73xGFxWyba52S5r7wc", "Not Before - Thu Jan 18 2018 01:30:22"),
-                arguments("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJuYmYiOjB9.AqIAHlKSdpcDp7mD6sWsfKCQxI2hyJYsI7Y4Dh6N6pI", "Not Before - Thu Jan 01 1970 00:00:00"),
-                arguments("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJuYmYiOjE3MjIxNjc0Nzd9.2almhOGrigs8lXH9DLKBkkUCS6r5j7zpJXYsXJN39d4", "Not Before - Sun Jul 28 2024 11:51:17"),
-                arguments("eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwibmJmIjoiMjAyNC0wNS0yMFQyMjowMzo0MiswMTowMCJ9.", "Not Before - Mon May 20 2024 22:03:42")
+                arguments("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwibmJmIjoxNzE2MjM5MDIyfQ.mZ_wGwRA0BBp_m6LJOPOBfwMosKrhTf9DbnKZYTzBzg", "Not Before - Mon May 20 2024 21:03:42 GMT"),
+                arguments("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwibmJmIjoiMTcxNjIzOTAyMiJ9.JD7t6jE6sOzuaFi5Lj5e3RhnoRDDWW9QHv_U3bFgEKM", "Not Before - Mon May 20 2024 21:03:42 GMT"),
+                arguments("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJuYmYiOjE1MTYyMzkwMjJ9.1OhNEYnVM64dytXGZ1kj_Z3fV73xGFxWyba52S5r7wc", "Not Before - Thu Jan 18 2018 01:30:22 GMT"),
+                arguments("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJuYmYiOjB9.AqIAHlKSdpcDp7mD6sWsfKCQxI2hyJYsI7Y4Dh6N6pI", "Not Before - Thu Jan 01 1970 00:00:00 GMT"),
+                arguments("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJuYmYiOjE3MjIxNjc0Nzd9.2almhOGrigs8lXH9DLKBkkUCS6r5j7zpJXYsXJN39d4", "Not Before - Sun Jul 28 2024 11:51:17 GMT"),
+                arguments("eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwibmJmIjoiMjAyNC0wNS0yMFQyMjowMzo0MiswMTowMCJ9.", "Not Before - Mon May 20 2024 21:03:42 GMT")
         );
     }
 
@@ -140,7 +141,7 @@ class JWSInformationTest {
     void givenJWSWithNbfTimeClaims_whenNotBeforeDateInThePast_thenInformationCorrect(String data, String expectedText) throws ParseException {
         JWS jws = JWSFactory.parse(data);
 
-        Information information = jws.information().getFirst();
+        Information information = jws.information(ZoneId.of("UTC")).getFirst();
 
         assertThat(information.text()).isEqualTo(expectedText);
         assertThat(information.isWarning()).isFalse();
@@ -159,7 +160,7 @@ class JWSInformationTest {
     void givenJWSWithNbfTimeClaims_whenNotBeforeDateInvalid_thenInformationCorrect(String data, String expectedText) throws ParseException {
         JWS jws = JWSFactory.parse(data);
 
-        Information information = jws.information().getFirst();
+        Information information = jws.information(ZoneId.of("UTC")).getFirst();
 
         assertThat(information.text()).isEqualTo(expectedText);
         assertThat(information.isWarning()).isTrue();
@@ -167,8 +168,8 @@ class JWSInformationTest {
 
     private static Stream<Arguments> jwsWithFutureNbfValues() {
         return Stream.of(
-                arguments("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJuYmYiOjIzMjIxNjc0Nzd9.cMocfo6ghvuYBqDwZ9GBdfbCnMLsUcZe2GZRuaah0-c", "Not Before - Sun Aug 02 2043 22:31:17"),
-                arguments("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJuYmYiOjE4MjIxNjc0Nzd9._m-Rhio9DLcVRfWo7S-KIvlTk29QuDgal-tqreN4y4E", "Not Before - Tue Sep 28 2027 21:37:57")
+                arguments("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJuYmYiOjIzMjIxNjc0Nzd9.cMocfo6ghvuYBqDwZ9GBdfbCnMLsUcZe2GZRuaah0-c", "Not Before - Sun Aug 02 2043 22:31:17 GMT"),
+                arguments("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJuYmYiOjE4MjIxNjc0Nzd9._m-Rhio9DLcVRfWo7S-KIvlTk29QuDgal-tqreN4y4E", "Not Before - Tue Sep 28 2027 21:37:57 GMT")
         );
     }
 
@@ -177,7 +178,7 @@ class JWSInformationTest {
     void givenJWSWithNbfTimeClaims_whenNotBeforeDateIsInTheFuture_thenInformationCorrect(String data, String expectedText) throws ParseException {
         JWS jws = JWSFactory.parse(data);
 
-        Information information = jws.information().getFirst();
+        Information information = jws.information(ZoneId.of("UTC")).getFirst();
 
         assertThat(information.text()).isEqualTo(expectedText);
         assertThat(information.isWarning()).isTrue();
@@ -186,8 +187,8 @@ class JWSInformationTest {
 
     private static Stream<Arguments> jwsWithValidIatValues() {
         return Stream.of(
-                arguments("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOjE3MTYyMzkwMjJ9.y06rqsXv0DMutukwDaUJU0Sf-Ye3qrDkyFpOaj1J08A", "Issued At - Mon May 20 2024 21:03:42"),
-                arguments("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOiIxNzE2MjM5MDIyIn0.c2Ogr8QeTwopupVPqI56VaovZXE3svug2BI-Trft2EA", "Issued At - Mon May 20 2024 21:03:42")
+                arguments("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOjE3MTYyMzkwMjJ9.y06rqsXv0DMutukwDaUJU0Sf-Ye3qrDkyFpOaj1J08A", "Issued At - Mon May 20 2024 21:03:42 GMT"),
+                arguments("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOiIxNzE2MjM5MDIyIn0.c2Ogr8QeTwopupVPqI56VaovZXE3svug2BI-Trft2EA", "Issued At - Mon May 20 2024 21:03:42 GMT")
         );
     }
 
@@ -196,7 +197,7 @@ class JWSInformationTest {
     void givenJWSWithIatTimeClaims_thenInformationCorrect(String data, String expectedText) throws ParseException {
         JWS jws = JWSFactory.parse(data);
 
-        Information information = jws.information().getFirst();
+        Information information = jws.information(ZoneId.of("UTC")).getFirst();
 
         assertThat(information.text()).isEqualTo(expectedText);
         assertThat(information.isWarning()).isFalse();
@@ -205,12 +206,12 @@ class JWSInformationTest {
 
     private static Stream<Arguments> jwsWithValidIatDatesInThePast() {
         return Stream.of(
-                arguments("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOjE3MTYyMzkwMjJ9.y06rqsXv0DMutukwDaUJU0Sf-Ye3qrDkyFpOaj1J08A", "Issued At - Mon May 20 2024 21:03:42"),
-                arguments("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOiIxNzE2MjM5MDIyIn0.c2Ogr8QeTwopupVPqI56VaovZXE3svug2BI-Trft2EA", "Issued At - Mon May 20 2024 21:03:42"),
-                arguments("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOjE1MTYyMzkwMjJ9.hqWGSaFpvbrXkOWc6lrnffhNWR19W_S1YKFBx2arWBk", "Issued At - Thu Jan 18 2018 01:30:22"),
-                arguments("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOjB9.9TaucSjKgR3_gXUlzTGperv3PK9IAXO0ZVbgP9Wx4IY", "Issued At - Thu Jan 01 1970 00:00:00"),
-                arguments("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOjE3MjIxNjc0Nzd9.SWmvLUBWE5ddBWvSEWnrHM8W3rfzyYmEQVk6-ywFFgQ", "Issued At - Sun Jul 28 2024 11:51:17"),
-                arguments("eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoiMjAyNC0wNS0yMFQyMjowMzo0MiswMTowMCJ9.", "Issued At - Mon May 20 2024 22:03:42")
+                arguments("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOjE3MTYyMzkwMjJ9.y06rqsXv0DMutukwDaUJU0Sf-Ye3qrDkyFpOaj1J08A", "Issued At - Mon May 20 2024 21:03:42 GMT"),
+                arguments("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOiIxNzE2MjM5MDIyIn0.c2Ogr8QeTwopupVPqI56VaovZXE3svug2BI-Trft2EA", "Issued At - Mon May 20 2024 21:03:42 GMT"),
+                arguments("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOjE1MTYyMzkwMjJ9.hqWGSaFpvbrXkOWc6lrnffhNWR19W_S1YKFBx2arWBk", "Issued At - Thu Jan 18 2018 01:30:22 GMT"),
+                arguments("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOjB9.9TaucSjKgR3_gXUlzTGperv3PK9IAXO0ZVbgP9Wx4IY", "Issued At - Thu Jan 01 1970 00:00:00 GMT"),
+                arguments("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOjE3MjIxNjc0Nzd9.SWmvLUBWE5ddBWvSEWnrHM8W3rfzyYmEQVk6-ywFFgQ", "Issued At - Sun Jul 28 2024 11:51:17 GMT"),
+                arguments("eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoiMjAyNC0wNS0yMFQyMjowMzo0MiswMTowMCJ9.", "Issued At - Mon May 20 2024 21:03:42 GMT")
         );
     }
 
@@ -219,7 +220,7 @@ class JWSInformationTest {
     void givenJWSWithIatTimeClaims_whenIssuedAtDateInThePast_thenInformationCorrect(String data, String expectedText) throws ParseException {
         JWS jws = JWSFactory.parse(data);
 
-        Information information = jws.information().getFirst();
+        Information information = jws.information(ZoneId.of("UTC")).getFirst();
 
         assertThat(information.text()).isEqualTo(expectedText);
         assertThat(information.isWarning()).isFalse();
@@ -238,7 +239,7 @@ class JWSInformationTest {
     void givenJWSWithIatTimeClaims_whenIssuedAtDateInvalid_thenInformationCorrect(String data, String expectedText) throws ParseException {
         JWS jws = JWSFactory.parse(data);
 
-        Information information = jws.information().getFirst();
+        Information information = jws.information(ZoneId.of("UTC")).getFirst();
 
         assertThat(information.text()).isEqualTo(expectedText);
         assertThat(information.isWarning()).isTrue();
@@ -247,8 +248,8 @@ class JWSInformationTest {
 
     private static Stream<Arguments> jwsWithFutureIatDates() {
         return Stream.of(
-                arguments("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOjIzMjIxNjc0Nzd9.3UYGoLpdXRhnlai81VFV_iWmW90xnCimcYverY1-Zk4", "Issued At - Sun Aug 02 2043 22:31:17"),
-                arguments("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOjE4MjIxNjc0Nzd9._H-G7WjMbg8IVADVbz1Lsd7I_bGQZBYKPf8S2Q9vxf4", "Issued At - Tue Sep 28 2027 21:37:57")
+                arguments("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOjIzMjIxNjc0Nzd9.3UYGoLpdXRhnlai81VFV_iWmW90xnCimcYverY1-Zk4", "Issued At - Sun Aug 02 2043 22:31:17 GMT"),
+                arguments("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOjE4MjIxNjc0Nzd9._H-G7WjMbg8IVADVbz1Lsd7I_bGQZBYKPf8S2Q9vxf4", "Issued At - Tue Sep 28 2027 21:37:57 GMT")
         );
     }
 
@@ -257,16 +258,41 @@ class JWSInformationTest {
     void givenJWSWithIatTimeClaims_whenIssuedAtDateIsInTheFuture_thenInformationCorrect(String data, String expectedText) throws ParseException {
         JWS jws = JWSFactory.parse(data);
 
-        Information information = jws.information().getFirst();
+        Information information = jws.information(ZoneId.of("UTC")).getFirst();
 
         assertThat(information.text()).isEqualTo(expectedText);
         assertThat(information.isWarning()).isTrue();
+    }
+
+    private static Stream<Arguments> timeZonesAndJWSWithValidExpValues() {
+        return Stream.of(
+                arguments("UTC","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiZXhwIjoyMzE2MjM5MDIyfQ.nmCDcUHT-yLgrRG1LKMH9E2FQs2xWcB8CncxoqKdQEQ", "Expiration Time - Tue May 26 2043 07:43:42 GMT"),
+                arguments("UTC","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiZXhwIjoiMjMxNjIzOTAyMiJ9.kDOLZJTcFVwrSVSDeFK31EIx7Q4e4Ya33iNCk4QZ10c", "Expiration Time - Tue May 26 2043 07:43:42 GMT"),
+                arguments("UTC","eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiZXhwIjoiMjAzNi0xMi0xOVQxNjozOTo1Ny0wODowMCJ9.", "Expiration Time - Sat Dec 20 2036 00:39:57 GMT"),
+                arguments("America/Los_Angeles","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiZXhwIjoyMzE2MjM5MDIyfQ.nmCDcUHT-yLgrRG1LKMH9E2FQs2xWcB8CncxoqKdQEQ", "Expiration Time - Tue May 26 2043 00:43:42 GMT-7"),
+                arguments("America/Los_Angeles","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiZXhwIjoiMjMxNjIzOTAyMiJ9.kDOLZJTcFVwrSVSDeFK31EIx7Q4e4Ya33iNCk4QZ10c", "Expiration Time - Tue May 26 2043 00:43:42 GMT-7"),
+                arguments("America/Los_Angeles","eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiZXhwIjoiMjAzNi0xMi0xOVQxNjozOTo1Ny0wODowMCJ9.", "Expiration Time - Fri Dec 19 2036 16:39:57 GMT-8"),
+                arguments("Asia/Seoul","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiZXhwIjoyMzE2MjM5MDIyfQ.nmCDcUHT-yLgrRG1LKMH9E2FQs2xWcB8CncxoqKdQEQ", "Expiration Time - Tue May 26 2043 16:43:42 GMT+9"),
+                arguments("Asia/Seoul","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiZXhwIjoiMjMxNjIzOTAyMiJ9.kDOLZJTcFVwrSVSDeFK31EIx7Q4e4Ya33iNCk4QZ10c", "Expiration Time - Tue May 26 2043 16:43:42 GMT+9"),
+                arguments("Asia/Seoul","eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiZXhwIjoiMjAzNi0xMi0xOVQxNjozOTo1Ny0wODowMCJ9.", "Expiration Time - Sat Dec 20 2036 09:39:57 GMT+9")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("timeZonesAndJWSWithValidExpValues")
+    void givenJWSWithExpTimeClaims_whenExpiryDateInTheFuture_thenInformationAndTimeZoneCorrect(String timeZone, String data, String expectedText) throws ParseException {
+        JWS jws = JWSFactory.parse(data);
+
+        Information information = jws.information(ZoneId.of(timeZone)).getFirst();
+
+        assertThat(information.text()).isEqualTo(expectedText);
+        assertThat(information.isWarning()).isFalse();
     }
 
     @Test
     void givenJWE_thenInformationIsEmpty() throws ParseException {
         JWE jwe = JWEFactory.parse("eyJlbmMiOiJBMTI4R0NNIiwiYWxnIjoiQTEyOEtXIn0.H3X6mT5HLgcFfzLoe4ku6Knhh9Ofv1eL.qF5-N_7K8VQ4yMSz.WXUNY6eg5fR4tc8Hqf5XDRM9ALGwcQyYG4IYwwg8Ctkx1UuxoV7t6UnemjzCj2sOYUqi3KYpDzrKVJpzokz0vcIem4lFe5N_ds8FAMpW0GSF9ePA8qvV99WaP0N2ECVPmgihvL6qwNhdptlLKtxcOpE41U5LnU22voPK55VF4_1j0WmTgWgZ7DwLDysp6EIDjrrt-DY.febBmP71KADmKRVfeSnv_g");
 
-        assertThat(jwe.information()).isEmpty();
+        assertThat(jwe.information(ZoneId.of("UTC"))).isEmpty();
     }
 }
