@@ -26,6 +26,7 @@ import com.nimbusds.jose.JWSVerifier;
 import com.nimbusds.jose.util.Base64URL;
 
 import java.nio.charset.StandardCharsets;
+import java.time.ZoneId;
 import java.util.List;
 
 import static com.blackberry.jwteditor.model.jose.JWSVerifierFactory.verifierFor;
@@ -68,9 +69,9 @@ public class JWS extends JOSEObject {
     }
 
     @Override
-    public List<Information> information() {
+    public List<Information> information(ZoneId timeZoneId) {
         return claims.timeClaims().stream()
-                .map(Information::from)
+                .map(timeClaim -> Information.from(timeClaim, timeZoneId))
                 .toList();
     }
 
