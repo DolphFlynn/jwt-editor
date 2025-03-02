@@ -18,6 +18,7 @@ Additionally it facilitates several well-known attacks against JWT implementatio
 ## Recent Changes
 - Add Tokens view and ability to store interesting JWS within project file.
 - Display JWS TimeClaims in default time zone (Thanks again to [@Nirusu](https://github.com/Nirusu)).
+- Remember last used signing key within Attack dialogs.
 
 The complete changelog, which also includes prior versions, can be found [here](https://github.com/DolphFlynn/jwt-editor/blob/main/CHANGELOG.md).
 
