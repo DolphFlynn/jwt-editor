@@ -18,13 +18,15 @@ limitations under the License.
 
 package com.blackberry.jwteditor.model.jose;
 
+import java.time.ZoneId;
+
 public record Information(String text, boolean isWarning) {
 
-    public static Information from(TimeClaim timeClaim) {
+    public static Information from(TimeClaim timeClaim, ZoneId timeZoneId) {
         StringBuilder sb = new StringBuilder(timeClaim.type().toString()).append(" - ");
 
         if (timeClaim.hasDate()) {
-            sb.append(timeClaim.date());
+            sb.append(timeClaim.date(timeZoneId));
         } else {
             sb.append("invalid value: ").append(timeClaim.value());
         }
