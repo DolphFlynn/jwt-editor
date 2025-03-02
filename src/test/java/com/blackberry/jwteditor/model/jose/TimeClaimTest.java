@@ -25,7 +25,6 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.time.Instant;
-import java.time.ZoneId;
 import java.util.stream.Stream;
 
 import static com.blackberry.jwteditor.model.jose.TimeClaimType.*;
@@ -42,7 +41,7 @@ class TimeClaimTest {
         assertThat(timeClaim.value()).isEqualTo("-1");
         assertThat(timeClaim.isValid()).isFalse();
         assertThat(timeClaim.hasDate()).isFalse();
-        assertThat(timeClaim.date(ZoneId.of("UTC"))).isEmpty();
+        assertThat(timeClaim.date()).isEmpty();
         assertThat(timeClaim.dateTime()).isNull();
     }
 
@@ -55,7 +54,7 @@ class TimeClaimTest {
         assertThat(timeClaim.value()).isEqualTo("invalid");
         assertThat(timeClaim.isValid()).isFalse();
         assertThat(timeClaim.hasDate()).isFalse();
-        assertThat(timeClaim.date(ZoneId.of("UTC"))).isEmpty();
+        assertThat(timeClaim.date()).isEmpty();
         assertThat(timeClaim.dateTime()).isNull();
     }
 
@@ -76,7 +75,7 @@ class TimeClaimTest {
         assertThat(timeClaim.value()).isEqualTo(isoDateTime);
         assertThat(timeClaim.isValid()).isTrue();
         assertThat(timeClaim.hasDate()).isTrue();
-        assertThat(timeClaim.date(ZoneId.of("UTC"))).isEqualTo(expectedDateTimeString);
+        assertThat(timeClaim.date()).isEqualTo(expectedDateTimeString);
         assertThat(timeClaim.dateTime()).isNotNull();
     }
 
@@ -98,7 +97,7 @@ class TimeClaimTest {
         assertThat(timeClaim.value()).isEqualTo(epochDateTimeValue);
         assertThat(timeClaim.isValid()).isTrue();
         assertThat(timeClaim.hasDate()).isTrue();
-        assertThat(timeClaim.date(ZoneId.of("UTC"))).isEqualTo(expectedDateTimeString);
+        assertThat(timeClaim.date()).isEqualTo(expectedDateTimeString);
         assertThat(timeClaim.dateTime()).isNotNull();
     }
 
@@ -113,7 +112,7 @@ class TimeClaimTest {
         assertThat(timeClaim.value()).isEqualTo(epochSecondsValue);
         assertThat(timeClaim.isValid()).isFalse();
         assertThat(timeClaim.hasDate()).isTrue();
-        assertThat(timeClaim.date(ZoneId.of("UTC"))).isNotEmpty();
+        assertThat(timeClaim.date()).isNotEmpty();
         assertThat(timeClaim.dateTime()).isNotNull();
     }
 
@@ -128,7 +127,7 @@ class TimeClaimTest {
         assertThat(timeClaim.value()).isEqualTo(epochSecondsValue);
         assertThat(timeClaim.isValid()).isTrue();
         assertThat(timeClaim.hasDate()).isTrue();
-        assertThat(timeClaim.date(ZoneId.of("UTC"))).isNotEmpty();
+        assertThat(timeClaim.date()).isNotEmpty();
         assertThat(timeClaim.dateTime()).isNotNull();
     }
 
@@ -143,7 +142,7 @@ class TimeClaimTest {
         assertThat(timeClaim.value()).isEqualTo(epochSecondsValue);
         assertThat(timeClaim.isValid()).isTrue();
         assertThat(timeClaim.hasDate()).isTrue();
-        assertThat(timeClaim.date(ZoneId.of("UTC"))).isNotEmpty();
+        assertThat(timeClaim.date()).isNotEmpty();
         assertThat(timeClaim.dateTime()).isNotNull();
     }
 
@@ -158,7 +157,7 @@ class TimeClaimTest {
         assertThat(timeClaim.value()).isEqualTo(epochSecondsValue);
         assertThat(timeClaim.isValid()).isFalse();
         assertThat(timeClaim.hasDate()).isTrue();
-        assertThat(timeClaim.date(ZoneId.of("UTC"))).isNotEmpty();
+        assertThat(timeClaim.date()).isNotEmpty();
         assertThat(timeClaim.dateTime()).isNotNull();
     }
     @Test
@@ -172,7 +171,7 @@ class TimeClaimTest {
         assertThat(timeClaim.value()).isEqualTo(epochSecondsValue);
         assertThat(timeClaim.isValid()).isTrue();
         assertThat(timeClaim.hasDate()).isTrue();
-        assertThat(timeClaim.date(ZoneId.of("UTC"))).isNotEmpty();
+        assertThat(timeClaim.date()).isNotEmpty();
         assertThat(timeClaim.dateTime()).isNotNull();
     }
 
@@ -187,56 +186,7 @@ class TimeClaimTest {
         assertThat(timeClaim.value()).isEqualTo(epochSecondsValue);
         assertThat(timeClaim.isValid()).isFalse();
         assertThat(timeClaim.hasDate()).isTrue();
-        assertThat(timeClaim.date(ZoneId.of("UTC"))).isNotEmpty();
+        assertThat(timeClaim.date()).isNotEmpty();
         assertThat(timeClaim.dateTime()).isNotNull();
-    }
-
-    static Stream<Arguments> expectedTimeZoneConversionsFromEpochSeconds() {
-        return Stream.of(
-                arguments("UTC", Long.toString(0L), "Thu Jan 01 1970 00:00:00 GMT"),
-                arguments("UTC", Long.toString(946684800L), "Sat Jan 01 2000 00:00:00 GMT"),
-                arguments("UTC", Long.toString(1751328000), "Tue Jul 01 2025 00:00:00 GMT"),
-                arguments("UTC", Long.toString(2524608000L), "Sat Jan 01 2050 00:00:00 GMT"),
-                arguments("America/Los_Angeles", Long.toString(0L), "Wed Dec 31 1969 16:00:00 GMT-8"),
-                arguments("America/Los_Angeles", Long.toString(946684800L), "Fri Dec 31 1999 16:00:00 GMT-8"),
-                arguments("America/Los_Angeles", Long.toString(1751328000), "Mon Jun 30 2025 17:00:00 GMT-7"),
-                arguments("America/Los_Angeles", Long.toString(2524608000L), "Fri Dec 31 2049 16:00:00 GMT-8"),
-                arguments("Asia/Seoul", Long.toString(0L), "Thu Jan 01 1970 09:00:00 GMT+9"),
-                arguments("Asia/Seoul", Long.toString(946684800L), "Sat Jan 01 2000 09:00:00 GMT+9"),
-                arguments("Asia/Seoul", Long.toString(1751328000), "Tue Jul 01 2025 09:00:00 GMT+9"),
-                arguments("Asia/Seoul", Long.toString(2524608000L), "Sat Jan 01 2050 09:00:00 GMT+9")
-        );
-    }
-
-    @MethodSource("expectedTimeZoneConversionsFromEpochSeconds")
-    @ParameterizedTest
-    void testDateStringTimeZoneFromEpochSeconds(String timeZoneName, String epochSeconds, String expectedString) {
-        TimeClaim iat = TimeClaimFactory.fromEpochSeconds(ISSUED_AT_TIME, epochSeconds);
-
-        assertThat(iat.date(ZoneId.of(timeZoneName))).isEqualTo(expectedString);
-    }
-
-    static Stream<Arguments> expectedTimeZoneConversionsFromIsoDateTime() {
-        return Stream.of(
-                arguments("UTC", "1970-01-01T00:00:00.00Z", "Thu Jan 01 1970 00:00:00 GMT"),
-                arguments("UTC", "1999-12-31T16:00:00.00-08:00", "Sat Jan 01 2000 00:00:00 GMT"),
-                arguments("UTC", "2025-07-01T02:00:00.00+02:00", "Tue Jul 01 2025 00:00:00 GMT"),
-                arguments("UTC", "2050-01-01T09:00:00.00+09:00", "Sat Jan 01 2050 00:00:00 GMT"),
-                arguments("America/Los_Angeles", "1970-01-01T00:00:00.00Z", "Wed Dec 31 1969 16:00:00 GMT-8"),
-                arguments("America/Los_Angeles", "1999-12-31T16:00:00.00-08:00", "Fri Dec 31 1999 16:00:00 GMT-8"),
-                arguments("America/Los_Angeles", "2025-07-01T02:00:00.00+02:00", "Mon Jun 30 2025 17:00:00 GMT-7"),
-                arguments("America/Los_Angeles", "2050-01-01T09:00:00.00+09:00", "Fri Dec 31 2049 16:00:00 GMT-8"),
-                arguments("Asia/Seoul", "1970-01-01T00:00:00.00Z", "Thu Jan 01 1970 09:00:00 GMT+9"),
-                arguments("Asia/Seoul", "1999-12-31T16:00:00.00-08:00", "Sat Jan 01 2000 09:00:00 GMT+9"),
-                arguments("Asia/Seoul", "2025-07-01T02:00:00.00+02:00", "Tue Jul 01 2025 09:00:00 GMT+9"),
-                arguments("Asia/Seoul", "2050-01-01T09:00:00.00+09:00", "Sat Jan 01 2050 09:00:00 GMT+9")
-        );
-    }
-
-    @MethodSource("expectedTimeZoneConversionsFromIsoDateTime")
-    @ParameterizedTest
-    void testDateStringTimeZoneFromIsoDateTime(String timeZoneName, String isoDateTime, String expectedString) {
-        TimeClaim iat = TimeClaimFactory.fromIsoDateTime(ISSUED_AT_TIME, isoDateTime);
-        assertThat(iat.date(ZoneId.of(timeZoneName))).isEqualTo(expectedString);
     }
 }

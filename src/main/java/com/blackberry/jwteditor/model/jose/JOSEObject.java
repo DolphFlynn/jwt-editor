@@ -20,7 +20,6 @@ package com.blackberry.jwteditor.model.jose;
 
 import com.nimbusds.jose.util.Base64URL;
 
-import java.time.ZoneId;
 import java.util.List;
 
 /**
@@ -43,5 +42,5 @@ public abstract class JOSEObject {
      */
     public abstract String serialize();
 
-    public abstract List<Information> information(ZoneId timeZoneId);
+    public abstract List<Information> information();
 }
