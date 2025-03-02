@@ -18,7 +18,6 @@ limitations under the License.
 
 package com.blackberry.jwteditor.model.jose;
 
-import java.time.ZoneId;
 import java.util.List;
 
 /**
@@ -75,7 +74,7 @@ public class MutableJOSEObject {
         return original;
     }
 
-    public List<Information> information(ZoneId timeZoneId) {
-        return modified.information(timeZoneId);
+    public List<Information> information() {
+        return modified.information();
     }
 }

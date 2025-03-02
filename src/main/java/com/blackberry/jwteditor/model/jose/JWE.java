@@ -28,7 +28,6 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import java.security.Provider;
 import java.security.Security;
 import java.text.ParseException;
-import java.time.ZoneId;
 import java.util.List;
 
 import static java.util.Collections.emptyList;
@@ -70,7 +69,7 @@ public class JWE extends JOSEObject {
     }
 
     @Override
-    public List<Information> information(ZoneId timeZoneId) {
+    public List<Information> information() {
         return emptyList();
     }
 

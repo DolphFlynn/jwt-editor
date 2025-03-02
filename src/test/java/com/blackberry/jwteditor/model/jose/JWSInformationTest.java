@@ -25,7 +25,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.text.ParseException;
-import java.time.ZoneId;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -37,7 +36,7 @@ class JWSInformationTest {
     void givenJWSWithNoTimeClaims_thenInformationIsEmpty() throws ParseException {
         JWS jws = JWSFactory.parse("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJUZXN0In0.WVLalefVZ5Rj991Cjgh0qBjKSIQaqC_CgN3b-30GKpQ");
 
-        assertThat(jws.information(ZoneId.of("UTC"))).isEmpty();
+        assertThat(jws.information()).isEmpty();
     }
 
     @ParameterizedTest
@@ -48,7 +47,7 @@ class JWSInformationTest {
     void givenJWSWithExpTimeClaims_thenInformationCorrect(String data) throws ParseException {
         JWS jws = JWSFactory.parse(data);
 
-        Information information = jws.information(ZoneId.of("UTC")).getFirst();
+        Information information = jws.information().getFirst();
 
         assertThat(information.text()).isEqualTo("Expiration Time - Mon May 20 2024 21:03:42 GMT");
         assertThat(information.isWarning()).isTrue();
@@ -67,7 +66,7 @@ class JWSInformationTest {
     void givenJWSWithExpTimeClaims_whenExpiryDateInTheFuture_thenInformationCorrect(String data, String expectedText) throws ParseException {
         JWS jws = JWSFactory.parse(data);
 
-        Information information = jws.information(ZoneId.of("UTC")).getFirst();
+        Information information = jws.information().getFirst();
 
         assertThat(information.text()).isEqualTo(expectedText);
         assertThat(information.isWarning()).isFalse();
@@ -86,7 +85,7 @@ class JWSInformationTest {
     void givenJWSWithExpTimeClaims_whenExpiryDateInvalid_thenInformationCorrect(String data, String expectedText) throws ParseException {
         JWS jws = JWSFactory.parse(data);
 
-        Information information = jws.information(ZoneId.of("UTC")).getFirst();
+        Information information = jws.information().getFirst();
 
         assertThat(information.text()).isEqualTo(expectedText);
         assertThat(information.isWarning()).isTrue();
@@ -104,7 +103,7 @@ class JWSInformationTest {
     void givenJWSWithExpTimeClaims_whenExpiryDateIsInThePast_thenInformationCorrect(String data, String expectedText) throws ParseException {
         JWS jws = JWSFactory.parse(data);
 
-        Information information = jws.information(ZoneId.of("UTC")).getFirst();
+        Information information = jws.information().getFirst();
 
         assertThat(information.text()).isEqualTo(expectedText);
         assertThat(information.isWarning()).isTrue();
@@ -119,7 +118,7 @@ class JWSInformationTest {
     void givenJWSWithNbfTimeClaims_thenInformationCorrect(String data) throws ParseException {
         JWS jws = JWSFactory.parse(data);
 
-        Information information = jws.information(ZoneId.of("UTC")).getFirst();
+        Information information = jws.information().getFirst();
 
         assertThat(information.text()).isEqualTo("Not Before - Mon May 20 2024 21:03:42 GMT");
         assertThat(information.isWarning()).isFalse();
@@ -141,7 +140,7 @@ class JWSInformationTest {
     void givenJWSWithNbfTimeClaims_whenNotBeforeDateInThePast_thenInformationCorrect(String data, String expectedText) throws ParseException {
         JWS jws = JWSFactory.parse(data);
 
-        Information information = jws.information(ZoneId.of("UTC")).getFirst();
+        Information information = jws.information().getFirst();
 
         assertThat(information.text()).isEqualTo(expectedText);
         assertThat(information.isWarning()).isFalse();
@@ -160,7 +159,7 @@ class JWSInformationTest {
     void givenJWSWithNbfTimeClaims_whenNotBeforeDateInvalid_thenInformationCorrect(String data, String expectedText) throws ParseException {
         JWS jws = JWSFactory.parse(data);
 
-        Information information = jws.information(ZoneId.of("UTC")).getFirst();
+        Information information = jws.information().getFirst();
 
         assertThat(information.text()).isEqualTo(expectedText);
         assertThat(information.isWarning()).isTrue();
@@ -178,7 +177,7 @@ class JWSInformationTest {
     void givenJWSWithNbfTimeClaims_whenNotBeforeDateIsInTheFuture_thenInformationCorrect(String data, String expectedText) throws ParseException {
         JWS jws = JWSFactory.parse(data);
 
-        Information information = jws.information(ZoneId.of("UTC")).getFirst();
+        Information information = jws.information().getFirst();
 
         assertThat(information.text()).isEqualTo(expectedText);
         assertThat(information.isWarning()).isTrue();
@@ -197,7 +196,7 @@ class JWSInformationTest {
     void givenJWSWithIatTimeClaims_thenInformationCorrect(String data, String expectedText) throws ParseException {
         JWS jws = JWSFactory.parse(data);
 
-        Information information = jws.information(ZoneId.of("UTC")).getFirst();
+        Information information = jws.information().getFirst();
 
         assertThat(information.text()).isEqualTo(expectedText);
         assertThat(information.isWarning()).isFalse();
@@ -220,7 +219,7 @@ class JWSInformationTest {
     void givenJWSWithIatTimeClaims_whenIssuedAtDateInThePast_thenInformationCorrect(String data, String expectedText) throws ParseException {
         JWS jws = JWSFactory.parse(data);
 
-        Information information = jws.information(ZoneId.of("UTC")).getFirst();
+        Information information = jws.information().getFirst();
 
         assertThat(information.text()).isEqualTo(expectedText);
         assertThat(information.isWarning()).isFalse();
@@ -239,7 +238,7 @@ class JWSInformationTest {
     void givenJWSWithIatTimeClaims_whenIssuedAtDateInvalid_thenInformationCorrect(String data, String expectedText) throws ParseException {
         JWS jws = JWSFactory.parse(data);
 
-        Information information = jws.information(ZoneId.of("UTC")).getFirst();
+        Information information = jws.information().getFirst();
 
         assertThat(information.text()).isEqualTo(expectedText);
         assertThat(information.isWarning()).isTrue();
@@ -258,41 +257,16 @@ class JWSInformationTest {
     void givenJWSWithIatTimeClaims_whenIssuedAtDateIsInTheFuture_thenInformationCorrect(String data, String expectedText) throws ParseException {
         JWS jws = JWSFactory.parse(data);
 
-        Information information = jws.information(ZoneId.of("UTC")).getFirst();
+        Information information = jws.information().getFirst();
 
         assertThat(information.text()).isEqualTo(expectedText);
         assertThat(information.isWarning()).isTrue();
-    }
-
-    private static Stream<Arguments> timeZonesAndJWSWithValidExpValues() {
-        return Stream.of(
-                arguments("UTC","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiZXhwIjoyMzE2MjM5MDIyfQ.nmCDcUHT-yLgrRG1LKMH9E2FQs2xWcB8CncxoqKdQEQ", "Expiration Time - Tue May 26 2043 07:43:42 GMT"),
-                arguments("UTC","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiZXhwIjoiMjMxNjIzOTAyMiJ9.kDOLZJTcFVwrSVSDeFK31EIx7Q4e4Ya33iNCk4QZ10c", "Expiration Time - Tue May 26 2043 07:43:42 GMT"),
-                arguments("UTC","eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiZXhwIjoiMjAzNi0xMi0xOVQxNjozOTo1Ny0wODowMCJ9.", "Expiration Time - Sat Dec 20 2036 00:39:57 GMT"),
-                arguments("America/Los_Angeles","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiZXhwIjoyMzE2MjM5MDIyfQ.nmCDcUHT-yLgrRG1LKMH9E2FQs2xWcB8CncxoqKdQEQ", "Expiration Time - Tue May 26 2043 00:43:42 GMT-7"),
-                arguments("America/Los_Angeles","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiZXhwIjoiMjMxNjIzOTAyMiJ9.kDOLZJTcFVwrSVSDeFK31EIx7Q4e4Ya33iNCk4QZ10c", "Expiration Time - Tue May 26 2043 00:43:42 GMT-7"),
-                arguments("America/Los_Angeles","eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiZXhwIjoiMjAzNi0xMi0xOVQxNjozOTo1Ny0wODowMCJ9.", "Expiration Time - Fri Dec 19 2036 16:39:57 GMT-8"),
-                arguments("Asia/Seoul","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiZXhwIjoyMzE2MjM5MDIyfQ.nmCDcUHT-yLgrRG1LKMH9E2FQs2xWcB8CncxoqKdQEQ", "Expiration Time - Tue May 26 2043 16:43:42 GMT+9"),
-                arguments("Asia/Seoul","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiZXhwIjoiMjMxNjIzOTAyMiJ9.kDOLZJTcFVwrSVSDeFK31EIx7Q4e4Ya33iNCk4QZ10c", "Expiration Time - Tue May 26 2043 16:43:42 GMT+9"),
-                arguments("Asia/Seoul","eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiZXhwIjoiMjAzNi0xMi0xOVQxNjozOTo1Ny0wODowMCJ9.", "Expiration Time - Sat Dec 20 2036 09:39:57 GMT+9")
-        );
-    }
-
-    @ParameterizedTest
-    @MethodSource("timeZonesAndJWSWithValidExpValues")
-    void givenJWSWithExpTimeClaims_whenExpiryDateInTheFuture_thenInformationAndTimeZoneCorrect(String timeZone, String data, String expectedText) throws ParseException {
-        JWS jws = JWSFactory.parse(data);
-
-        Information information = jws.information(ZoneId.of(timeZone)).getFirst();
-
-        assertThat(information.text()).isEqualTo(expectedText);
-        assertThat(information.isWarning()).isFalse();
     }
 
     @Test
     void givenJWE_thenInformationIsEmpty() throws ParseException {
         JWE jwe = JWEFactory.parse("eyJlbmMiOiJBMTI4R0NNIiwiYWxnIjoiQTEyOEtXIn0.H3X6mT5HLgcFfzLoe4ku6Knhh9Ofv1eL.qF5-N_7K8VQ4yMSz.WXUNY6eg5fR4tc8Hqf5XDRM9ALGwcQyYG4IYwwg8Ctkx1UuxoV7t6UnemjzCj2sOYUqi3KYpDzrKVJpzokz0vcIem4lFe5N_ds8FAMpW0GSF9ePA8qvV99WaP0N2ECVPmgihvL6qwNhdptlLKtxcOpE41U5LnU22voPK55VF4_1j0WmTgWgZ7DwLDysp6EIDjrrt-DY.febBmP71KADmKRVfeSnv_g");
 
-        assertThat(jwe.information(ZoneId.of("UTC"))).isEmpty();
+        assertThat(jwe.information()).isEmpty();
     }
 }

@@ -25,7 +25,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import java.time.ZoneId;
 import java.util.stream.Stream;
 
 import static com.blackberry.jwteditor.model.jose.TimeClaimType.*;
@@ -49,29 +48,7 @@ class InformationTest {
     @MethodSource("data")
     @ParameterizedTest
     void testInformationFromTimeClaims(TimeClaim timeClaim, String expectedText, boolean expectedIsWarning) {
-        Information information = Information.from(timeClaim, ZoneId.of("UTC"));
-
-        assertThat(information.text()).isEqualTo(expectedText);
-        assertThat(information.isWarning()).isEqualTo(expectedIsWarning);
-    }
-
-    static Stream<Arguments> dataWithTimeZone() {
-        return Stream.of(
-                arguments(new TimeClaim(ISSUED_AT_TIME, "isogeny", null), "Issued At - invalid value: isogeny", true),
-                arguments(TimeClaimFactory.fromEpochSeconds(ISSUED_AT_TIME, "1516239022"), "Issued At - Thu Jan 18 2018 10:30:22 GMT+9", false),
-                arguments(TimeClaimFactory.fromEpochSeconds(ISSUED_AT_TIME, "2516239022"), "Issued At - Sun Sep 26 2049 12:17:02 GMT+9", true),
-                arguments(new TimeClaim(NOT_BEFORE_TIME, "isogeny", null), "Not Before - invalid value: isogeny", true),
-                arguments(TimeClaimFactory.fromEpochSeconds(NOT_BEFORE_TIME, "1516239022"), "Not Before - Thu Jan 18 2018 10:30:22 GMT+9", false),
-                arguments(TimeClaimFactory.fromEpochSeconds(NOT_BEFORE_TIME, "2516239022"), "Not Before - Sun Sep 26 2049 12:17:02 GMT+9", true),
-                arguments(new TimeClaim(EXPIRATION_TIME, "isogeny", null), "Expiration Time - invalid value: isogeny", true),
-                arguments(TimeClaimFactory.fromEpochSeconds(EXPIRATION_TIME, "1516239022"), "Expiration Time - Thu Jan 18 2018 10:30:22 GMT+9", true),
-                arguments(TimeClaimFactory.fromEpochSeconds(EXPIRATION_TIME, "2516239022"), "Expiration Time - Sun Sep 26 2049 12:17:02 GMT+9", false));
-    }
-
-    @MethodSource("dataWithTimeZone")
-    @ParameterizedTest
-    void testInformationFromTimeClaimsWithTimeZone(TimeClaim timeClaim, String expectedText, boolean expectedIsWarning) {
-        Information information = Information.from(timeClaim, ZoneId.of("Asia/Seoul"));
+        Information information = Information.from(timeClaim);
 
         assertThat(information.text()).isEqualTo(expectedText);
         assertThat(information.isWarning()).isEqualTo(expectedIsWarning);

@@ -39,10 +39,8 @@ import com.nimbusds.jose.util.Base64URL;
 import org.json.JSONException;
 
 import java.text.ParseException;
-import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
-import java.util.TimeZone;
 
 import static com.blackberry.jwteditor.model.jose.ClaimsType.JSON;
 import static com.blackberry.jwteditor.model.jose.ClaimsType.TEXT;
@@ -55,7 +53,6 @@ import static com.blackberry.jwteditor.view.dialog.operations.SigningPanel.Mode.
 import static com.blackberry.jwteditor.view.dialog.operations.SigningPanel.Mode.NORMAL;
 
 public class EditorPresenter {
-    private final static ZoneId JVM_DEFAULT_TIME_ZONE_ID = TimeZone.getDefault().toZoneId();
 
     private final KeysRepository keysRepository;
     private final TokenRepository tokenRepository;
@@ -390,7 +387,7 @@ public class EditorPresenter {
         //Highlight the serialized text as changed if it differs from the original, and the change wasn't triggered by onSelectionChanging
         view.setSerialized(joseObject.serialize(), mutableJoseObject.changed() && !selectionChanging);
 
-        view.setInformation(mutableJoseObject.information(JVM_DEFAULT_TIME_ZONE_ID));
+        view.setInformation(mutableJoseObject.information());
     }
 
     /**
