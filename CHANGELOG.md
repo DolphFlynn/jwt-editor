@@ -1,4 +1,7 @@
 # Changelog
+## Unreleased
+- Add Tokens view and ability to store interesting JWS within project file.
+- Display JWS TimeClaims in default time zone (Thanks again to [@Nirusu](https://github.com/Nirusu)).
 
 ## [2.5](https://github.com/DolphFlynn/jwt-editor/releases/tag/2.5) 2025-01-13
 - Add ability to test for HMAC signatures using [weak secrets](https://github.com/wallarm/jwt-secrets).
