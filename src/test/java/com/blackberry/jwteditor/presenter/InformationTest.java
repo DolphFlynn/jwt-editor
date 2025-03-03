@@ -21,6 +21,7 @@ package com.blackberry.jwteditor.presenter;
 import com.blackberry.jwteditor.model.jose.Information;
 import com.blackberry.jwteditor.model.jose.TimeClaim;
 import com.blackberry.jwteditor.model.jose.TimeClaimFactory;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -32,6 +33,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 class InformationTest {
+
+    @BeforeAll
+    static void setTimeZone() {
+        System.setProperty("user.timezone", "UTC");
+    }
+
     static Stream<Arguments> data() {
         return Stream.of(
                 arguments(new TimeClaim(ISSUED_AT_TIME, "isogeny", null), "Issued At - invalid value: isogeny", true),
