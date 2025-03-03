@@ -32,7 +32,7 @@ dependencies {
 
     compileOnly("org.bouncycastle:bcprov-jdk18on:1.80")
     compileOnly("org.bouncycastle:bcpkix-jdk18on:1.80")
-    compileOnly("net.portswigger.burp.extensions:montoya-api:2024.7")
+    compileOnly("net.portswigger.burp.extensions:montoya-api:2025.2")
 
     implementation("com.jetbrains.intellij.java:java-gui-forms-rt:243.23654.166")
     implementation("com.nimbusds:nimbus-jose-jwt:9.21")
@@ -42,7 +42,7 @@ dependencies {
 
     testImplementation("org.bouncycastle:bcprov-jdk18on:1.80")
     testImplementation("org.bouncycastle:bcpkix-jdk18on:1.80")
-    testImplementation("net.portswigger.burp.extensions:montoya-api:2024.7")
+    testImplementation("net.portswigger.burp.extensions:montoya-api:2025.2")
     testImplementation("org.junit.jupiter:junit-jupiter:5.12.0")
     testImplementation("org.assertj:assertj-core:3.27.3")
     testImplementation("org.mockito:mockito-core:5.15.2")
