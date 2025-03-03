@@ -31,7 +31,7 @@ dependencies {
     "guiGenerationTask"("com.jetbrains.intellij.java:java-compiler-ant-tasks:243.23654.166")
 
     compileOnly("org.bouncycastle:bcprov-jdk18on:1.80")
-    compileOnly("org.bouncycastle:bcpkix-jdk18on:1.79")
+    compileOnly("org.bouncycastle:bcpkix-jdk18on:1.80")
     compileOnly("net.portswigger.burp.extensions:montoya-api:2024.7")
 
     implementation("com.jetbrains.intellij.java:java-gui-forms-rt:243.23654.166")
@@ -41,7 +41,7 @@ dependencies {
     implementation("org.json:json:20250107")
 
     testImplementation("org.bouncycastle:bcprov-jdk18on:1.80")
-    testImplementation("org.bouncycastle:bcpkix-jdk18on:1.79")
+    testImplementation("org.bouncycastle:bcpkix-jdk18on:1.80")
     testImplementation("net.portswigger.burp.extensions:montoya-api:2024.7")
     testImplementation("org.junit.jupiter:junit-jupiter:5.12.0")
     testImplementation("org.assertj:assertj-core:3.27.3")
