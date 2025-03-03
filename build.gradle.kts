@@ -85,6 +85,8 @@ tasks.withType<JavaCompile> {
 
 tasks.named<Test>("test") {
     useJUnitPlatform()
+
+    systemProperty("user.timezone", "UTC")
 }
 
 tasks.named<Jar>("jar") {
