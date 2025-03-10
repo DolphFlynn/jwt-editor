@@ -28,7 +28,7 @@ configurations {
 }
 
 dependencies {
-    "guiGenerationTask"("com.jetbrains.intellij.java:java-compiler-ant-tasks:243.25659.52")
+    "guiGenerationTask"("com.jetbrains.intellij.java:java-compiler-ant-tasks:243.25659.59")
 
     compileOnly("org.bouncycastle:bcprov-jdk18on:1.80")
     compileOnly("org.bouncycastle:bcpkix-jdk18on:1.80")
