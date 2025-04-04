@@ -6,6 +6,7 @@ updates:
       interval: "monthly"
     ignore:
       - dependency-name: "com.nimbusds:nimbus-jose-jwt"
+      - dependency-name: "net.portswigger.burp.extensions:montoya-api"
 
   - package-ecosystem: "github-actions"
     directory: "/"
