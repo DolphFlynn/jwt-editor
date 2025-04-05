@@ -1,5 +1,5 @@
 # Changelog
-## Unreleased
+## [2.6](https://github.com/DolphFlynn/jwt-editor/releases/tag/2.6) 2025-04-05
 - Add Tokens view and ability to store interesting JWS within project file.
 - Display JWS TimeClaims in default time zone (Thanks again to [@Nirusu](https://github.com/Nirusu)).
 - Remember last used signing key within Attack dialogs.
