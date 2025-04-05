@@ -16,6 +16,8 @@ Additionally it facilitates several well-known attacks against JWT implementatio
 
 
 ## Recent Changes
+The last release was tagged [2.6](https://github.com/DolphFlynn/jwt-editor/releases/tag/2.6) on 2025-04-05 and included
+the following changes:
 - Add Tokens view and ability to store interesting JWS within project file.
 - Display JWS TimeClaims in default time zone (Thanks again to [@Nirusu](https://github.com/Nirusu)).
 - Remember last used signing key within Attack dialogs.
