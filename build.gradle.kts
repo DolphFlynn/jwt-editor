@@ -30,8 +30,8 @@ configurations {
 dependencies {
     "guiGenerationTask"("com.jetbrains.intellij.java:java-compiler-ant-tasks:251.25410.159")
 
-    compileOnly("org.bouncycastle:bcprov-jdk18on:1.80")
-    compileOnly("org.bouncycastle:bcpkix-jdk18on:1.80")
+    compileOnly("org.bouncycastle:bcprov-jdk18on:1.81")
+    compileOnly("org.bouncycastle:bcpkix-jdk18on:1.81")
     compileOnly("net.portswigger.burp.extensions:montoya-api:2024.7")
 
     implementation("com.jetbrains.intellij.java:java-gui-forms-rt:252.16774")
@@ -40,8 +40,8 @@ dependencies {
     implementation("com.fifesoft:rsyntaxtextarea:3.6.0")
     implementation("org.json:json:20250517")
 
-    testImplementation("org.bouncycastle:bcprov-jdk18on:1.80")
-    testImplementation("org.bouncycastle:bcpkix-jdk18on:1.80")
+    testImplementation("org.bouncycastle:bcprov-jdk18on:1.81")
+    testImplementation("org.bouncycastle:bcpkix-jdk18on:1.81")
     testImplementation("net.portswigger.burp.extensions:montoya-api:2024.7")
     testImplementation("org.junit.jupiter:junit-jupiter:5.13.0")
     testImplementation("org.assertj:assertj-core:3.27.3")
