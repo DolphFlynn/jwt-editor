@@ -34,7 +34,7 @@ dependencies {
     compileOnly("org.bouncycastle:bcpkix-jdk18on:1.81")
     compileOnly("net.portswigger.burp.extensions:montoya-api:2024.7")
 
-    implementation("com.jetbrains.intellij.java:java-gui-forms-rt:252.21158")
+    implementation("com.jetbrains.intellij.java:java-gui-forms-rt:253.8964")
     implementation("com.nimbusds:nimbus-jose-jwt:9.21")
     implementation("org.exbin.deltahex:deltahex-swing:0.1.2")
     implementation("com.fifesoft:rsyntaxtextarea:3.6.0")
