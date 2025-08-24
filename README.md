@@ -182,5 +182,5 @@ If you have found a bug or think that a particular feature is missing, please ra
 
 ## Useful Links
 * PortSwigger's JWT [Learning Material](https://portswigger.net/web-security/jwt) and associated [labs](https://portswigger.net/web-security/all-labs#jwt).
-* BlackBerry's [blog post](https://blogs.blackberry.com/en/2022/09/secure-json-web-tokens-free-tool-from-blackberry-product-security) for the original release.
+* BlackBerry's [blog post](https://web.archive.org/web/20250118113009/https://blogs.blackberry.com/en/2022/09/secure-json-web-tokens-free-tool-from-blackberry-product-security) for the original release.
 * [JWT4B](https://github.com/ozzi-/JWT4B) is an another Burp Suite extension providing JWT support.
