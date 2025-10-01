@@ -43,7 +43,7 @@ dependencies {
     testImplementation("org.bouncycastle:bcprov-jdk18on:1.82")
     testImplementation("org.bouncycastle:bcpkix-jdk18on:1.82")
     testImplementation("net.portswigger.burp.extensions:montoya-api:2024.7")
-    testImplementation("org.junit.jupiter:junit-jupiter:5.13.4")
+    testImplementation("org.junit.jupiter:junit-jupiter:6.0.0")
     testImplementation("org.assertj:assertj-core:3.27.4")
     testImplementation("org.mockito:mockito-core:5.19.0")
 
