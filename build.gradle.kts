@@ -38,7 +38,7 @@ dependencies {
     implementation("com.nimbusds:nimbus-jose-jwt:9.21")
     implementation("org.exbin.deltahex:deltahex-swing:0.1.2")
     implementation("com.fifesoft:rsyntaxtextarea:3.6.1")
-    implementation("org.json:json:20250517")
+    implementation("org.json:json:20251224")
 
     testImplementation("org.bouncycastle:bcprov-jdk18on:1.83")
     testImplementation("org.bouncycastle:bcpkix-jdk18on:1.83")
