@@ -28,13 +28,13 @@ configurations {
 }
 
 dependencies {
-    "guiGenerationTask"("com.jetbrains.intellij.java:java-compiler-ant-tasks:253.29346.145")
+    "guiGenerationTask"("com.jetbrains.intellij.java:java-compiler-ant-tasks:253.29346.255")
 
     compileOnly("org.bouncycastle:bcprov-jdk18on:1.83")
     compileOnly("org.bouncycastle:bcpkix-jdk18on:1.83")
     compileOnly("net.portswigger.burp.extensions:montoya-api:2024.7")
 
-    implementation("com.jetbrains.intellij.java:java-gui-forms-rt:253.29346.145")
+    implementation("com.jetbrains.intellij.java:java-gui-forms-rt:253.29346.255")
     implementation("com.nimbusds:nimbus-jose-jwt:9.21")
     implementation("org.exbin.deltahex:deltahex-swing:0.1.2")
     implementation("com.fifesoft:rsyntaxtextarea:3.6.1")
