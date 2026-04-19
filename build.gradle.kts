@@ -30,10 +30,10 @@ configurations {
 dependencies {
     "guiGenerationTask"("com.jetbrains.intellij.java:java-compiler-ant-tasks:261.22158.340")
 
-    compileOnly("org.bouncycastle:bcprov-jdk18on:1.83")
-    compileOnly("org.bouncycastle:bcpkix-jdk18on:1.83")
     compileOnly("net.portswigger.burp.extensions:montoya-api:2024.7")
 
+    implementation("org.bouncycastle:bcprov-jdk18on:1.83")
+    implementation("org.bouncycastle:bcpkix-jdk18on:1.83")
     implementation("com.jetbrains.intellij.java:java-gui-forms-rt:261.22158.340")
     implementation("com.nimbusds:nimbus-jose-jwt:9.21")
     implementation("org.exbin.deltahex:deltahex-swing:0.1.2")
@@ -105,6 +105,8 @@ tasks.named<Jar>("jar") {
                         "org/exbin/deltahex/swing/DefaultCodeAreaCommandHandler\$BinaryDataClipboardData.class",
                         "org/exbin/deltahex/swing/DefaultCodeAreaCommandHandler\$ClipboardData.class",
                         "org/exbin/deltahex/swing/DefaultCodeAreaCommandHandler\$CodeDataClipboardData.class",
+                        "META-INF/BC2048KE.DSA",
+                        "META-INF/BC2048KE.SF",
                         "META-INF/LICENSE"
                     )
                 }
