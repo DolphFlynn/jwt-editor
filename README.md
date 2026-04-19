@@ -16,7 +16,7 @@ Additionally it facilitates several well-known attacks against JWT implementatio
 
 
 ## Recent Changes
-The last release was tagged [2.6.1](https://github.com/DolphFlynn/jwt-editor/releases/tag/2.6) on 2026-04-19 and included
+The last release was tagged [2.6.1](https://github.com/DolphFlynn/jwt-editor/releases/tag/2.6.1) on 2026-04-19 and included
 the following changes:
 - Fix classloader issue with the BouncyCastle (Thanks to [@b0x-Protector](https://github.com/b0x-Protector) for reporting this).
 - Small UI improvements.
