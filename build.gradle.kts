@@ -28,26 +28,26 @@ configurations {
 }
 
 dependencies {
-    "guiGenerationTask"("com.jetbrains.intellij.java:java-compiler-ant-tasks:261.22158.340")
+    add("guiGenerationTask", libs.intellij.java.compiler.ant)
 
-    compileOnly("net.portswigger.burp.extensions:montoya-api:2024.7")
+    compileOnly(libs.montoya.api)
 
-    implementation("org.bouncycastle:bcprov-jdk18on:1.83")
-    implementation("org.bouncycastle:bcpkix-jdk18on:1.83")
-    implementation("com.jetbrains.intellij.java:java-gui-forms-rt:261.22158.340")
-    implementation("com.nimbusds:nimbus-jose-jwt:9.21")
-    implementation("org.exbin.deltahex:deltahex-swing:0.1.2")
-    implementation("com.fifesoft:rsyntaxtextarea:3.6.2")
-    implementation("org.json:json:20251224")
+    implementation(libs.bcprov)
+    implementation(libs.bcpkix)
+    implementation(libs.intellij.gui.forms)
+    implementation(libs.nimbus.jose.jwt)
+    implementation(libs.deltahex)
+    implementation(libs.rsyntaxtextarea)
+    implementation(libs.json)
 
-    testImplementation("org.bouncycastle:bcprov-jdk18on:1.83")
-    testImplementation("org.bouncycastle:bcpkix-jdk18on:1.83")
-    testImplementation("net.portswigger.burp.extensions:montoya-api:2024.7")
-    testImplementation("org.junit.jupiter:junit-jupiter:6.0.3")
-    testImplementation("org.assertj:assertj-core:3.27.7")
-    testImplementation("org.mockito:mockito-core:5.23.0")
+    testImplementation(libs.bcprov)
+    testImplementation(libs.bcpkix)
+    testImplementation(libs.montoya.api)
+    testImplementation(libs.junit.jupiter)
+    testImplementation(libs.assertj.core)
+    testImplementation(libs.mockito.core)
 
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testRuntimeOnly(libs.junit.platform.launcher)
 }
 
 tasks.withType<Checkstyle> {
