@@ -1,5 +1,5 @@
 [versions]
-bouncycastle = "1.83"
+bouncycastle = "1.84"
 deltahex = "0.1.2"
 intellij = "261.22158.340"
 json = "20251224"
