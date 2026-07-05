@@ -2,7 +2,7 @@
 bouncycastle = "1.83"
 deltahex = "0.1.2"
 intellij = "261.23567.174"
-json = "20251224"
+json = "20260522"
 montoya = "2026.2"
 nimbus = "9.21"
 rsyntax = "3.6.2"
