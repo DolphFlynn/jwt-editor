@@ -270,6 +270,8 @@ public class PEMUtils {
         pemWriter.writeObject(pemObject);
         pemWriter.close();
         stringWriter.close();
-        return stringWriter.toString();
+        
+        // Normalize line endings for consistent cross-platform output
+        return stringWriter.toString().replace("\r\n", "\n");
     }
 }
