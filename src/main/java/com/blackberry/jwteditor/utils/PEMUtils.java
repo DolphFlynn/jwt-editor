@@ -20,6 +20,7 @@ package com.blackberry.jwteditor.utils;
 
 import com.blackberry.jwteditor.exceptions.PemException;
 import com.blackberry.jwteditor.pem.JWKToPemConverterFactory;
+import com.blackberry.jwteditor.pem.PemWriter;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.Curve;
 import com.nimbusds.jose.jwk.ECKey;
@@ -35,7 +36,6 @@ import org.bouncycastle.math.ec.ECPoint;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.bouncycastle.util.io.pem.PemObject;
-import org.bouncycastle.util.io.pem.PemWriter;
 
 import java.io.*;
 import java.math.BigInteger;
@@ -266,10 +266,11 @@ public class PEMUtils {
      */
     public static String pemObjectToString(PemObject pemObject) throws IOException {
         StringWriter stringWriter = new StringWriter();
-        PemWriter pemWriter = new PemWriter(stringWriter);
-        pemWriter.writeObject(pemObject);
-        pemWriter.close();
-        stringWriter.close();
+
+        try (PemWriter pemWriter = new PemWriter(stringWriter)) {
+            pemWriter.writeObject(pemObject);
+        }
+
         return stringWriter.toString();
     }
 }
