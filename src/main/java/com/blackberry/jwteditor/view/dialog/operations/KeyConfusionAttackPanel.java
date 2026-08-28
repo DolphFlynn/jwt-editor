@@ -24,7 +24,7 @@ import com.blackberry.jwteditor.exceptions.UnsupportedKeyException;
 import com.blackberry.jwteditor.model.jose.JWS;
 import com.blackberry.jwteditor.model.keys.JWKKey;
 import com.blackberry.jwteditor.model.keys.Key;
-import com.blackberry.jwteditor.operations.Attacks;
+import com.blackberry.jwteditor.operations.HmacKeyConfusionAttack;
 import com.nimbusds.jose.JWSAlgorithm;
 
 import javax.swing.*;
@@ -68,12 +68,7 @@ public class KeyConfusionAttackPanel extends OperationPanel<JWS, JWS> {
 
         lastSigningKeys.recordKeyUse(KEY_CONFUSION, selectedKey);
 
-        return Attacks.hmacKeyConfusion(
-                originalJwt,
-                selectedKey,
-                selectedAlgorithm,
-                checkBoxTrailingNewline.isSelected()
-        );
+        return HmacKeyConfusionAttack.attack(originalJwt, selectedKey, selectedAlgorithm, checkBoxTrailingNewline.isSelected());
     }
 
     @Override
