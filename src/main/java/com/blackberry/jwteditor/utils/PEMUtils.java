@@ -20,7 +20,6 @@ package com.blackberry.jwteditor.utils;
 
 import com.blackberry.jwteditor.exceptions.PemException;
 import com.blackberry.jwteditor.pem.JWKToPemConverterFactory;
-import com.blackberry.jwteditor.pem.PemWriter;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.Curve;
 import com.nimbusds.jose.jwk.ECKey;
@@ -37,7 +36,10 @@ import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.bouncycastle.util.io.pem.PemObject;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.math.BigInteger;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
@@ -48,6 +50,8 @@ import java.security.spec.InvalidKeySpecException;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Map;
+
+import static com.blackberry.jwteditor.pem.PemKey.NewLineStrategy.SYSTEM_DEFAULT;
 
 /**
  * Class containing utilities to convert between PEM and nimbus-jose JWK formats
@@ -60,7 +64,7 @@ public class PEMUtils {
      * @throws PemException if PEM conversion fails
      */
     public static String jwkToPem(JWK jwk) throws PemException {
-        return JWKToPemConverterFactory.converterFor(jwk).convertToPem();
+        return JWKToPemConverterFactory.converterFor(jwk).convertToPem(SYSTEM_DEFAULT);
     }
 
     /**
@@ -256,21 +260,5 @@ public class PEMUtils {
         } catch (ClassCastException e){
             throw new PemException("Invalid ASN1");
         }
-    }
-
-    /**
-     * Convert a BouncyCastle PemObject to its String representation
-     * @param pemObject the PemObject
-     * @return a PEM string
-     * @throws IOException if conversion fails
-     */
-    public static String pemObjectToString(PemObject pemObject) throws IOException {
-        StringWriter stringWriter = new StringWriter();
-
-        try (PemWriter pemWriter = new PemWriter(stringWriter)) {
-            pemWriter.writeObject(pemObject);
-        }
-
-        return stringWriter.toString();
     }
 }

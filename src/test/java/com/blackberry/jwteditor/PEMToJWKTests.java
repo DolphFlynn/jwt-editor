@@ -33,6 +33,7 @@ import utils.BouncyCastleExtension;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
+import static com.blackberry.jwteditor.pem.PemKey.NewLineStrategy.SYSTEM_DEFAULT;
 import static data.PemData.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -164,14 +165,7 @@ class PEMToJWKTests {
         assertThat(pem).isEqualTo(newPem);
     }
 
-    /**
-     * Convert an OKP to PEM
-     *
-     * @param octetKeyPair the OKP
-     * @return a PEM string
-     * @throws PemException if PEM conversion fails
-     */
     private static String octetKeyPairToPem(OctetKeyPair octetKeyPair) throws PemException {
-        return JWKToPemConverterFactory.converterFor(octetKeyPair).convertToPem();
+        return JWKToPemConverterFactory.converterFor(octetKeyPair).convertToPem(SYSTEM_DEFAULT);
     }
 }

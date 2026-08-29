@@ -18,6 +18,7 @@ limitations under the License.
 
 package com.blackberry.jwteditor.pem;
 
+import com.blackberry.jwteditor.pem.PemKey.NewLineStrategy;
 import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.io.pem.PemHeader;
 import org.bouncycastle.util.io.pem.PemObject;
@@ -29,25 +30,10 @@ import java.io.Writer;
 
 // Based on BouncyCastle PemWriter - https://github.com/bcgit/bc-java/blob/main/core/src/main/java/org/bouncycastle/util/io/pem/PemWriter.java and RFC 1421
 public class PemWriter extends BufferedWriter {
-
-    public enum NewLineStrategy {
-        SYSTEM_DEFAULT;
-
-        public String newLine() {
-            return switch (this) {
-                case SYSTEM_DEFAULT -> System.lineSeparator();
-            };
-        }
-    }
-
     private static final int LINE_LENGTH = 64;
 
     private final char[] buf;
     private final NewLineStrategy newLineStrategy;
-
-    public PemWriter(Writer out) {
-        this(out, NewLineStrategy.SYSTEM_DEFAULT);
-    }
 
     public PemWriter(Writer out, NewLineStrategy newLineStrategy) {
         super(out);
