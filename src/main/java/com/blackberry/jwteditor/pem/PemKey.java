@@ -51,10 +51,14 @@ public class PemKey {
     }
 
     public enum NewLineStrategy {
+        LINUX_MACOS,
+        WINDOWS,
         SYSTEM_DEFAULT;
 
         public String newLine() {
             return switch (this) {
+                case LINUX_MACOS -> "\n";
+                case WINDOWS -> "\r\n";
                 case SYSTEM_DEFAULT -> System.lineSeparator();
             };
         }

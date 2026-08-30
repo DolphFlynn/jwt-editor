@@ -29,20 +29,20 @@ import java.io.IOException;
 import java.io.Writer;
 
 // Based on BouncyCastle PemWriter - https://github.com/bcgit/bc-java/blob/main/core/src/main/java/org/bouncycastle/util/io/pem/PemWriter.java and RFC 1421
-public class PemWriter extends BufferedWriter {
+class PemWriter extends BufferedWriter {
     private static final int LINE_LENGTH = 64;
 
     private final char[] buf;
     private final NewLineStrategy newLineStrategy;
 
-    public PemWriter(Writer out, NewLineStrategy newLineStrategy) {
+    PemWriter(Writer out, NewLineStrategy newLineStrategy) {
         super(out);
 
         this.newLineStrategy = newLineStrategy;
         this.buf = new char[LINE_LENGTH];
     }
 
-    public void writeObject(PemObjectGenerator objectGenerator) throws IOException {
+    void writeObject(PemObjectGenerator objectGenerator) throws IOException {
         PemObject pemObject = objectGenerator.generate();
 
         this.write("-----BEGIN %s-----%s".formatted(pemObject.getType(), newLineStrategy.newLine()));
