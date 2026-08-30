@@ -51,9 +51,15 @@ public class PemKey {
     }
 
     public enum NewLineStrategy {
-        LINUX_MACOS,
-        WINDOWS,
-        SYSTEM_DEFAULT;
+        LINUX_MACOS("Linux / MacOS (0x0A)"),
+        WINDOWS("Windows (0x0D0A)"),
+        SYSTEM_DEFAULT("System Default");
+
+        private final String displayName;
+
+        NewLineStrategy(String displayName) {
+            this.displayName = displayName;
+        }
 
         public String newLine() {
             return switch (this) {
@@ -61,6 +67,11 @@ public class PemKey {
                 case WINDOWS -> "\r\n";
                 case SYSTEM_DEFAULT -> System.lineSeparator();
             };
+        }
+
+        @Override
+        public String toString() {
+            return displayName;
         }
     }
 }

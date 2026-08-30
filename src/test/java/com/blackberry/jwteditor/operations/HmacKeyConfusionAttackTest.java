@@ -19,6 +19,7 @@ import utils.BouncyCastleExtension;
 import java.text.ParseException;
 import java.util.Map;
 
+import static com.blackberry.jwteditor.pem.PemKey.NewLineStrategy.SYSTEM_DEFAULT;
 import static com.nimbusds.jose.HeaderParameterNames.ALGORITHM;
 import static com.nimbusds.jose.HeaderParameterNames.KEY_ID;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -59,7 +60,7 @@ class HmacKeyConfusionAttackTest {
         JWS expectedJWS = JWSFactory.parse(HMAC_KEY_CONFUSION_EXPECTED_JWS);
         JWKKey key = JWKKeyFactory.from(PEMUtils.pemToRSAKey(HMAC_KEY_CONFUSION_PEM));
 
-        JWS modifiedJWS  = HmacKeyConfusionAttack.attack(jws, key, JWSAlgorithm.HS256, false);
+        JWS modifiedJWS  = HmacKeyConfusionAttack.attack(jws, key, JWSAlgorithm.HS256, SYSTEM_DEFAULT, false);
 
         assertThat(modifiedJWS.signature().data()).isEqualTo(expectedJWS.signature().data());
     }
