@@ -14,19 +14,19 @@ import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.jwk.OctetSequenceKey;
 import com.nimbusds.jose.util.Base64URL;
 
-import static com.blackberry.jwteditor.utils.ByteArrayUtils.trimTrailingBytes;
+import static com.blackberry.jwteditor.utils.StringUtils.stripTrailing;
 import static com.nimbusds.jose.JOSEObjectType.JWT;
 
 public class HmacKeyConfusionAttack {
 
-    public static JWS attack(JWS jws, JWKKey key, JWSAlgorithm algorithm, NewLineStrategy selectedNewLineStrategy, boolean stripTrailingNewlines) throws PemException, UnsupportedKeyException, SigningException {
-        // Convert the key to its public key in PEM format
-        byte[] pemBytes = PemKeyFactory.jwkToPemKey(key.getJWK().toPublicJWK()).toString(selectedNewLineStrategy).getBytes();
+    public static JWS attack(JWS jws, JWKKey key, JWSAlgorithm algorithm, NewLineStrategy newLineStrategy, boolean stripTrailingNewline) throws PemException, UnsupportedKeyException, SigningException {
+        String publicKeyAsPem = PemKeyFactory.jwkToPemKey(key.getJWK().toPublicJWK()).toString(newLineStrategy);
 
-        // Remove any trailing /n (0xOA) characters from the PEM
-        if (stripTrailingNewlines) {
-            pemBytes = trimTrailingBytes(pemBytes, (byte) 0x0A);
+        if (stripTrailingNewline) {
+            publicKeyAsPem = stripTrailing(publicKeyAsPem, newLineStrategy.newLine());
         }
+
+        byte[] pemBytes = publicKeyAsPem.getBytes();
 
         // Build a new header for the chosen HMAC algorithm
         JWSHeader signingInfo = new JWSHeader.Builder(algorithm).type(JWT).build();
