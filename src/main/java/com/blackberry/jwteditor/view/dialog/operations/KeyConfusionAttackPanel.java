@@ -24,7 +24,8 @@ import com.blackberry.jwteditor.exceptions.UnsupportedKeyException;
 import com.blackberry.jwteditor.model.jose.JWS;
 import com.blackberry.jwteditor.model.keys.JWKKey;
 import com.blackberry.jwteditor.model.keys.Key;
-import com.blackberry.jwteditor.operations.Attacks;
+import com.blackberry.jwteditor.operations.HmacKeyConfusionAttack;
+import com.blackberry.jwteditor.pem.PemKey.NewLineStrategy;
 import com.nimbusds.jose.JWSAlgorithm;
 
 import javax.swing.*;
@@ -44,6 +45,7 @@ public class KeyConfusionAttackPanel extends OperationPanel<JWS, JWS> {
     private JComboBox<Key> comboBoxSigningKey;
     private JComboBox<JWSAlgorithm> comboBoxSigningAlgorithm;
     private JCheckBox checkBoxTrailingNewline;
+    private JComboBox<NewLineStrategy> comboBoxNewLineStrategy;
 
     public KeyConfusionAttackPanel(List<Key> signingKeys, LastSigningKeys lastSigningKeys) {
         super("key_confusion_attack_dialog_title", new Dimension(650, 350));
@@ -57,6 +59,7 @@ public class KeyConfusionAttackPanel extends OperationPanel<JWS, JWS> {
         comboBoxSigningKey.setSelectedIndex(lastUsedKeyIndex);
 
         comboBoxSigningAlgorithm.setModel(new DefaultComboBoxModel<>(ALGORITHMS));
+        comboBoxNewLineStrategy.setModel(new DefaultComboBoxModel<>(NewLineStrategy.values()));
 
         add(panel, CENTER);
     }
@@ -65,15 +68,15 @@ public class KeyConfusionAttackPanel extends OperationPanel<JWS, JWS> {
     public JWS performOperation(JWS originalJwt) throws SigningException, PemException, UnsupportedKeyException {
         JWKKey selectedKey = (JWKKey) comboBoxSigningKey.getSelectedItem();
         JWSAlgorithm selectedAlgorithm = (JWSAlgorithm) comboBoxSigningAlgorithm.getSelectedItem();
+        NewLineStrategy selectedNewLineStrategy = (NewLineStrategy) comboBoxNewLineStrategy.getSelectedItem();
 
         lastSigningKeys.recordKeyUse(KEY_CONFUSION, selectedKey);
 
-        return Attacks.hmacKeyConfusion(
-                originalJwt,
+        return HmacKeyConfusionAttack.attack(originalJwt,
                 selectedKey,
                 selectedAlgorithm,
-                checkBoxTrailingNewline.isSelected()
-        );
+                selectedNewLineStrategy,
+                checkBoxTrailingNewline.isSelected());
     }
 
     @Override
