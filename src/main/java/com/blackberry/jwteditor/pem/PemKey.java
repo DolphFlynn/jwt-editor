@@ -52,7 +52,9 @@ public class PemKey {
 
     public enum NewLineStrategy {
         LINUX_MACOS("Linux / MacOS (0x0A)"),
+        LINUX_MACOS_NO_TRAILING_LINE("Linux / MacOS (0x0A) - no trailing newline"),
         WINDOWS("Windows (0x0D0A)"),
+        WINDOWS_NO_TRAILING_LINE("Windows (0x0D0A) - no trailing newline"),
         SYSTEM_DEFAULT("System Default");
 
         private final String displayName;
@@ -63,9 +65,16 @@ public class PemKey {
 
         public String newLine() {
             return switch (this) {
-                case LINUX_MACOS -> "\n";
-                case WINDOWS -> "\r\n";
+                case LINUX_MACOS, LINUX_MACOS_NO_TRAILING_LINE -> "\n";
+                case WINDOWS, WINDOWS_NO_TRAILING_LINE -> "\r\n";
                 case SYSTEM_DEFAULT -> System.lineSeparator();
+            };
+        }
+
+        public boolean writeTrailingNewline() {
+            return switch (this) {
+                case LINUX_MACOS, WINDOWS, SYSTEM_DEFAULT -> true;
+                case LINUX_MACOS_NO_TRAILING_LINE, WINDOWS_NO_TRAILING_LINE -> false;
             };
         }
 

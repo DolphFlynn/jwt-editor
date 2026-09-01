@@ -14,18 +14,12 @@ import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.jwk.OctetSequenceKey;
 import com.nimbusds.jose.util.Base64URL;
 
-import static com.blackberry.jwteditor.utils.StringUtils.stripTrailing;
 import static com.nimbusds.jose.JOSEObjectType.JWT;
 
 public class HmacKeyConfusionAttack {
 
-    public static JWS attack(JWS jws, JWKKey key, JWSAlgorithm algorithm, NewLineStrategy newLineStrategy, boolean stripTrailingNewline) throws PemException, UnsupportedKeyException, SigningException {
+    public static JWS attack(JWS jws, JWKKey key, JWSAlgorithm algorithm, NewLineStrategy newLineStrategy) throws PemException, UnsupportedKeyException, SigningException {
         String publicKeyAsPem = PemKeyFactory.jwkToPemKey(key.getJWK().toPublicJWK()).toString(newLineStrategy);
-
-        if (stripTrailingNewline) {
-            publicKeyAsPem = stripTrailing(publicKeyAsPem, newLineStrategy.newLine());
-        }
-
         byte[] pemBytes = publicKeyAsPem.getBytes();
 
         // Build a new header for the chosen HMAC algorithm

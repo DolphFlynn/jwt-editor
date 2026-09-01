@@ -18,7 +18,6 @@ limitations under the License.
 
 package com.blackberry.jwteditor.utils;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -47,82 +46,5 @@ class StringUtilsTest {
         int actual = StringUtils.countOccurrences(data, c);
 
         assertThat(actual).isEqualTo(expected);
-    }
-
-    @Test
-    void givenRepeatedTrailingString_whenStripTrailing_thenRemovesAllOccurrences() {
-        String result = StringUtils.stripTrailing("hello!!!!!!", "!!");
-
-        assertThat(result).isEqualTo("hello");
-    }
-
-    @Test
-    void givenSingleTrailingString_whenStripTrailing_thenRemoves() {
-        String result = StringUtils.stripTrailing("hello.txt", ".txt");
-
-        assertThat(result).isEqualTo("hello");
-    }
-
-    @Test
-    void givenNoTrailingString_whenStripTrailing_thenReturnsOriginalValue() {
-        String result = StringUtils.stripTrailing("hello", "world");
-
-        assertThat(result).isEqualTo("hello");
-    }
-
-    @Test
-    void givenPartialTrailingMatch_whenStripTrailing_thenReturnsOriginalValue() {
-        String result = StringUtils.stripTrailing("helloab", "abc");
-
-        assertThat(result).isEqualTo("helloab");
-    }
-
-    @Test
-    void givenValueContainingOnlyTrailingStrings_whenStripTrailing_thenReturnsEmptyString() {
-        String result = StringUtils.stripTrailing("abcabcabc", "abc");
-
-        assertThat(result).isEmpty();
-    }
-
-    @Test
-    void givenEmptyValue_whenStripTrailing_thenReturnsEmptyString() {
-        String result = StringUtils.stripTrailing("", "abc");
-
-        assertThat(result).isEmpty();
-    }
-
-    @Test
-    void givenEmptyTrailingString_whenStripTrailing_thenReturnsOriginalValue() {
-        String result = StringUtils.stripTrailing("hello", "");
-
-        assertThat(result).isEqualTo("hello");
-    }
-
-    @Test
-    void givenNullTrailingString_whenStripTrailing_thenReturnsOriginalValue() {
-        String result = StringUtils.stripTrailing("hello", null);
-
-        assertThat(result).isEqualTo("hello");
-    }
-
-    @Test
-    void givenNullValue_whenStripTrailing_thenReturnsNull() {
-        String result = StringUtils.stripTrailing(null, "abc");
-
-        assertThat(result).isNull();
-    }
-
-    @Test
-    void givenTrailingStringInMiddle_whenStripTrailing_thenPreservesMiddleOccurrences() {
-        String result = StringUtils.stripTrailing("abc-value-abcabc", "abc");
-
-        assertThat(result).isEqualTo("abc-value-");
-    }
-
-    @Test
-    void givenDifferentCharacterCase_whenStripTrailing_thenUsesCaseSensitiveMatching() {
-        String result = StringUtils.stripTrailing("helloABC", "abc");
-
-        assertThat(result).isEqualTo("helloABC");
     }
 }
