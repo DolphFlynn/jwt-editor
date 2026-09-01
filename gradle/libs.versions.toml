@@ -1,7 +1,7 @@
 [versions]
 bouncycastle = "1.83"
 deltahex = "0.1.2"
-intellij = "261.24374.191"
+intellij = "262.9437.288"
 json = "20260719"
 montoya = "2026.2"
 nimbus = "9.21"
