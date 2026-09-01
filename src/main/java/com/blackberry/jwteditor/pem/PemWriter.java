@@ -64,7 +64,11 @@ class PemWriter extends BufferedWriter {
         }
 
         writeEncoded(pemObject.getContent());
-        this.write("-----END %s-----%s".formatted(pemObject.getType(), newLineStrategy.newLine()));
+        this.write("-----END %s-----".formatted(pemObject.getType()));
+
+        if (newLineStrategy.writeTrailingNewline()) {
+            this.write(newLineStrategy.newLine());
+        }
     }
 
     private void writeEncoded(byte[] bytes) throws IOException {

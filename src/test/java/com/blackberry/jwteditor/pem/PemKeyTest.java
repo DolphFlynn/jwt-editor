@@ -37,14 +37,6 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 class PemKeyTest {
     private static final String SYSTEM_LINE_SEPARATOR = System.lineSeparator();
 
-    private static Stream<Arguments> data() {
-        return Stream.of(
-                arguments(SYSTEM_DEFAULT, SYSTEM_LINE_SEPARATOR),
-                arguments(LINUX_MACOS, "\n"),
-                arguments(WINDOWS, "\r\n")
-        );
-    }
-
     @Test
     void givenPemObjectWithoutHeaders_whenConvertedToString_thenUsingTheSystemLineSeparatorByDefault() {
         PemObject object = new PemObject("TEST", "content".getBytes(US_ASCII));
@@ -54,14 +46,39 @@ class PemKeyTest {
         assertThat(serialized).isEqualTo("-----BEGIN TEST-----%sY29udGVudA==%s-----END TEST-----%s".formatted(SYSTEM_LINE_SEPARATOR, SYSTEM_LINE_SEPARATOR, SYSTEM_LINE_SEPARATOR));
     }
 
-    @MethodSource("data")
+    private static Stream<Arguments> trailingNewLineData() {
+        return Stream.of(
+                arguments(SYSTEM_DEFAULT, SYSTEM_LINE_SEPARATOR),
+                arguments(LINUX_MACOS, "\n"),
+                arguments(WINDOWS, "\r\n")
+        );
+    }
+
+    private static Stream<Arguments> noTrailingNewLineData() {
+        return Stream.of(
+                arguments(LINUX_MACOS_NO_TRAILING_LINE, "\n"),
+                arguments(WINDOWS_NO_TRAILING_LINE, "\r\n")
+        );
+    }
+
+    @MethodSource("trailingNewLineData")
     @ParameterizedTest
-    void givenPemObjectWithoutHeaders_whenConvertedToStringUsingSystemDefaultSeparator_thenOutputCorrect(NewLineStrategy strategy, String newLine) {
+    void givenPemObjectWithoutHeaders_whenConvertedToStringUsingNewLineStrategy_thenOutputCorrect(NewLineStrategy strategy, String newLine) {
         PemObject object = new PemObject("TEST", new byte[]{0, 1, 2, 3});
 
         String serialized = new PemKey(object).toString(strategy);
 
         assertThat(serialized).isEqualTo("-----BEGIN TEST-----%sAAECAw==%s-----END TEST-----%s".formatted(newLine, newLine, newLine));
+    }
+
+    @MethodSource("noTrailingNewLineData")
+    @ParameterizedTest
+    void givenPemObjectWithoutHeaders_whenConvertedToStringUsingNewLineStrategyWithNoTrailingNewLine_thenOutputCorrect(NewLineStrategy strategy, String newLine) {
+        PemObject object = new PemObject("TEST", new byte[]{0, 1, 2, 3});
+
+        String serialized = new PemKey(object).toString(strategy);
+
+        assertThat(serialized).isEqualTo("-----BEGIN TEST-----%sAAECAw==%s-----END TEST-----".formatted(newLine, newLine));
     }
 
     @Test
@@ -76,9 +93,9 @@ class PemKeyTest {
         assertThat(serialized).isEqualTo("-----BEGIN TEST-----%sName1: Value1%sName2: Value2%s%sAA==%s-----END TEST-----%s".formatted(SYSTEM_LINE_SEPARATOR, SYSTEM_LINE_SEPARATOR, SYSTEM_LINE_SEPARATOR, SYSTEM_LINE_SEPARATOR, SYSTEM_LINE_SEPARATOR, SYSTEM_LINE_SEPARATOR));
     }
 
-    @MethodSource("data")
+    @MethodSource("trailingNewLineData")
     @ParameterizedTest
-    void givenPemObjectWithHeaders_whenConvertedToStringUsingSystemDefaultSeparator_thenOutputCorrect(NewLineStrategy strategy, String newLine) {
+    void givenPemObjectWithHeaders_whenConvertedToStringUsingNewLineStrategy_thenOutputCorrect(NewLineStrategy strategy, String newLine) {
         List<PemHeader> headers = List.of(
                 new PemHeader("Name1", "Value1"),
                 new PemHeader("Name2", "Value2"));
@@ -87,6 +104,19 @@ class PemKeyTest {
         String serialized = new PemKey(object).toString(strategy);
 
         assertThat(serialized).isEqualTo("-----BEGIN TEST-----%sName1: Value1%sName2: Value2%s%sAA==%s-----END TEST-----%s".formatted(newLine, newLine, newLine, newLine, newLine, newLine));
+    }
+
+    @MethodSource("noTrailingNewLineData")
+    @ParameterizedTest
+    void givenPemObjectWithHeaders_whenConvertedToStringUsingNewLineStrategyWithNoTrailingNewLine_thenOutputCorrect(NewLineStrategy strategy, String newLine) {
+        List<PemHeader> headers = List.of(
+                new PemHeader("Name1", "Value1"),
+                new PemHeader("Name2", "Value2"));
+        PemObject object = new PemObject("TEST", headers, new byte[]{0});
+
+        String serialized = new PemKey(object).toString(strategy);
+
+        assertThat(serialized).isEqualTo("-----BEGIN TEST-----%sName1: Value1%sName2: Value2%s%sAA==%s-----END TEST-----".formatted(newLine, newLine, newLine, newLine, newLine));
     }
 
     @Test

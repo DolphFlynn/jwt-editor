@@ -38,22 +38,21 @@ class HmacKeyConfusionAttackTest {
 
     private static Stream<Arguments> data() {
         return Stream.of(
-                arguments(SYSTEM_DEFAULT, "\n".equals(lineSeparator()) ? EXPECTED_JWS_SIGNATURE_LINUX_MACOS_TRAILING_NEWLINE : EXPECTED_JWS_SIGNATURE_WINDOWS_TRAILING_NEWLINE, false),
-                arguments(LINUX_MACOS, EXPECTED_JWS_SIGNATURE_LINUX_MACOS_TRAILING_NEWLINE, false),
-                arguments(WINDOWS, EXPECTED_JWS_SIGNATURE_WINDOWS_TRAILING_NEWLINE, false),
-                arguments(SYSTEM_DEFAULT, "\n".equals(lineSeparator()) ? EXPECTED_JWS_SIGNATURE_LINUX_MACOS : EXPECTED_JWS_SIGNATURE_WINDOWS, true),
-                arguments(LINUX_MACOS, EXPECTED_JWS_SIGNATURE_LINUX_MACOS, true),
-                arguments(WINDOWS, EXPECTED_JWS_SIGNATURE_WINDOWS, true)
+                arguments(SYSTEM_DEFAULT, "\n".equals(lineSeparator()) ? EXPECTED_JWS_SIGNATURE_LINUX_MACOS_TRAILING_NEWLINE : EXPECTED_JWS_SIGNATURE_WINDOWS_TRAILING_NEWLINE),
+                arguments(LINUX_MACOS, EXPECTED_JWS_SIGNATURE_LINUX_MACOS_TRAILING_NEWLINE),
+                arguments(WINDOWS, EXPECTED_JWS_SIGNATURE_WINDOWS_TRAILING_NEWLINE),
+                arguments(LINUX_MACOS_NO_TRAILING_LINE, EXPECTED_JWS_SIGNATURE_LINUX_MACOS),
+                arguments(WINDOWS_NO_TRAILING_LINE, EXPECTED_JWS_SIGNATURE_WINDOWS)
         );
     }
 
     @MethodSource("data")
     @ParameterizedTest
-    void testHMACKeyConfusion(NewLineStrategy newLineStrategy, String expectedSignature, boolean stripTrailingNewline) throws Exception {
+    void testHMACKeyConfusion(NewLineStrategy newLineStrategy, String expectedSignature) throws Exception {
         JWS jws = JWSFactory.parse(JWS);
         JWKKey key = JWKKeyFactory.from(PEMUtils.pemToRSAKey(RSA_KEY_PEM));
 
-        JWS modifiedJWS  = HmacKeyConfusionAttack.attack(jws, key, HS256, newLineStrategy, stripTrailingNewline);
+        JWS modifiedJWS  = HmacKeyConfusionAttack.attack(jws, key, HS256, newLineStrategy);
 
         assertThat(modifiedJWS.signature().data()).isEqualTo(Base64.getUrlDecoder().decode(expectedSignature));
     }

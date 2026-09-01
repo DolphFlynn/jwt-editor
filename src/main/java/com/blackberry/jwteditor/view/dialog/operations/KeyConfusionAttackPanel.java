@@ -32,9 +32,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
+import static com.blackberry.jwteditor.pem.PemKey.NewLineStrategy.SYSTEM_DEFAULT;
 import static com.blackberry.jwteditor.view.dialog.operations.LastSigningKeys.Signer.KEY_CONFUSION;
 import static com.nimbusds.jose.JWSAlgorithm.*;
 import static java.awt.BorderLayout.CENTER;
+import static java.util.Arrays.stream;
 
 public class KeyConfusionAttackPanel extends OperationPanel<JWS, JWS> {
     private static final JWSAlgorithm[] ALGORITHMS = {HS256, HS384, HS512};
@@ -44,7 +46,6 @@ public class KeyConfusionAttackPanel extends OperationPanel<JWS, JWS> {
     private JPanel panel;
     private JComboBox<Key> comboBoxSigningKey;
     private JComboBox<JWSAlgorithm> comboBoxSigningAlgorithm;
-    private JCheckBox checkBoxTrailingNewline;
     private JComboBox<NewLineStrategy> comboBoxNewLineStrategy;
 
     public KeyConfusionAttackPanel(List<Key> signingKeys, LastSigningKeys lastSigningKeys) {
@@ -59,7 +60,9 @@ public class KeyConfusionAttackPanel extends OperationPanel<JWS, JWS> {
         comboBoxSigningKey.setSelectedIndex(lastUsedKeyIndex);
 
         comboBoxSigningAlgorithm.setModel(new DefaultComboBoxModel<>(ALGORITHMS));
-        comboBoxNewLineStrategy.setModel(new DefaultComboBoxModel<>(NewLineStrategy.values()));
+
+        NewLineStrategy[] newLineStrategies = stream(NewLineStrategy.values()).filter(s -> s != SYSTEM_DEFAULT).toArray(NewLineStrategy[]::new);
+        comboBoxNewLineStrategy.setModel(new DefaultComboBoxModel<>(newLineStrategies));
 
         add(panel, CENTER);
     }
@@ -75,8 +78,8 @@ public class KeyConfusionAttackPanel extends OperationPanel<JWS, JWS> {
         return HmacKeyConfusionAttack.attack(originalJwt,
                 selectedKey,
                 selectedAlgorithm,
-                selectedNewLineStrategy,
-                checkBoxTrailingNewline.isSelected());
+                selectedNewLineStrategy
+        );
     }
 
     @Override

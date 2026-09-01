@@ -35,18 +35,4 @@ public class StringUtils {
 
         return count;
     }
-
-    public static String stripTrailing(String value, String trailing) {
-        if (value == null || trailing == null || trailing.isEmpty()) {
-            return value;
-        }
-
-        int end = value.length();
-
-        while (end >= trailing.length() && value.startsWith(trailing, end - trailing.length())) {
-            end -= trailing.length();
-        }
-
-        return value.substring(0, end);
-    }
 }
